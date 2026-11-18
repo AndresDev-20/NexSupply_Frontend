@@ -1,0 +1,116 @@
+/* Bloque: role-preview */
+.role-preview {
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  background-color: var(--color-surface);
+  box-shadow: var(--shadow-md);
+}
+
+.role-preview__header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: var(--space-6) var(--space-5) var(--space-5);
+  color: var(--palette-white);
+  text-align: center;
+  background:
+    radial-gradient(80% 60% at 50% 0%, rgba(255, 201, 40, 0.28) 0%, transparent 70%),
+    linear-gradient(170deg, var(--palette-green-700), var(--palette-green-950));
+}
+
+.role-preview__icon {
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  border: 3px solid var(--palette-yellow-400);
+  border-radius: var(--radius-lg);
+  color: var(--palette-green-900);
+  background-color: var(--palette-white);
+}
+
+.role-preview__icon svg {
+  width: 26px;
+  height: 26px;
+}
+
+.role-preview__name {
+  margin-top: var(--space-3);
+  max-width: 100%;
+  overflow: hidden;
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.role-preview__name--placeholder {
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.role-preview__description {
+  margin-top: var(--space-1);
+  font-size: var(--font-size-xs);
+  color: var(--palette-green-100);
+}
+
+.role-preview__total {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: var(--space-4);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.role-preview__count {
+  font-size: var(--font-size-3xl);
+  font-weight: var(--font-weight-extrabold);
+  font-variant-numeric: tabular-nums;
+  color: var(--color-primary);
+}
+
+.role-preview__count-label {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+.role-preview__modules {
+  display: grid;
+  gap: var(--space-3);
+  margin: 0;
+  padding: var(--space-4) var(--space-5) var(--space-5);
+  list-style: none;
+}
+
+.role-preview__module-head {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: var(--space-1);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+}
+
+.role-preview__module-count {
+  font-variant-numeric: tabular-nums;
+  color: var(--color-text-muted);
+}
+
+.role-preview__bar {
+  display: block;
+  height: 6px;
+  overflow: hidden;
+  border-radius: var(--radius-full);
+  background-color: var(--color-surface-muted);
+}
+
+/* El ancho llega como variable CSS (dato, no estilo): así la barra puede animarse */
+.role-preview__bar-fill {
+  display: block;
+  width: var(--role-preview-fill, 0%);
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--color-primary), var(--color-accent));
+  transition: width var(--duration-slow) var(--easing-standard);
+}

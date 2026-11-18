@@ -1,0 +1,7 @@
+/* Punto de entrada de los estilos globales. El orden importa:
+   tokens primero (variables), luego la base que las usa. */
+@import '@fontsource-variable/plus-jakarta-sans';
+@import './tokens.css';
+/* Paletas del negocio (Fase 15): redefinen tokens */
+@import './palettes.css';
+@import './base.css';

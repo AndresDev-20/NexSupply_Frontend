@@ -1,0 +1,45 @@
+/* Bloque: loading-screen */
+.loading-screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 100dvh;
+  padding: var(--space-10) var(--space-4) var(--space-6);
+  background-color: var(--color-bg);
+}
+
+.loading-screen__body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-5);
+}
+
+.loading-screen__emblem {
+  width: 180px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: var(--radius-lg);
+  animation: loading-screen-breathe 2.4s var(--easing-standard) infinite;
+}
+
+.loading-screen__message {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-muted);
+}
+
+@keyframes loading-screen-breathe {
+  50% {
+    transform: scale(1.03);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .loading-screen__emblem {
+    animation: none;
+  }
+}

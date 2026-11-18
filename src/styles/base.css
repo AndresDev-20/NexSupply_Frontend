@@ -1,0 +1,113 @@
+/* =====================================================================
+   Estilos base: reset mínimo y elementos HTML. Sin clases de componentes:
+   cada componente tiene su propio archivo .css con nombres BEM.
+   ===================================================================== */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+* {
+  margin: 0;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body {
+  min-height: 100dvh;
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-md);
+  line-height: var(--line-height-base);
+  color: var(--color-text);
+  background-color: var(--color-bg);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#root {
+  min-height: 100dvh;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  line-height: var(--line-height-tight);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: -0.01em;
+  text-wrap: balance;
+}
+
+p {
+  text-wrap: pretty;
+}
+
+img,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+a {
+  color: var(--color-primary);
+  text-underline-offset: 3px;
+}
+
+/* Foco visible solo con teclado: imprescindible en un POS que se usa con teclado */
+:focus-visible {
+  outline: 3px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+/* Accesibilidad: quien activa "reducir movimiento" en su sistema no ve animaciones
+   decorativas (sacudidas, flotación, entradas). Los indicadores de carga se exceptúan:
+   el usuario necesita saber que algo está pasando (giran más lento, ver Spinner.css). */
+@media (prefers-reduced-motion: reduce) {
+  *:not(.spinner__circle):not(.button__icon--spin),
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Texto secundario */
+.u-text-muted {
+  color: var(--color-text-muted);
+}
+
+/* Las cifras se alinean en columnas (tablas de precios, totales) */
+.u-tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Texto solo para lectores de pantalla */
+.u-visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

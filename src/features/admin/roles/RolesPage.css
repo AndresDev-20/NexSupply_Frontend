@@ -1,0 +1,47 @@
+/* Bloque: role-cell */
+.role-cell {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.role-cell__icon {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  border-radius: var(--radius-md);
+  color: var(--color-primary);
+  background-color: var(--color-primary-soft);
+}
+
+.role-cell__icon--system {
+  color: var(--color-accent-strong);
+  background-color: var(--color-accent-soft);
+}
+
+.role-cell__text {
+  display: grid;
+  min-width: 0;
+}
+
+.role-cell__name {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  font-weight: var(--font-weight-semibold);
+}
+
+.role-cell__description {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
+
+.role-cell__users {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+}

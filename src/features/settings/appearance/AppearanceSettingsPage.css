@@ -1,0 +1,143 @@
+/* Configuración → Apariencia (Fase 15) */
+
+.palette-picker {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.palette-option {
+  position: relative;
+  display: grid;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  cursor: pointer;
+  transition: border-color var(--duration-base) ease, transform var(--duration-base) ease;
+}
+
+.palette-option:hover {
+  transform: translateY(-2px);
+  border-color: var(--color-border-strong);
+}
+
+.palette-option.is-selected {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-primary-soft);
+}
+
+/* El radio está oculto: el foco del teclado se muestra en la tarjeta */
+.palette-option:has(input:focus-visible) {
+  outline: 3px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+.palette-option__swatches {
+  display: flex;
+  height: 40px;
+  overflow: hidden;
+  border-radius: var(--radius-md);
+}
+
+.palette-option__swatches span {
+  flex: 1;
+}
+
+.palette-option__swatches span:first-child {
+  flex: 2;
+}
+
+.palette-option__text {
+  display: grid;
+}
+
+.palette-option__text small {
+  color: var(--color-text-muted);
+}
+
+.palette-option__check {
+  position: absolute;
+  top: var(--space-3);
+  right: var(--space-3);
+  width: 22px;
+  height: 22px;
+  padding: 3px;
+  border-radius: 50%;
+  color: var(--color-text-on-primary);
+  background: var(--color-primary);
+}
+
+/* ---------- Temporadas ---------- */
+.season-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  transition: opacity var(--duration-base) ease;
+}
+
+.season-list.is-off {
+  opacity: 0.45;
+}
+
+.season-card {
+  position: relative;
+  display: grid;
+  gap: 2px;
+  padding: var(--space-3) var(--space-4) var(--space-4);
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+}
+
+.season-card.is-today {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 3px var(--color-accent-soft);
+}
+
+.season-card__preview {
+  position: relative;
+  display: block;
+  height: 34px;
+  margin: calc(-1 * var(--space-3)) calc(-1 * var(--space-4)) var(--space-2);
+  color: var(--color-text-subtle);
+  background: linear-gradient(160deg, var(--palette-green-800), var(--palette-green-950));
+}
+
+.season-card__preview .seasonal {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.season-card small {
+  color: var(--color-text-muted);
+}
+
+.season-card__today {
+  justify-self: start;
+  margin-top: var(--space-1);
+  padding: 1px var(--space-2);
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-on-accent);
+  background: var(--color-accent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .palette-option,
+  .season-list {
+    transition: none;
+  }
+
+  .palette-option:hover {
+    transform: none;
+  }
+}

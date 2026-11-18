@@ -1,0 +1,68 @@
+/* Bloque: sequence-ticket — número del próximo documento */
+.sequence-ticket {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  gap: var(--space-1);
+  padding: var(--space-6) var(--space-5);
+  border-radius: var(--radius-xl);
+  color: var(--palette-white);
+  text-align: center;
+  background:
+    radial-gradient(80% 60% at 50% 0%, rgba(255, 201, 40, 0.25) 0%, transparent 70%),
+    linear-gradient(160deg, var(--palette-green-700), var(--palette-green-950));
+  box-shadow: var(--shadow-md);
+}
+
+.sequence-ticket__icon {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  margin-bottom: var(--space-2);
+  border-radius: var(--radius-md);
+  color: var(--palette-green-900);
+  background-color: var(--palette-yellow-400);
+}
+
+.sequence-ticket__icon svg {
+  width: 22px;
+  height: 22px;
+}
+
+.sequence-ticket__label {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--palette-green-200);
+}
+
+.sequence-ticket__number {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: 0.04em;
+  /* Al cambiar el número, la ficha "late" */
+  animation: sequence-ticket-tick var(--duration-base) var(--easing-emphasized);
+}
+
+.sequence-ticket--compact {
+  padding: var(--space-4);
+}
+
+.sequence-ticket--compact .sequence-ticket__icon {
+  display: none;
+}
+
+.sequence-ticket--compact .sequence-ticket__number {
+  font-size: var(--font-size-xl);
+}
+
+@keyframes sequence-ticket-tick {
+  from {
+    transform: scale(0.96);
+  }
+}

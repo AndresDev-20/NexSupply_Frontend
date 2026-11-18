@@ -1,0 +1,286 @@
+/* Bloque: category-picker — usa también los estilos de text-field (etiqueta, error, ayuda) */
+.category-picker {
+  position: relative;
+}
+
+.category-picker__trigger {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  min-height: 48px;
+  padding: 0 var(--space-4) 0 var(--space-2);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-md);
+  text-align: left;
+  color: var(--color-text);
+  background-color: var(--color-surface);
+  cursor: pointer;
+  transition:
+    border-color var(--duration-fast) var(--easing-standard),
+    box-shadow var(--duration-fast) var(--easing-standard);
+}
+
+.category-picker__trigger:hover {
+  border-color: var(--color-text-subtle);
+}
+
+.category-picker__trigger:focus-visible,
+.category-picker__trigger--open {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-accent) 45%, transparent);
+}
+
+.text-field--invalid .category-picker__trigger {
+  border-color: var(--color-danger);
+}
+
+.category-picker__trigger-icon {
+  margin-left: var(--space-2);
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  color: var(--color-text-subtle);
+}
+
+.category-picker__value {
+  display: flex;
+  flex: 1;
+  align-items: baseline;
+  gap: var(--space-1);
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.category-picker__value-parent {
+  flex-shrink: 1;
+  min-width: 0;
+  overflow: hidden;
+  font-size: var(--font-size-sm);
+  text-overflow: ellipsis;
+  color: var(--color-text-muted);
+}
+
+.category-picker__value-name {
+  flex-shrink: 0;
+  max-width: 100%;
+  overflow: hidden;
+  font-weight: var(--font-weight-semibold);
+  text-overflow: ellipsis;
+}
+
+.category-picker__placeholder {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  color: var(--color-text-subtle);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.category-picker__chevron {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  color: var(--color-text-subtle);
+  transition: transform var(--duration-fast) var(--easing-standard);
+}
+
+.category-picker__trigger--open .category-picker__chevron {
+  transform: rotate(180deg);
+}
+
+/* Botón para quitar el filtro, dentro del campo */
+.category-picker__clear {
+  position: absolute;
+  right: 40px;
+  bottom: 12px;
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border: 0;
+  border-radius: var(--radius-full);
+  color: var(--color-text-muted);
+  background-color: var(--color-surface-muted);
+  cursor: pointer;
+}
+
+.category-picker__clear svg {
+  width: 14px;
+  height: 14px;
+}
+
+/* ---------- Panel ---------- */
+.category-picker__panel {
+  position: absolute;
+  top: calc(100% + var(--space-1));
+  left: 0;
+  z-index: var(--z-modal);
+  /* Más ancho que el campo cuando este es angosto (barra de filtros): los nombres
+     caben en una línea. Nunca más ancho que la pantalla. */
+  width: max(100%, 380px);
+  max-width: calc(100vw - var(--space-8));
+  overflow: hidden;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-lg);
+  background-color: var(--color-surface);
+  box-shadow: var(--shadow-lg);
+  animation: category-picker-in var(--duration-base) var(--easing-standard);
+}
+
+.category-picker__search {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.category-picker__search svg {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  color: var(--color-text-subtle);
+}
+
+.category-picker__search input {
+  flex: 1;
+  min-width: 0;
+  min-height: 40px;
+  border: 0;
+  font-size: var(--font-size-md);
+  color: var(--color-text);
+  background: transparent;
+}
+
+.category-picker__search input:focus {
+  outline: none;
+}
+
+.category-picker__body {
+  max-height: min(380px, 55dvh);
+  overflow-y: auto;
+  padding: var(--space-1);
+}
+
+.category-picker__list {
+  display: grid;
+  gap: 2px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.category-picker__option {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  width: 100%;
+  min-height: 44px;
+  padding: var(--space-2) var(--space-3);
+  border: 0;
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
+  text-align: left;
+  color: var(--color-text);
+  background: transparent;
+  cursor: pointer;
+}
+
+.category-picker__option:hover,
+.category-picker__option:focus-visible {
+  outline: none;
+  background-color: var(--color-surface-muted);
+}
+
+.category-picker__option--selected {
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-primary);
+  background-color: var(--color-primary-soft);
+}
+
+.category-picker__option-text {
+  display: grid;
+  flex: 1;
+  min-width: 0;
+}
+
+/* Una sola línea: todas las opciones del mismo alto; el nombre completo queda en el title */
+.category-picker__option-name {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.category-picker__option-parent {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
+
+.category-picker__check {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
+.category-picker__count {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 2px;
+  padding: 2px 4px 2px var(--space-2);
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  background-color: var(--color-surface-muted);
+}
+
+.category-picker__count svg {
+  width: 14px;
+  height: 14px;
+}
+
+.category-picker__back {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  margin: var(--space-1) var(--space-2);
+  padding: var(--space-1) 0;
+  border: 0;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-primary);
+  background: transparent;
+  cursor: pointer;
+}
+
+.category-picker__back svg {
+  width: 16px;
+  height: 16px;
+}
+
+.category-picker__group {
+  padding: var(--space-1) var(--space-3) var(--space-2);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+.category-picker__empty {
+  padding: var(--space-4) var(--space-3);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+@keyframes category-picker-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+}

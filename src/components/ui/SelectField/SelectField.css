@@ -1,0 +1,15 @@
+/* Bloque: select-field (reutiliza los estilos de text-field) */
+.select-field__select {
+  padding-right: var(--space-10);
+  appearance: none;
+  cursor: pointer;
+}
+
+.select-field__chevron {
+  position: absolute;
+  right: var(--space-3);
+  width: 18px;
+  height: 18px;
+  color: var(--color-text-subtle);
+  pointer-events: none;
+}

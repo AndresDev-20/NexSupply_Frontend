@@ -1,0 +1,57 @@
+/* Bloque: save-bar */
+.save-bar {
+  position: sticky;
+  bottom: var(--space-4);
+  z-index: var(--z-topbar);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-top: var(--space-6);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-lg);
+  color: var(--palette-white);
+  background: linear-gradient(120deg, var(--palette-green-900), var(--palette-green-700));
+  box-shadow: var(--shadow-lg);
+  animation: save-bar-in var(--duration-slow) var(--easing-emphasized);
+}
+
+.save-bar__text {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+}
+
+.save-bar__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: var(--radius-full);
+  background-color: var(--palette-yellow-400);
+  box-shadow: 0 0 0 4px rgba(255, 201, 40, 0.25);
+}
+
+.save-bar__actions {
+  display: flex;
+  gap: var(--space-2);
+  margin-left: auto;
+}
+
+/* "Descartar" sobre el fondo verde */
+.save-bar__discard.button--ghost {
+  color: var(--palette-green-100);
+}
+
+.save-bar__discard.button--ghost:hover:not(:disabled) {
+  color: var(--palette-white);
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+@keyframes save-bar-in {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+}

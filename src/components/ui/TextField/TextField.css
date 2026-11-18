@@ -1,0 +1,118 @@
+/* Bloque: text-field */
+.text-field {
+  display: grid;
+  /* Sin esto, en una fila de campos el más bajo estira sus filas internas
+     (etiqueta y campo quedan desalineados con el vecino que tiene ayuda o error) */
+  align-content: start;
+  gap: var(--space-2);
+}
+
+.text-field__label {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text);
+}
+
+/* Campo obligatorio: asterisco rojo después de la etiqueta */
+.text-field__label--required::after {
+  content: ' *';
+  color: var(--color-danger);
+}
+
+.text-field__control {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.text-field__icon {
+  position: absolute;
+  left: var(--space-3);
+  width: 18px;
+  height: 18px;
+  color: var(--color-text-subtle);
+  pointer-events: none;
+}
+
+.text-field__input {
+  width: 100%;
+  min-height: 48px; /* cómodo para tocar en celular */
+  padding: 0 var(--space-4);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  /* 16px evita que Safari en iPhone haga zoom al enfocar el campo */
+  font-size: var(--font-size-md);
+  background-color: var(--color-surface);
+  transition:
+    border-color var(--duration-fast) var(--easing-standard),
+    box-shadow var(--duration-fast) var(--easing-standard);
+}
+
+.text-field__input::placeholder {
+  color: var(--color-text-subtle);
+}
+
+.text-field__input:hover {
+  border-color: var(--color-text-subtle);
+}
+
+.text-field__input:focus-visible {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-accent) 45%, transparent);
+}
+
+.text-field__input--with-icon {
+  padding-left: var(--space-10);
+}
+
+.text-field__input--with-end {
+  padding-right: var(--space-12);
+}
+
+.text-field__end {
+  position: absolute;
+  right: var(--space-1);
+  display: flex;
+}
+
+.text-field__hint {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
+
+.text-field__error {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-danger);
+}
+
+/* Modificador: campo con error. Destella una vez en rojo para llamar la atención */
+.text-field--invalid .text-field__input {
+  border-color: var(--color-danger);
+  animation: text-field-error-flash 700ms var(--easing-standard);
+}
+
+.text-field__error {
+  animation: text-field-error-in 260ms var(--easing-standard);
+}
+
+@keyframes text-field-error-flash {
+  0% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--color-danger) 45%, transparent);
+  }
+  100% {
+    box-shadow: 0 0 0 8px transparent;
+  }
+}
+
+@keyframes text-field-error-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+}
+
+.text-field--invalid .text-field__input:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-danger) 25%, transparent);
+}

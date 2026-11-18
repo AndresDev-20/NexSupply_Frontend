@@ -1,0 +1,197 @@
+/* Bloque: sidebar
+   Mobile-first: por defecto es un panel oculto que se desliza desde la izquierda. */
+.sidebar {
+  position: fixed;
+  inset: 0 auto 0 0;
+  z-index: var(--z-drawer);
+  display: flex;
+  flex-direction: column;
+  width: min(84vw, var(--layout-sidebar-width));
+  color: var(--color-sidebar-text);
+  background:
+    radial-gradient(120% 60% at 0% 0%, var(--color-sidebar-bg-gradient) 0%, transparent 70%),
+    var(--color-sidebar-bg);
+  transform: translateX(-100%);
+  visibility: hidden;
+  transition:
+    transform var(--duration-slow) var(--easing-standard),
+    visibility 0s linear var(--duration-slow);
+}
+
+.sidebar--open {
+  transform: translateX(0);
+  visibility: visible;
+  box-shadow: var(--shadow-lg);
+  transition:
+    transform var(--duration-slow) var(--easing-standard),
+    visibility 0s;
+}
+
+.sidebar__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-5) var(--space-4) var(--space-4) var(--space-5);
+  border-bottom: 1px solid var(--color-sidebar-border);
+}
+
+/* La guirnalda de temporada cuelga sobre el encabezado */
+.sidebar__header {
+  position: relative;
+}
+
+.sidebar__header:has(.seasonal) {
+  padding-top: var(--space-8);
+}
+
+.sidebar__brand {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.sidebar__emblem {
+  width: 48px;
+  height: 32px;
+  object-fit: cover;
+  border-radius: var(--radius-sm);
+  background-color: var(--palette-white);
+}
+
+.sidebar__brand-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.sidebar__brand-name {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-extrabold);
+  letter-spacing: -0.02em;
+  color: var(--palette-white);
+}
+
+.sidebar__brand-name--accent {
+  color: var(--palette-yellow-400);
+}
+
+.sidebar__brand-tagline {
+  max-width: 170px;
+  overflow: hidden;
+  font-size: var(--font-size-xs);
+  color: var(--color-sidebar-text-muted);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.sidebar__close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  border: 0;
+  border-radius: var(--radius-md);
+  color: var(--color-sidebar-text);
+  background: transparent;
+}
+
+.sidebar__close:hover {
+  background-color: var(--color-sidebar-hover);
+}
+
+.sidebar__nav {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--space-4) var(--space-3);
+}
+
+.sidebar__group + .sidebar__group {
+  margin-top: var(--space-5);
+}
+
+.sidebar__group-title {
+  padding: 0 var(--space-3) var(--space-2);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-sidebar-text-muted);
+}
+
+.sidebar__list {
+  display: grid;
+  gap: var(--space-1);
+  padding: 0;
+  list-style: none;
+}
+
+.sidebar__link {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: 44px;
+  padding: 0 var(--space-3);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-sidebar-text);
+  text-decoration: none;
+  transition: background-color var(--duration-fast) var(--easing-standard);
+}
+
+.sidebar__link:hover {
+  background-color: var(--color-sidebar-hover);
+}
+
+.sidebar__link--active {
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-sidebar-active-text);
+  background-color: var(--color-sidebar-active-bg);
+}
+
+/* Indicador amarillo a la izquierda del enlace activo */
+.sidebar__link--active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 10px;
+  bottom: 10px;
+  width: 3px;
+  border-radius: var(--radius-full);
+  background-color: var(--color-accent);
+}
+
+.sidebar__link-icon {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+.sidebar__footer {
+  padding: var(--space-4) var(--space-5) var(--space-5);
+  border-top: 1px solid var(--color-sidebar-border);
+}
+
+/* Laptop: el menú queda fijo y siempre visible */
+@media (min-width: 1024px) {
+  .sidebar {
+    z-index: var(--z-sidebar);
+    width: var(--layout-sidebar-width);
+    transform: none;
+    visibility: visible;
+    transition: none;
+  }
+
+  .sidebar--open {
+    box-shadow: none;
+  }
+
+  .sidebar__close {
+    display: none;
+  }
+}

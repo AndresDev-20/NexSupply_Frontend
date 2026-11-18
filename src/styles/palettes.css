@@ -1,0 +1,120 @@
+/* =====================================================================
+   Paletas del negocio (Fase 15, D-UX-3, D-UX-4)
+
+   Cada paleta redefine las escalas de marca (--palette-green-* = color principal,
+   --palette-yellow-* = acento) y los tintes del modo oscuro (--dark-*). Los colores
+   semánticos (tokens.css) se calculan a partir de ellas, así que ninguna pantalla cambia.
+
+   Los colores de estado (éxito, advertencia, peligro, información) NO cambian: son fijos.
+   "campo" es la identidad original y no necesita bloque (valores de tokens.css).
+
+   Revisadas para leerse bien en claro y oscuro: el principal sobre blanco y el texto
+   sobre el principal superan 4.5:1 (WCAG AA).
+   ===================================================================== */
+
+/* Bosque: verde profundo y dorado */
+:root[data-palette='bosque'] {
+  --palette-green-950: #04140b;
+  --palette-green-900: #062012;
+  --palette-green-800: #0a3320;
+  --palette-green-700: #0f4a2e;
+  --palette-green-600: #16633d;
+  --palette-green-500: #23804f;
+  --palette-green-400: #4fa274;
+  --palette-green-200: #bfe0cc;
+  --palette-green-100: #e0f1e7;
+  --palette-green-50: #f1f8f4;
+  --palette-yellow-600: #9a6b0a;
+  --palette-yellow-500: #d4a017;
+  --palette-yellow-400: #e6b93a;
+  --palette-yellow-100: #f8edcc;
+  --dark-bg: #0a140f;
+  --dark-surface: #101e17;
+  --dark-surface-muted: #15271e;
+  --dark-border: #213a2d;
+  --dark-border-strong: #2d4f3d;
+  --dark-primary-soft: #133826;
+  --dark-accent-soft: #352a0c;
+  --dark-sidebar-gradient: #082a18;
+  --sidebar-text: #d5e6dc;
+  --sidebar-text-muted: #8db29e;
+}
+
+/* Cosecha: verde oliva y naranja */
+:root[data-palette='cosecha'] {
+  --palette-green-950: #161a06;
+  --palette-green-900: #20260a;
+  --palette-green-800: #333d12;
+  --palette-green-700: #46531a;
+  --palette-green-600: #5c6b22;
+  --palette-green-500: #788a2e;
+  --palette-green-400: #9aab52;
+  --palette-green-200: #dbe3bd;
+  --palette-green-100: #eef2dc;
+  --palette-green-50: #f7f9ee;
+  --palette-yellow-600: #b4530a;
+  --palette-yellow-500: #f08a24;
+  --palette-yellow-400: #f7a54e;
+  --palette-yellow-100: #fde6cc;
+  --dark-bg: #12140b;
+  --dark-surface: #1a1d10;
+  --dark-surface-muted: #212616;
+  --dark-border: #313820;
+  --dark-border-strong: #434d2c;
+  --dark-primary-soft: #2a3314;
+  --dark-accent-soft: #3a240c;
+  --dark-sidebar-gradient: #262e0c;
+  --sidebar-text: #e3e8d2;
+  --sidebar-text-muted: #a7b283;
+}
+
+/* Río: azul petróleo y amarillo */
+:root[data-palette='rio'] {
+  --palette-green-950: #03141a;
+  --palette-green-900: #051e27;
+  --palette-green-800: #0a3442;
+  --palette-green-700: #0f4a5c;
+  --palette-green-600: #156277;
+  --palette-green-500: #1f7f98;
+  --palette-green-400: #4ba3b9;
+  --palette-green-200: #bfe0e8;
+  --palette-green-100: #e0f1f5;
+  --palette-green-50: #f1f8fa;
+  --dark-bg: #0a1418;
+  --dark-surface: #0f1e24;
+  --dark-surface-muted: #14272e;
+  --dark-border: #213a43;
+  --dark-border-strong: #2e5059;
+  --dark-primary-soft: #123540;
+  --dark-sidebar-gradient: #062a36;
+  --sidebar-text: #d4e7ec;
+  --sidebar-text-muted: #8ab3bf;
+}
+
+/* Tierra: café y verde hoja */
+:root[data-palette='tierra'] {
+  --palette-green-950: #1a0f08;
+  --palette-green-900: #26170c;
+  --palette-green-800: #3d2615;
+  --palette-green-700: #55361e;
+  --palette-green-600: #6f4828;
+  --palette-green-500: #8e5e36;
+  --palette-green-400: #b07f55;
+  --palette-green-200: #e7d3c0;
+  --palette-green-100: #f4ebe1;
+  --palette-green-50: #faf6f1;
+  --palette-yellow-600: #4a7a1f;
+  --palette-yellow-500: #7cb342;
+  --palette-yellow-400: #9ccc65;
+  --palette-yellow-100: #e6f2d6;
+  --dark-bg: #15100c;
+  --dark-surface: #1e1712;
+  --dark-surface-muted: #271e17;
+  --dark-border: #3a2d22;
+  --dark-border-strong: #4f3e30;
+  --dark-primary-soft: #3a2616;
+  --dark-accent-soft: #1f2e12;
+  --dark-sidebar-gradient: #2e1d10;
+  --sidebar-text: #ecdfd2;
+  --sidebar-text-muted: #b89c82;
+}

@@ -1,0 +1,81 @@
+/* Bloque: checkbox */
+.checkbox {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  min-height: 36px;
+  padding: var(--space-2) 0;
+  cursor: pointer;
+}
+
+/* El input real queda invisible pero accesible */
+.checkbox__input {
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+}
+
+.checkbox__box {
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  margin-top: 1px;
+  border: 2px solid var(--color-border-strong);
+  border-radius: var(--radius-sm);
+  background-color: var(--color-surface);
+  transition:
+    background-color var(--duration-fast) var(--easing-standard),
+    border-color var(--duration-fast) var(--easing-standard);
+}
+
+.checkbox__icon {
+  width: 14px;
+  height: 14px;
+  color: var(--color-text-on-primary);
+  opacity: 0;
+  transform: scale(0.6);
+  transition:
+    opacity var(--duration-fast) var(--easing-standard),
+    transform var(--duration-fast) var(--easing-emphasized);
+}
+
+.checkbox__input:checked + .checkbox__box,
+.checkbox__input:indeterminate + .checkbox__box {
+  border-color: var(--color-primary);
+  background-color: var(--color-primary);
+}
+
+.checkbox__input:checked + .checkbox__box .checkbox__icon,
+.checkbox__input:indeterminate + .checkbox__box .checkbox__icon {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.checkbox__input:focus-visible + .checkbox__box {
+  outline: 3px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+.checkbox__text {
+  display: grid;
+  gap: 2px;
+}
+
+.checkbox__label {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+}
+
+.checkbox__description {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
+
+.checkbox--disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}

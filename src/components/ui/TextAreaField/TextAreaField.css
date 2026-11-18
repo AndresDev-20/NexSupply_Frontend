@@ -1,0 +1,20 @@
+/* Bloque: textarea-field (usa también los estilos de text-field) */
+.textarea-field__input {
+  min-height: 88px;
+  padding: var(--space-3) var(--space-4);
+  line-height: var(--line-height-base);
+  resize: vertical;
+}
+
+.textarea-field__footer {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.textarea-field__counter {
+  margin-left: auto;
+  font-size: var(--font-size-xs);
+  font-variant-numeric: tabular-nums;
+  color: var(--color-text-subtle);
+}

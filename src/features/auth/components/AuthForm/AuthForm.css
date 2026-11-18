@@ -1,0 +1,151 @@
+/* Bloque: auth-form — compartido por las pantallas de acceso */
+.auth-form {
+  display: grid;
+  gap: var(--space-5);
+}
+
+/* Entrada escalonada: título, avisos, campos y botón aparecen uno tras otro */
+.auth-form > * {
+  animation: auth-form-item-in 420ms var(--easing-standard) both;
+}
+
+.auth-form > :nth-child(2) {
+  animation-delay: 60ms;
+}
+
+.auth-form > :nth-child(3) {
+  animation-delay: 120ms;
+}
+
+.auth-form > :nth-child(4) {
+  animation-delay: 180ms;
+}
+
+.auth-form > :nth-child(5) {
+  animation-delay: 240ms;
+}
+
+.auth-form > :nth-child(n + 6) {
+  animation-delay: 300ms;
+}
+
+/* Modificador: el ingreso falló. Sacudida horizontal, como un "no" con la cabeza */
+.auth-form--shake {
+  animation: auth-form-shake 480ms cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+
+@keyframes auth-form-item-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+
+@keyframes auth-form-shake {
+  10%,
+  90% {
+    transform: translateX(-2px);
+  }
+  20%,
+  80% {
+    transform: translateX(4px);
+  }
+  30%,
+  50%,
+  70% {
+    transform: translateX(-8px);
+  }
+  40%,
+  60% {
+    transform: translateX(8px);
+  }
+}
+
+.auth-form__header {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.auth-form__icon-wrap {
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  margin-bottom: var(--space-2);
+  border-radius: var(--radius-lg);
+  color: var(--color-primary);
+  background-color: var(--color-primary-soft);
+}
+
+.auth-form__icon {
+  width: 26px;
+  height: 26px;
+}
+
+.auth-form__title {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-extrabold);
+  letter-spacing: -0.02em;
+}
+
+.auth-form__subtitle {
+  color: var(--color-text-muted);
+}
+
+.auth-form__fields {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.auth-form__row {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.auth-form__link {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-primary);
+  text-decoration: none;
+}
+
+.auth-form__link:hover {
+  text-decoration: underline;
+}
+
+.auth-form__link--with-icon {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.auth-form__link-icon {
+  width: 16px;
+  height: 16px;
+}
+
+.auth-form__submit {
+  width: 100%;
+}
+
+.auth-form__footer {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-2);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+.auth-form__link-button {
+  padding: 0;
+  border: 0;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-primary);
+  background: none;
+}
+
+.auth-form__link-button:hover {
+  text-decoration: underline;
+}

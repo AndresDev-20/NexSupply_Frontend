@@ -1,0 +1,94 @@
+/* Esqueletos de carga (Fase 15) */
+.skeleton {
+  display: block;
+  max-width: 100%;
+  border-radius: var(--radius-sm);
+  background:
+    linear-gradient(90deg, transparent 0%, color-mix(in srgb, var(--color-surface) 70%, transparent) 50%, transparent 100%) no-repeat,
+    var(--color-surface-muted);
+  background-size: 200% 100%, auto;
+  animation: skeleton-shine 1.4s ease-in-out infinite;
+}
+
+@keyframes skeleton-shine {
+  from {
+    background-position: 150% 0, 0 0;
+  }
+  to {
+    background-position: -50% 0, 0 0;
+  }
+}
+
+/* ---------- Tabla ---------- */
+.skeleton-table {
+  display: grid;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+}
+
+.skeleton-table__row {
+  display: grid;
+  grid-template-columns: repeat(var(--cols), minmax(0, 1fr));
+  gap: var(--space-4);
+  align-items: center;
+  padding: var(--space-4);
+  border-top: 1px solid var(--color-border);
+}
+
+.skeleton-table__row--head {
+  border-top: 0;
+  background: var(--color-surface-muted);
+}
+
+/* ---------- Tarjetas ---------- */
+.skeleton-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--space-3);
+}
+
+.skeleton-card {
+  display: grid;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+}
+
+/* ---------- Pantalla ---------- */
+.skeleton-page {
+  display: grid;
+  gap: var(--space-5);
+}
+
+.skeleton-page__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.skeleton-page__section,
+.skeleton-page__table {
+  display: grid;
+  gap: var(--space-3);
+  padding: var(--space-5);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+}
+
+.skeleton-page__fields {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--space-3);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton {
+    animation: none;
+  }
+}

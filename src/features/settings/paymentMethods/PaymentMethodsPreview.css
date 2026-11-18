@@ -1,0 +1,75 @@
+/* Bloque: pay-preview — botones de pago del POS */
+.pay-preview {
+  padding: var(--space-5);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  background-color: var(--color-surface);
+  box-shadow: var(--shadow-md);
+}
+
+.pay-preview__title {
+  margin-bottom: var(--space-3);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+}
+
+.pay-preview__grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pay-preview__button {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-1);
+  padding: var(--space-3) var(--space-2);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-md);
+  text-align: center;
+  background-color: var(--color-surface-muted);
+}
+
+.pay-preview__button--current {
+  border-color: var(--color-accent);
+  background-color: var(--color-accent-soft);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-accent) 30%, transparent);
+  animation: pay-preview-pop var(--duration-slow) var(--easing-emphasized);
+}
+
+.pay-preview__icon {
+  width: 20px;
+  height: 20px;
+  color: var(--color-primary);
+}
+
+.pay-preview__name {
+  max-width: 100%;
+  overflow: hidden;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.pay-preview__ref {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  font-size: 10px;
+  color: var(--color-text-muted);
+}
+
+.pay-preview__ref svg {
+  width: 10px;
+  height: 10px;
+}
+
+@keyframes pay-preview-pop {
+  from {
+    transform: scale(0.92);
+  }
+}

@@ -1,0 +1,94 @@
+/* Colores de las categorías (categoryVisuals.js). Cada tono define --cat-color y
+   --cat-soft; los componentes los usan con [data-tone]. color-mix sobre la superficie
+   hace que el fondo suave funcione igual en modo claro y oscuro. */
+[data-tone] {
+  --cat-color: var(--color-primary);
+  --cat-soft: color-mix(in srgb, var(--cat-color) 16%, var(--color-surface));
+}
+
+[data-tone='amber'] {
+  --cat-color: #d99a00;
+}
+[data-tone='brown'] {
+  --cat-color: #a0703c;
+}
+[data-tone='teal'] {
+  --cat-color: #1f9e8f;
+}
+[data-tone='purple'] {
+  --cat-color: #8a5cd6;
+}
+[data-tone='blue'] {
+  --cat-color: #2f7fc4;
+}
+[data-tone='red'] {
+  --cat-color: #d1453b;
+}
+[data-tone='orange'] {
+  --cat-color: #e0702a;
+}
+[data-tone='green'] {
+  --cat-color: #2e8b3e;
+}
+[data-tone='lime'] {
+  --cat-color: #6fa832;
+}
+[data-tone='slate'] {
+  --cat-color: #6b7a86;
+}
+[data-tone='pink'] {
+  --cat-color: #d04f8a;
+}
+[data-tone='neutral'] {
+  --cat-color: var(--color-text-muted);
+}
+
+/* Bloque: cat-badge — ícono en un cuadrito con el color de la categoría */
+.cat-badge {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  border-radius: var(--radius-md);
+  color: var(--cat-color);
+  background-color: var(--cat-soft);
+  transition:
+    background-color var(--duration-fast) var(--easing-standard),
+    color var(--duration-fast) var(--easing-standard);
+}
+
+.cat-badge--sm {
+  width: 30px;
+  height: 30px;
+}
+
+.cat-badge--sm svg {
+  width: 16px;
+  height: 16px;
+}
+
+.cat-badge--md {
+  width: 38px;
+  height: 38px;
+}
+
+.cat-badge--md svg {
+  width: 18px;
+  height: 18px;
+}
+
+.cat-badge--lg {
+  width: 52px;
+  height: 52px;
+  border-radius: var(--radius-lg);
+}
+
+.cat-badge--lg svg {
+  width: 26px;
+  height: 26px;
+}
+
+/* Variante sólida: la categoría elegida */
+.cat-badge--solid {
+  color: var(--palette-white);
+  background-color: var(--cat-color);
+}

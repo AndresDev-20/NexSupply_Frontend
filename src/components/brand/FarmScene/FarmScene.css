@@ -1,0 +1,421 @@
+/* Bloque: farm-scene — granja animada del panel de marca.
+   Solo se anima transform y opacity: la tarjeta gráfica las procesa sin
+   recalcular la página, así la escena no vuelve lento el formulario. */
+.farm-scene {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+/* Los elementos SVG giran o se voltean respecto a su propio centro */
+.farm-scene * {
+  transform-box: fill-box;
+}
+
+/* ---------- Colinas ---------- */
+.farm-scene__hill--far {
+  fill: #1f6b33;
+  opacity: 0.7;
+}
+
+.farm-scene__hill--mid {
+  fill: #1a5c2c;
+  opacity: 0.85;
+}
+
+.farm-scene__hill--near {
+  fill: #0d3a1a;
+}
+
+/* ---------- Nubes ---------- */
+.farm-scene__cloud-shape {
+  fill: rgba(255, 255, 255, 0.1);
+}
+
+.farm-scene__cloud {
+  animation: farm-scene-drift 70s linear infinite;
+}
+
+.farm-scene__cloud--2 {
+  animation-duration: 95s;
+  animation-delay: -40s;
+}
+
+.farm-scene__cloud--3 {
+  animation-duration: 120s;
+  animation-delay: -80s;
+}
+
+/* ---------- Pájaros ---------- */
+.farm-scene__flock {
+  animation: farm-scene-fly 26s linear infinite;
+  animation-delay: -6s;
+}
+
+.farm-scene__bird {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.55);
+  stroke-width: 2;
+  stroke-linecap: round;
+  transform-origin: center;
+  animation: farm-scene-flap 0.6s ease-in-out infinite;
+}
+
+/* ---------- Polen ---------- */
+.farm-scene__pollen {
+  fill: var(--palette-yellow-400);
+  opacity: 0;
+  animation: farm-scene-pollen 10s ease-in infinite;
+}
+
+/* ---------- Molino ---------- */
+.farm-scene__windmill-tower {
+  /* Clara para que se distinga sobre el fondo verde oscuro */
+  fill: rgba(255, 255, 255, 0.35);
+}
+
+.farm-scene__windmill-blades rect {
+  fill: rgba(255, 255, 255, 0.75);
+}
+
+.farm-scene__windmill-blades {
+  transform-origin: center;
+  animation: farm-scene-spin 9s linear infinite;
+}
+
+.farm-scene__windmill-hub {
+  fill: var(--palette-yellow-400);
+}
+
+/* ---------- Pasto ---------- */
+.farm-scene__grass {
+  fill: none;
+  stroke: #3f8f45;
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  transform-origin: bottom center;
+  animation: farm-scene-sway 3.2s ease-in-out infinite;
+}
+
+/* ---------- Detalles comunes de los animales ---------- */
+.farm-scene__eye {
+  fill: #12210f;
+}
+
+.farm-scene__leg {
+  fill: #2b2b26;
+  transform-origin: top center;
+}
+
+/* ---------- Vaca ---------- */
+.farm-scene__walker--cow {
+  transform-origin: center;
+  animation: farm-scene-cow-walk 32s ease-in-out infinite;
+}
+
+.farm-scene__cow-body,
+.farm-scene__cow-face {
+  fill: #f7f5ef;
+}
+
+.farm-scene__cow-spot {
+  fill: #0b3d1c;
+}
+
+.farm-scene__cow-udder,
+.farm-scene__cow-muzzle {
+  fill: #f2b8ad;
+}
+
+.farm-scene__cow-ear {
+  fill: #e9e4d6;
+}
+
+.farm-scene__cow-horn {
+  fill: none;
+  stroke: #ffd36a;
+  stroke-width: 3;
+  stroke-linecap: round;
+}
+
+.farm-scene__cow-tail {
+  fill: none;
+  stroke: #f7f5ef;
+  stroke-width: 3;
+  stroke-linecap: round;
+  transform-origin: top right;
+  animation: farm-scene-tail 2.4s ease-in-out infinite;
+}
+
+.farm-scene__cow-tail-tip {
+  fill: #0b3d1c;
+}
+
+/* Patas: se mueven solo mientras camina (la animación de la vaca define las pausas) */
+.farm-scene__cow .farm-scene__leg--a {
+  animation: farm-scene-step 0.9s ease-in-out infinite;
+}
+
+.farm-scene__cow .farm-scene__leg--b {
+  animation: farm-scene-step 0.9s ease-in-out -0.45s infinite;
+}
+
+/* La cabeza baja a pastar cada cierto tiempo */
+.farm-scene__cow-head {
+  transform-origin: left center;
+  animation: farm-scene-graze 32s ease-in-out infinite;
+}
+
+/* ---------- Cerdo ---------- */
+.farm-scene__walker--pig {
+  transform-origin: center;
+  animation: farm-scene-pig-trot 24s ease-in-out infinite;
+}
+
+.farm-scene__pig-body,
+.farm-scene__pig-ear {
+  fill: #f3a9b8;
+}
+
+.farm-scene__pig-snout {
+  fill: #e48a9d;
+}
+
+.farm-scene__nostril {
+  fill: #9c4b5d;
+}
+
+.farm-scene__pig-tail {
+  fill: none;
+  stroke: #f3a9b8;
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  transform-origin: right center;
+  animation: farm-scene-wiggle 0.8s ease-in-out infinite;
+}
+
+.farm-scene__pig {
+  animation: farm-scene-bob 0.5s ease-in-out infinite;
+}
+
+.farm-scene__leg--pig {
+  fill: #e48a9d;
+}
+
+.farm-scene__pig .farm-scene__leg--a {
+  animation: farm-scene-step 0.5s ease-in-out infinite;
+}
+
+.farm-scene__pig .farm-scene__leg--b {
+  animation: farm-scene-step 0.5s ease-in-out -0.25s infinite;
+}
+
+/* ---------- Gallina ---------- */
+.farm-scene__hen-feathers {
+  fill: #fbf7ee;
+}
+
+.farm-scene__hen-tail {
+  fill: #e8dfcb;
+}
+
+.farm-scene__hen-comb {
+  fill: #e0453a;
+}
+
+.farm-scene__hen-beak {
+  fill: #ffb21a;
+}
+
+.farm-scene__hen-legs {
+  fill: none;
+  stroke: #ffb21a;
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+/* Picotea: el cuerpo se inclina hacia adelante y vuelve */
+.farm-scene__hen-body {
+  transform-origin: bottom center;
+  animation: farm-scene-peck 2.6s ease-in-out infinite;
+}
+
+/* ---------- Animaciones ---------- */
+@keyframes farm-scene-drift {
+  from {
+    transform: translateX(-200px);
+  }
+  to {
+    transform: translateX(760px);
+  }
+}
+
+@keyframes farm-scene-fly {
+  from {
+    transform: translate(-80px, 20px);
+  }
+  50% {
+    transform: translate(300px, -20px);
+  }
+  to {
+    transform: translate(700px, 10px);
+  }
+}
+
+@keyframes farm-scene-flap {
+  50% {
+    transform: scaleY(0.4);
+  }
+}
+
+@keyframes farm-scene-pollen {
+  0% {
+    opacity: 0;
+    transform: translate(0, 0);
+  }
+  15% {
+    opacity: 0.9;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(30px, -360px);
+  }
+}
+
+@keyframes farm-scene-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes farm-scene-sway {
+  50% {
+    transform: skewX(-10deg);
+  }
+}
+
+@keyframes farm-scene-step {
+  50% {
+    transform: rotate(14deg);
+  }
+}
+
+@keyframes farm-scene-tail {
+  50% {
+    transform: rotate(-18deg);
+  }
+}
+
+@keyframes farm-scene-wiggle {
+  50% {
+    transform: rotate(16deg);
+  }
+}
+
+@keyframes farm-scene-bob {
+  50% {
+    transform: translateY(-2px);
+  }
+}
+
+@keyframes farm-scene-peck {
+  0%,
+  55%,
+  100% {
+    transform: rotate(0);
+  }
+  65%,
+  80% {
+    transform: rotate(-32deg);
+  }
+  72% {
+    transform: rotate(-26deg);
+  }
+}
+
+/* Vaca: camina a la derecha, pasta, se voltea y regresa */
+@keyframes farm-scene-cow-walk {
+  0% {
+    transform: translateX(0) scaleX(1);
+  }
+  35% {
+    transform: translateX(110px) scaleX(1);
+  }
+  48% {
+    transform: translateX(110px) scaleX(1);
+  }
+  50% {
+    transform: translateX(110px) scaleX(-1);
+  }
+  85% {
+    transform: translateX(0) scaleX(-1);
+  }
+  98% {
+    transform: translateX(0) scaleX(-1);
+  }
+  100% {
+    transform: translateX(0) scaleX(1);
+  }
+}
+
+/* Pasta durante las pausas de la caminata (35–48 % y 85–98 %) */
+@keyframes farm-scene-graze {
+  0%,
+  36%,
+  47%,
+  86%,
+  97%,
+  100% {
+    transform: rotate(0);
+  }
+  40%,
+  44%,
+  90%,
+  94% {
+    transform: rotate(28deg);
+  }
+}
+
+/* Cerdo: trota más rápido y en sentido contrario a la vaca */
+@keyframes farm-scene-pig-trot {
+  0% {
+    transform: translateX(0) scaleX(-1);
+  }
+  42% {
+    transform: translateX(-90px) scaleX(-1);
+  }
+  50% {
+    transform: translateX(-90px) scaleX(1);
+  }
+  92% {
+    transform: translateX(0) scaleX(1);
+  }
+  100% {
+    transform: translateX(0) scaleX(-1);
+  }
+}
+
+/* ---------- Desfases para que nada se mueva al unísono ---------- */
+.farm-scene__bird--2 {
+  animation-delay: -0.2s;
+}
+
+.farm-scene__bird--3 {
+  animation-delay: -0.4s;
+}
+
+.farm-scene__pollen--1 { animation-duration: 9s; animation-delay: 0s; }
+.farm-scene__pollen--2 { animation-duration: 11s; animation-delay: -1.7s; }
+.farm-scene__pollen--3 { animation-duration: 13s; animation-delay: -3.4s; }
+.farm-scene__pollen--4 { animation-duration: 9s; animation-delay: -5.1s; }
+.farm-scene__pollen--5 { animation-duration: 11s; animation-delay: -6.8s; }
+.farm-scene__pollen--6 { animation-duration: 13s; animation-delay: -8.5s; }
+
+.farm-scene__grass--2 { animation-delay: -0.45s; }
+.farm-scene__grass--3 { animation-delay: -0.9s; }
+.farm-scene__grass--4 { animation-delay: -1.35s; }
+.farm-scene__grass--5 { animation-delay: -1.8s; }
+.farm-scene__grass--6 { animation-delay: -2.25s; }
+.farm-scene__grass--7 { animation-delay: -2.7s; }

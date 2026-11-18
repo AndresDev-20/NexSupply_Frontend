@@ -1,0 +1,94 @@
+/* Bloque: profit-summary — ganancia en vivo dentro del formulario de producto */
+.profit-summary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid color-mix(in srgb, var(--color-success) 35%, transparent);
+  border-radius: var(--radius-lg);
+  background-color: var(--color-success-soft);
+  animation: profit-summary-in var(--duration-base) var(--easing-standard);
+}
+
+.profit-summary > svg {
+  width: 26px;
+  height: 26px;
+  flex-shrink: 0;
+  color: var(--color-success);
+}
+
+.profit-summary--loss {
+  border-color: color-mix(in srgb, var(--color-danger) 35%, transparent);
+  background-color: var(--color-danger-soft);
+}
+
+.profit-summary--loss > svg {
+  color: var(--color-danger);
+}
+
+.profit-summary__text {
+  display: grid;
+}
+
+.profit-summary__label {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-muted);
+}
+
+.profit-summary__value {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-extrabold);
+  font-variant-numeric: tabular-nums;
+}
+
+.profit-summary__percent {
+  color: var(--color-success);
+}
+
+.profit-summary--loss .profit-summary__percent {
+  color: var(--color-danger);
+}
+
+@keyframes profit-summary-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+}
+
+/* La ganancia se calcula: una línea que aclara de dónde sale */
+.profit-summary__hint {
+  flex-basis: 100%;
+  font-size: var(--font-size-xs);
+  opacity: 0.8;
+}
+
+/* Precio de compra del bulto (calculado, no se escribe) */
+.pack-cost {
+  display: grid;
+  align-content: center;
+  gap: 2px;
+  padding: var(--space-3);
+  border: 1px dashed var(--color-border-strong);
+  border-radius: var(--radius-md);
+  background-color: var(--color-surface-muted);
+}
+
+.pack-cost__label {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-muted);
+}
+
+.pack-cost__value {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+  font-variant-numeric: tabular-nums;
+}
+
+.pack-cost__hint {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}

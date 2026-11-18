@@ -1,0 +1,195 @@
+/* Bloque: data-table — mobile-first: cada fila es una tarjeta */
+.data-table {
+  transition: opacity var(--duration-base) var(--easing-standard);
+}
+
+/* Mientras se recargan datos ya mostrados, se atenúan sin desaparecer */
+.data-table--refreshing {
+  opacity: 0.55;
+}
+
+.data-table__table {
+  display: block;
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.data-table__table tbody {
+  display: block;
+}
+
+/* Tablet y laptop pequeña: tarjetas en dos columnas */
+@media (min-width: 768px) and (max-width: 1279px) {
+  .data-table__table tbody {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-3);
+  }
+
+  .data-table__table tbody .data-table__row {
+    margin-bottom: 0;
+  }
+}
+
+.data-table__head {
+  display: none;
+}
+
+.data-table__row {
+  display: grid;
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
+  padding: var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background-color: var(--color-surface);
+  box-shadow: var(--shadow-sm);
+  animation: data-table-row-in var(--duration-slow) var(--easing-standard) both;
+}
+
+.data-table__td {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  min-width: 0;
+  font-size: var(--font-size-sm);
+}
+
+/* La etiqueta de la columna aparece a la izquierda en la tarjeta */
+.data-table__td::before {
+  content: attr(data-label);
+  flex-shrink: 0;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-subtle);
+}
+
+/* La columna principal encabeza la tarjeta, sin etiqueta */
+.data-table__td--primary {
+  padding-bottom: var(--space-2);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.data-table__td--primary::before {
+  display: none;
+}
+
+/* ---------- Estados: cargando, error, vacío ---------- */
+.data-table__state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-12) var(--space-4);
+  border: 1px dashed var(--color-border-strong);
+  border-radius: var(--radius-lg);
+  text-align: center;
+  color: var(--color-text-muted);
+}
+
+.data-table__state-icon {
+  width: 36px;
+  height: 36px;
+  color: var(--color-text-subtle);
+}
+
+.data-table__state--error .data-table__state-icon {
+  color: var(--color-danger);
+}
+
+.data-table__state-title {
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text);
+}
+
+.data-table__state-text {
+  max-width: 44ch;
+  font-size: var(--font-size-sm);
+}
+
+@keyframes data-table-row-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+
+/* ---------- Pantallas anchas: tabla clásica ----------
+   Desde 1280px (no 1024): con el menú lateral fijo, a 1024px el contenido mide
+   ~700px y una tabla de 6 columnas no cabe. Por debajo, las tarjetas se leen mejor. */
+@media (min-width: 1280px) {
+  .data-table {
+    overflow: hidden;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    background-color: var(--color-surface);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .data-table__table {
+    display: table;
+  }
+
+  .data-table__table tbody {
+    display: table-row-group;
+  }
+
+  .data-table__head {
+    display: table-header-group;
+  }
+
+  .data-table__th {
+    padding: var(--space-3) var(--space-4);
+    border-bottom: 1px solid var(--color-border);
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-semibold);
+    letter-spacing: 0.06em;
+    text-align: left;
+    text-transform: uppercase;
+    color: var(--color-text-subtle);
+    background-color: var(--color-surface-muted);
+  }
+
+  .data-table__th--end {
+    text-align: right;
+  }
+
+  .data-table__row {
+    display: table-row;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+    animation: none;
+    transition: background-color var(--duration-fast) var(--easing-standard);
+  }
+
+  .data-table__row:hover {
+    background-color: var(--color-surface-muted);
+  }
+
+  .data-table__row + .data-table__row .data-table__td {
+    border-top: 1px solid var(--color-border);
+  }
+
+  .data-table__td {
+    display: table-cell;
+    padding: var(--space-3) var(--space-4);
+    vertical-align: middle;
+  }
+
+  .data-table__td::before {
+    display: none;
+  }
+
+  .data-table__td--primary {
+    padding-bottom: var(--space-3);
+    border-bottom: 0;
+  }
+
+  .data-table__td--end {
+    text-align: right;
+  }
+}

@@ -1,0 +1,35 @@
+/* Bloque: form-with-preview */
+.form-with-preview {
+  display: grid;
+  gap: var(--space-6);
+}
+
+.form-with-preview__main {
+  min-width: 0;
+}
+
+.form-with-preview__aside {
+  display: none;
+}
+
+.form-with-preview__label {
+  margin-bottom: var(--space-3);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-text-subtle);
+}
+
+@media (min-width: 1024px) {
+  .form-with-preview {
+    grid-template-columns: minmax(0, 1fr) 300px;
+    align-items: start;
+  }
+
+  .form-with-preview__aside {
+    position: sticky;
+    top: 0;
+    display: block;
+  }
+}

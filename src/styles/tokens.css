@@ -1,0 +1,251 @@
+/* =====================================================================
+   NexSupply — Design tokens
+   Única fuente de colores, tipografía, espacios, radios, sombras y
+   movimiento. Los componentes NUNCA usan colores directos: usan estas
+   variables, así el modo oscuro y los temas de temporada solo redefinen
+   tokens, sin reescribir estilos.
+
+   Puntos de quiebre (mobile-first). Las variables CSS no funcionan dentro
+   de @media, por eso se documentan aquí y se escriben como número:
+     tablet   → @media (min-width: 768px)
+     laptop   → @media (min-width: 1024px)
+     desktop  → @media (min-width: 1440px)
+   ===================================================================== */
+
+:root {
+  /* ---------- Paleta base (tomada del logo de NexSupply) ---------- */
+  --palette-green-950: #061a0c;
+  --palette-green-900: #08240f;
+  --palette-green-800: #0b3d1c;
+  --palette-green-700: #11522a;
+  --palette-green-600: #1a6b35;
+  --palette-green-500: #2e8b3e;
+  --palette-green-400: #5aab4f;
+  --palette-green-200: #c5e3c3;
+  --palette-green-100: #e4f2e2;
+  --palette-green-50: #f3f9f1;
+
+  --palette-yellow-600: #b37a00;
+  --palette-yellow-500: #f2b100;
+  --palette-yellow-400: #ffc928;
+  --palette-yellow-100: #fff3cc;
+
+  --palette-earth-50: #fbfaf5;
+  --palette-earth-100: #f4f2ea;
+  --palette-earth-200: #e6e3d7;
+  --palette-earth-300: #d3cfbf;
+  --palette-earth-500: #8a8676;
+  /* Gris de texto sutil: 5:1 sobre los fondos claros (WCAG AA). El earth-500 se quedaba en 3,5:1 (Fase 16) */
+  --palette-earth-600: #6f6c60;
+  --palette-earth-700: #545a4f;
+  --palette-earth-900: #1b261e;
+
+  --palette-red-600: #b42318;
+  --palette-red-100: #fde8e6;
+  --palette-blue-600: #1d6fa5;
+  --palette-blue-100: #e3f0f9;
+  --palette-white: #ffffff;
+
+  /* Colores de estado: fijos, NO cambian con la paleta (Fase 15). Éxito siempre verde y
+     advertencia siempre ámbar, aunque la paleta del negocio sea azul o café. */
+  --palette-ok-600: #1a6b35;
+  --palette-ok-400: #5aab4f;
+  --palette-ok-100: #e4f2e2;
+  --palette-warn-600: #b37a00;
+  --palette-warn-400: #ffc928;
+  --palette-warn-100: #fff3cc;
+
+  /* Tintes del modo oscuro: cada paleta los redefine (styles/palettes.css) */
+  --dark-bg: #0c1610;
+  --dark-surface: #132119;
+  --dark-surface-muted: #19291f;
+  --dark-border: #24382b;
+  --dark-border-strong: #315038;
+  --dark-primary-soft: #183823;
+  --dark-accent-soft: #3a2f0b;
+  --dark-sidebar-gradient: #0a2a14;
+  --sidebar-text: #d7e8d5;
+  --sidebar-text-muted: #8fb18c;
+
+  /* ---------- Colores semánticos: tema claro ---------- */
+  --color-bg: var(--palette-earth-50);
+  --color-surface: var(--palette-white);
+  --color-surface-muted: var(--palette-earth-100);
+  --color-border: var(--palette-earth-200);
+  --color-border-strong: var(--palette-earth-300);
+
+  --color-text: var(--palette-earth-900);
+  --color-text-muted: var(--palette-earth-700);
+  --color-text-subtle: var(--palette-earth-600);
+  --color-text-on-primary: var(--palette-white);
+  --color-text-on-accent: var(--palette-green-900);
+
+  --color-primary: var(--palette-green-800);
+  --color-primary-hover: var(--palette-green-700);
+  --color-primary-soft: var(--palette-green-100);
+  --color-accent: var(--palette-yellow-500);
+  --color-accent-hover: var(--palette-yellow-400);
+  --color-accent-soft: var(--palette-yellow-100);
+  --color-accent-strong: var(--palette-yellow-600);
+
+  --color-success: var(--palette-ok-600);
+  --color-success-soft: var(--palette-ok-100);
+  --color-warning: var(--palette-warn-600);
+  --color-warning-soft: var(--palette-warn-100);
+  --color-danger: var(--palette-red-600);
+  --color-danger-soft: var(--palette-red-100);
+  --color-info: var(--palette-blue-600);
+  --color-info-soft: var(--palette-blue-100);
+
+  --color-focus-ring: var(--palette-yellow-500);
+
+  /* Barra lateral: siempre verde oscuro, es la firma visual del sistema */
+  --color-sidebar-bg: var(--palette-green-900);
+  --color-sidebar-bg-gradient: var(--palette-green-800);
+  --color-sidebar-text: var(--sidebar-text);
+  --color-sidebar-text-muted: var(--sidebar-text-muted);
+  --color-sidebar-hover: rgba(255, 255, 255, 0.07);
+  --color-sidebar-active-bg: color-mix(in srgb, var(--palette-yellow-500) 14%, transparent);
+  --color-sidebar-active-text: var(--palette-yellow-400);
+  --color-sidebar-border: rgba(255, 255, 255, 0.08);
+
+  --color-overlay: rgba(6, 26, 12, 0.55);
+
+  /* ---------- Tipografía ---------- */
+  --font-family-base: 'Plus Jakarta Sans Variable', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-family-mono: ui-monospace, 'Cascadia Code', 'Segoe UI Mono', Consolas, monospace;
+
+  --font-size-xs: 0.75rem;   /* 12px */
+  --font-size-sm: 0.875rem;  /* 14px */
+  --font-size-md: 1rem;      /* 16px */
+  --font-size-lg: 1.125rem;  /* 18px */
+  --font-size-xl: 1.375rem;  /* 22px */
+  --font-size-2xl: 1.75rem;  /* 28px */
+  --font-size-3xl: 2.25rem;  /* 36px */
+
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  --font-weight-extrabold: 800;
+
+  --line-height-tight: 1.2;
+  --line-height-base: 1.5;
+
+  /* ---------- Espaciado (escala de 4px) ---------- */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+
+  /* ---------- Bordes y sombras ---------- */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --radius-full: 999px;
+
+  --shadow-sm: 0 1px 2px rgba(27, 38, 30, 0.06);
+  --shadow-md: 0 4px 14px rgba(27, 38, 30, 0.08), 0 1px 3px rgba(27, 38, 30, 0.05);
+  --shadow-lg: 0 18px 40px rgba(27, 38, 30, 0.14);
+
+  /* ---------- Medidas del layout ---------- */
+  --layout-sidebar-width: 264px;
+  --layout-topbar-height: 64px;
+  --layout-content-max-width: 1280px;
+
+  /* ---------- Capas ---------- */
+  --z-sidebar: 30;
+  --z-topbar: 20;
+  --z-overlay: 40;
+  --z-drawer: 50;
+  --z-modal: 60;
+  --z-toast: 70;
+
+  /* ---------- Movimiento ---------- */
+  --duration-fast: 120ms;
+  --duration-base: 200ms;
+  --duration-slow: 320ms;
+  --easing-standard: cubic-bezier(0.2, 0, 0, 1);
+  --easing-emphasized: cubic-bezier(0.3, 0, 0, 1.15);
+
+  color-scheme: light;
+}
+
+/* ---------- Tema oscuro ----------
+   Se aplica si el sistema operativo lo pide (y el usuario no forzó el claro)
+   o si la raíz tiene data-theme="dark". Los tintes oscuros salen de --dark-* (cada paleta los redefine). */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --color-bg: var(--dark-bg);
+    --color-surface: var(--dark-surface);
+    --color-surface-muted: var(--dark-surface-muted);
+    --color-border: var(--dark-border);
+    --color-border-strong: var(--dark-border-strong);
+    --color-text: #e7efe6;
+    --color-text-muted: #b2c2b0;
+    --color-text-subtle: #7f927d;
+    --color-primary: var(--palette-green-500);
+    --color-primary-hover: var(--palette-green-400);
+    --color-primary-soft: var(--dark-primary-soft);
+    --color-accent-soft: var(--dark-accent-soft);
+    --color-success: var(--palette-ok-400);
+    --color-success-soft: #183823;
+    --color-warning: var(--palette-warn-400);
+    --color-warning-soft: #3a2f0b;
+    --color-danger: #f07167;
+    --color-danger-soft: #3b1715;
+    --color-info: #6cb4e4;
+    --color-info-soft: #13293a;
+    --color-sidebar-bg: var(--palette-green-950);
+    --color-sidebar-bg-gradient: var(--dark-sidebar-gradient);
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+    --shadow-md: 0 4px 14px rgba(0, 0, 0, 0.35);
+    --shadow-lg: 0 18px 40px rgba(0, 0, 0, 0.5);
+    color-scheme: dark;
+  }
+}
+
+:root[data-theme='dark'] {
+  --color-bg: var(--dark-bg);
+  --color-surface: var(--dark-surface);
+  --color-surface-muted: var(--dark-surface-muted);
+  --color-border: var(--dark-border);
+  --color-border-strong: var(--dark-border-strong);
+  --color-text: #e7efe6;
+  --color-text-muted: #b2c2b0;
+  --color-text-subtle: #7f927d;
+  --color-primary: var(--palette-green-500);
+  --color-primary-hover: var(--palette-green-400);
+  --color-primary-soft: var(--dark-primary-soft);
+  --color-accent-soft: var(--dark-accent-soft);
+  --color-success: var(--palette-ok-400);
+  --color-success-soft: #183823;
+  --color-warning: var(--palette-warn-400);
+  --color-warning-soft: #3a2f0b;
+  --color-danger: #f07167;
+  --color-danger-soft: #3b1715;
+  --color-info: #6cb4e4;
+  --color-info-soft: #13293a;
+  --color-sidebar-bg: var(--palette-green-950);
+  --color-sidebar-bg-gradient: var(--dark-sidebar-gradient);
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 14px rgba(0, 0, 0, 0.35);
+  --shadow-lg: 0 18px 40px rgba(0, 0, 0, 0.5);
+  color-scheme: dark;
+}
+
+/* Sin animaciones para quien lo pide en su sistema (accesibilidad) */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --duration-fast: 0ms;
+    --duration-base: 0ms;
+    --duration-slow: 0ms;
+  }
+}

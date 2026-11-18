@@ -1,0 +1,253 @@
+/* Apartados (Fase 10b) */
+
+/* ---------- Avance de pago ---------- */
+.layaway-progress {
+  display: grid;
+  gap: 4px;
+  min-width: 160px;
+}
+
+.layaway-progress__bar {
+  position: relative;
+  height: 8px;
+  overflow: hidden;
+  border-radius: var(--radius-full);
+  background: var(--color-surface-muted);
+}
+
+.layaway-progress__fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  border-radius: inherit;
+  background: var(--color-warning);
+  transition: width 600ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.layaway-progress__fill--success {
+  background: linear-gradient(90deg, var(--color-success), color-mix(in srgb, var(--color-success) 70%, var(--color-accent)));
+}
+
+.layaway-progress__fill--danger {
+  background: var(--color-danger);
+}
+
+.layaway-progress__fill--neutral {
+  background: var(--color-border-strong);
+}
+
+.layaway-progress__text {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
+
+.layaway-progress-card {
+  margin: 0 0 var(--space-5);
+  padding: var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+}
+
+.layaway-progress-card .layaway-progress__bar {
+  height: 12px;
+}
+
+.layaway-progress-card .layaway-progress__text {
+  font-size: var(--font-size-sm);
+}
+
+.layaway-due--late {
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-danger);
+}
+
+/* Mosaicos que filtran la lista */
+.layaway-tile {
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+  transition:
+    transform 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.layaway-tile:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+.layaway-tile:focus-visible {
+  outline: 3px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+/* ---------- Detalle ---------- */
+.layaway-section-title {
+  margin: var(--space-5) 0 var(--space-3);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-bold);
+}
+
+.layaway-columns {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--space-4);
+}
+
+.layaway-panel {
+  padding: 0 var(--space-4) var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+}
+
+.layaway-list {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.layaway-list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-3) 0;
+  border-bottom: 1px dashed var(--color-border);
+}
+
+.layaway-list li:last-child {
+  border-bottom: 0;
+}
+
+.layaway-list__item--cancelled {
+  opacity: 0.55;
+  text-decoration: line-through;
+}
+
+.layaway-list__amount {
+  align-items: flex-end;
+  text-align: end;
+}
+
+.layaway-empty {
+  margin: 0;
+  padding: var(--space-3) 0;
+  color: var(--color-text-muted);
+}
+
+.layaway-cancelled {
+  margin-bottom: var(--space-4);
+  padding: var(--space-4);
+  border: 1px solid color-mix(in srgb, var(--color-danger) 35%, transparent);
+  border-radius: var(--radius-lg);
+  background: var(--color-danger-soft);
+}
+
+.layaway-cancelled h3 {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0 0 var(--space-2);
+  font-size: var(--font-size-md);
+}
+
+.layaway-cancelled h3 svg,
+.layaway-cancelled__split svg {
+  width: 18px;
+  height: 18px;
+}
+
+.layaway-cancelled p {
+  margin: 0 0 var(--space-3);
+}
+
+.layaway-cancelled__split {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+}
+
+.layaway-cancelled__split span {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+/* ---------- Modales ---------- */
+.layaway-deliver__items {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0 0 var(--space-4);
+  padding: 0;
+  list-style: none;
+}
+
+.layaway-deliver__items li {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-muted);
+}
+
+.layaway-deliver__items svg {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  color: var(--color-success);
+}
+
+.layaway-hint {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+.layaway-split {
+  margin: 0;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-warning);
+  background: var(--color-warning-soft);
+}
+
+.layaway-split--ok {
+  color: var(--color-success);
+  background: var(--color-success-soft);
+}
+
+/* ---------- Saldo a favor en el cliente ---------- */
+.credit-history {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.credit-history li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-3) 0;
+  border-bottom: 1px dashed var(--color-border);
+}
+
+.credit-history__amount--in {
+  color: var(--color-success);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .layaway-progress__fill,
+  .layaway-tile {
+    transition: none;
+  }
+
+  .layaway-tile:hover {
+    transform: none;
+  }
+}

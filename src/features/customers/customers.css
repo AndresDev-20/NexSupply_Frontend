@@ -1,0 +1,332 @@
+/* Clientes y cartera (Fase 9) */
+
+/* ---------- Lista ---------- */
+.customer-debt {
+  align-items: flex-end;
+  text-align: end;
+}
+
+.customer-debt__overdue {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-danger);
+}
+
+.customer-tags {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+}
+
+.customer-strike {
+  text-decoration: line-through;
+  color: var(--color-text-muted);
+}
+
+.customer-meta {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.customer-meta svg {
+  width: 14px;
+  height: 14px;
+}
+
+/* ---------- Barra de avance (también la usa el inventario físico) ---------- */
+.count-progress {
+  display: block;
+  height: 8px;
+  overflow: hidden;
+  border-radius: var(--radius-full);
+  background-color: color-mix(in srgb, var(--color-text) 8%, transparent);
+}
+
+.count-progress__bar {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--color-primary), var(--color-accent));
+  transition: width var(--duration-slow) var(--easing-standard);
+}
+
+/* ---------- Deudas del cliente ---------- */
+.debt-list {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.debt-card {
+  --debt-color: var(--color-warning);
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-4);
+  border: 1px solid var(--color-border);
+  border-left: 4px solid var(--debt-color);
+  border-radius: var(--radius-lg);
+  background-color: var(--color-surface);
+  animation: cash-rise var(--duration-slow) var(--easing-standard) both;
+}
+
+.debt-card--danger {
+  --debt-color: var(--color-danger);
+}
+
+.debt-card--success {
+  --debt-color: var(--color-success);
+}
+
+.debt-card--neutral {
+  --debt-color: var(--color-border-strong, var(--color-border));
+}
+
+.debt-card__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.debt-card__title {
+  overflow-wrap: anywhere;
+}
+
+.debt-card__meta {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+.debt-card__figures {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-5);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+.debt-card__figures strong {
+  margin-left: 4px;
+  color: var(--color-text);
+}
+
+.debt-card__installments {
+  display: grid;
+  gap: 2px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.debt-card__installment {
+  display: grid;
+  grid-template-columns: minmax(90px, 1fr) minmax(90px, auto) minmax(90px, auto) minmax(110px, auto) auto;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
+  background-color: color-mix(in srgb, var(--color-text) 4%, transparent);
+}
+
+.debt-card__actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+@media (max-width: 599px) {
+  .debt-card__installment {
+    grid-template-columns: 1fr auto;
+    row-gap: 2px;
+  }
+}
+
+/* ---------- Formularios ---------- */
+.debt-calc,
+.payment-quick {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--space-2);
+}
+
+.installment-editor {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.installment-editor__row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.installment-editor__number {
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-on-primary);
+  background-color: var(--color-primary);
+}
+
+.installment-editor__input {
+  flex: 1 1 0;
+  min-width: 0;
+  height: 38px;
+  padding: 0 var(--space-3);
+  border: 1px solid var(--color-border-strong, var(--color-border));
+  border-radius: var(--radius-md);
+  font: inherit;
+  color: var(--color-text);
+  background-color: var(--color-surface);
+}
+
+.installment-editor__input--money {
+  font-variant-numeric: tabular-nums;
+  text-align: end;
+}
+
+.installment-editor__input:focus-visible {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary) 25%, transparent);
+}
+
+.installment-editor__sum {
+  margin-top: var(--space-2);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  text-align: end;
+  color: var(--color-success);
+}
+
+.installment-editor__sum--off {
+  color: var(--color-danger);
+}
+
+/* ---------- Recibo de abono ---------- */
+.receipt-sheet {
+  display: grid;
+  gap: var(--space-3);
+  max-width: 420px;
+  margin: 0 auto;
+  padding: var(--space-4);
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius-lg);
+  background-color: var(--color-surface);
+}
+
+.receipt-sheet__head {
+  text-align: center;
+}
+
+.receipt-sheet__business {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+}
+
+.receipt-sheet__title {
+  font-weight: var(--font-weight-semibold);
+}
+
+.receipt-sheet__date {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+.receipt-sheet__cancelled {
+  margin-top: var(--space-2);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-danger);
+}
+
+.receipt-sheet__rows {
+  display: grid;
+  gap: var(--space-1);
+  margin: 0;
+  font-size: var(--font-size-sm);
+}
+
+.receipt-sheet__rows div {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.receipt-sheet__rows dt {
+  color: var(--color-text-muted);
+}
+
+.receipt-sheet__rows dd {
+  margin: 0;
+  text-align: end;
+}
+
+.receipt-sheet__table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--font-size-sm);
+}
+
+.receipt-sheet__table th,
+.receipt-sheet__table td {
+  padding: var(--space-1) 0;
+  border-bottom: 1px solid var(--color-border);
+  text-align: start;
+  vertical-align: top;
+}
+
+.receipt-sheet__table td.numeric,
+.receipt-sheet__table tfoot td {
+  text-align: end;
+  white-space: nowrap;
+}
+
+.receipt-sheet__table small {
+  display: block;
+  color: var(--color-text-muted);
+}
+
+.receipt-sheet__table tfoot th,
+.receipt-sheet__table tfoot td {
+  font-weight: var(--font-weight-bold);
+  border-bottom: 0;
+}
+
+.receipt-sheet__foot {
+  font-size: var(--font-size-xs);
+  text-align: center;
+  color: var(--color-text-muted);
+}
+
+/* Al imprimir solo sale el recibo, en negro sobre blanco */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+
+  .receipt-sheet,
+  .receipt-sheet * {
+    visibility: visible;
+    color: #000 !important;
+  }
+
+  .receipt-sheet {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    max-width: 80mm;
+    border: 0;
+    background: #fff;
+  }
+}

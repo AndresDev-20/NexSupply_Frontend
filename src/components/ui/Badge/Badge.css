@@ -1,0 +1,46 @@
+/* Bloque: badge */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  white-space: nowrap;
+}
+
+.badge__icon {
+  width: 12px;
+  height: 12px;
+}
+
+.badge--neutral {
+  color: var(--color-text-muted);
+  background-color: var(--color-surface-muted);
+}
+
+.badge--success {
+  color: var(--color-success);
+  background-color: var(--color-success-soft);
+}
+
+.badge--warning {
+  color: var(--color-warning);
+  background-color: var(--color-warning-soft);
+}
+
+.badge--danger {
+  color: var(--color-danger);
+  background-color: var(--color-danger-soft);
+}
+
+.badge--info {
+  color: var(--color-info);
+  background-color: var(--color-info-soft);
+}
+
+.badge--accent {
+  color: var(--color-text-on-accent);
+  background-color: var(--color-accent);
+}

@@ -1,0 +1,226 @@
+/* Bloque: notification-bell */
+.notification-bell {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.notification-bell__trigger {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  color: var(--color-text-muted);
+  background-color: var(--color-surface);
+}
+
+.notification-bell__trigger:hover {
+  color: var(--color-text);
+  background-color: var(--color-surface-muted);
+}
+
+.notification-bell__icon {
+  width: 20px;
+  height: 20px;
+}
+
+/* Con avisos sin leer la campana se mece un instante para llamar la atención */
+.notification-bell__trigger--active .notification-bell__icon {
+  color: var(--color-accent-strong);
+  transform-origin: top center;
+  animation: notification-bell-ring 1.2s var(--easing-standard) 2;
+}
+
+.notification-bell__count {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  display: grid;
+  place-items: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 5px;
+  border: 2px solid var(--color-surface);
+  border-radius: var(--radius-full);
+  font-size: 11px;
+  font-weight: var(--font-weight-bold);
+  color: var(--palette-white);
+  background-color: var(--color-danger);
+}
+
+.notification-bell__panel {
+  position: absolute;
+  top: calc(100% + var(--space-2));
+  right: calc(-1 * var(--space-12));
+  z-index: var(--z-modal);
+  width: min(360px, calc(100vw - 2 * var(--space-4)));
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background-color: var(--color-surface);
+  box-shadow: var(--shadow-lg);
+  animation: notification-bell-panel-in var(--duration-base) var(--easing-emphasized);
+  transform-origin: top right;
+}
+
+.notification-bell__header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.notification-bell__title {
+  font-weight: var(--font-weight-bold);
+}
+
+.notification-bell__mark-all {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: 0;
+  border: 0;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-primary);
+  background: none;
+}
+
+.notification-bell__list {
+  max-height: 380px;
+  overflow-y: auto;
+  padding: 0;
+  list-style: none;
+}
+
+.notification-bell__item {
+  display: grid;
+  gap: 2px;
+  width: 100%;
+  padding: var(--space-3) var(--space-4);
+  border: 0;
+  border-left: 3px solid transparent;
+  border-bottom: 1px solid var(--color-border);
+  text-align: left;
+  background: transparent;
+}
+
+.notification-bell__item:hover {
+  background-color: var(--color-surface-muted);
+}
+
+.notification-bell__item--unread {
+  background-color: color-mix(in srgb, var(--color-accent-soft) 55%, transparent);
+}
+
+.notification-bell__item--warning {
+  border-left-color: var(--color-warning);
+}
+
+.notification-bell__item--danger {
+  border-left-color: var(--color-danger);
+}
+
+.notification-bell__item--success {
+  border-left-color: var(--color-success);
+}
+
+.notification-bell__item--info {
+  border-left-color: var(--color-info);
+}
+
+.notification-bell__item-title {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+}
+
+.notification-bell__item-message {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+.notification-bell__item-date {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-subtle);
+}
+
+.notification-bell__empty {
+  display: grid;
+  place-items: center;
+  gap: var(--space-2);
+  padding: var(--space-8) var(--space-4);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+.notification-bell__empty-icon {
+  width: 28px;
+  height: 28px;
+  color: var(--color-text-subtle);
+}
+
+@keyframes notification-bell-ring {
+  0%,
+  60%,
+  100% {
+    transform: rotate(0);
+  }
+  10%,
+  30% {
+    transform: rotate(14deg);
+  }
+  20%,
+  40% {
+    transform: rotate(-14deg);
+  }
+}
+
+@keyframes notification-bell-panel-in {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(-4px);
+  }
+}
+
+@media (min-width: 768px) {
+  .notification-bell__panel {
+    right: 0;
+  }
+}
+
+/* Avisos en el escritorio y sonido (D-CLI-8) */
+.notification-bell__footer {
+  display: grid;
+  gap: var(--space-1);
+  padding: var(--space-2) var(--space-4) var(--space-3);
+  border-top: 1px solid var(--color-border);
+}
+
+.notification-bell__toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-1) 0;
+  border: 0;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  text-align: start;
+  color: var(--color-text-muted);
+  background: none;
+  cursor: pointer;
+}
+
+.notification-bell__toggle:hover,
+.notification-bell__toggle--call {
+  color: var(--color-primary);
+}
+
+.notification-bell__hint {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}

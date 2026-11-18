@@ -1,0 +1,107 @@
+/* Ayuda de atajos de teclado (Fase 15) */
+.shortcuts-help__section + .shortcuts-help__section {
+  margin-top: var(--space-5);
+}
+
+.shortcuts-help__section h3 {
+  margin: 0 0 var(--space-2);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+.shortcuts-help__list {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.shortcuts-help__list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-2) 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.shortcuts-help__list small {
+  color: var(--color-text-muted);
+}
+
+.shortcut-keys {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  white-space: nowrap;
+}
+
+.shortcut-keys__then {
+  margin: 0 var(--space-1);
+  font-size: var(--font-size-xs);
+  color: var(--color-text-subtle);
+}
+
+kbd {
+  display: inline-block;
+  min-width: 26px;
+  padding: 2px 7px;
+  border: 1px solid var(--color-border-strong);
+  border-bottom-width: 3px;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+  text-align: center;
+  color: var(--color-text);
+  background: var(--color-surface-muted);
+}
+
+.shortcut-pending {
+  position: fixed;
+  right: var(--space-5);
+  bottom: var(--space-5);
+  z-index: var(--z-toast);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-full);
+  font-weight: var(--font-weight-semibold);
+  color: var(--palette-white);
+  background: var(--palette-green-900);
+  box-shadow: var(--shadow-lg);
+  animation: shortcut-pending-in var(--duration-base) var(--easing-standard);
+}
+
+.shortcut-pending span {
+  font-weight: var(--font-weight-regular);
+  opacity: 0.75;
+}
+
+.shortcut-pending kbd {
+  color: var(--palette-green-900);
+  background: var(--palette-yellow-400);
+  border-color: var(--palette-yellow-600);
+}
+
+@keyframes shortcut-pending-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+.topbar__shortcuts {
+  display: none;
+}
+
+/* El botón de atajos solo tiene sentido con teclado físico: desde laptop */
+@media (min-width: 1024px) {
+  .topbar__shortcuts {
+    display: inline-flex;
+  }
+}

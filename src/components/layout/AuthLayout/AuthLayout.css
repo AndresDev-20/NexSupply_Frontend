@@ -1,0 +1,285 @@
+/* Bloque: auth-layout (mobile-first) */
+.auth-layout {
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+  background-color: var(--color-bg);
+}
+
+/* ---------- Panel de marca ---------- */
+.auth-layout__brand {
+  position: relative;
+  overflow: hidden;
+  padding: var(--space-6) var(--space-4) var(--space-10);
+  color: var(--palette-white);
+  background:
+    radial-gradient(90% 120% at 100% 0%, color-mix(in srgb, var(--palette-yellow-500) 30%, transparent) 0%, transparent 55%),
+    radial-gradient(80% 100% at 0% 100%, color-mix(in srgb, var(--palette-green-400) 28%, transparent) 0%, transparent 60%),
+    linear-gradient(160deg, var(--palette-green-800), var(--palette-green-950));
+}
+
+/* Con guirnalda de temporada, más aire arriba para que no tape el emblema */
+.auth-layout__brand:has(.seasonal) {
+  padding-top: var(--space-12);
+}
+
+/* En celular la marca va en una fila corta: ahí basta la guirnalda; el mensaje, desde tablet */
+.auth-layout__season {
+  display: none;
+  margin-top: var(--space-3);
+}
+
+@media (min-width: 768px) {
+  .auth-layout__season {
+    display: inline-flex;
+  }
+}
+
+/* Surco curvo inferior: evoca los campos del logo y une el panel con el formulario */
+.auth-layout__brand::after {
+  content: '';
+  position: absolute;
+  left: -10%;
+  right: -10%;
+  bottom: -46px;
+  height: 80px;
+  border-top: 3px solid color-mix(in srgb, var(--palette-yellow-500) 60%, transparent);
+  border-radius: 50%;
+  background-color: var(--color-bg);
+}
+
+.auth-layout__brand-inner {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.auth-layout__emblem {
+  width: 72px;
+  height: 48px;
+  object-fit: cover;
+  border-radius: var(--radius-md);
+  background-color: var(--palette-white);
+}
+
+.auth-layout__name {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-extrabold);
+  letter-spacing: -0.02em;
+}
+
+.auth-layout__name--accent {
+  color: var(--palette-yellow-400);
+}
+
+/* En celular la frase se oculta para dejar el formulario a la vista */
+.auth-layout__tagline {
+  display: none;
+}
+
+/* La granja animada solo aparece desde laptop (en celular el panel es una franja) */
+.auth-layout__scene {
+  display: none;
+}
+
+.auth-layout__emblem-wrap {
+  position: relative;
+  flex-shrink: 0;
+}
+
+/* ---------- Formulario ---------- */
+.auth-layout__main {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  padding: var(--space-4) var(--space-4) var(--space-6);
+}
+
+.auth-layout__card {
+  width: 100%;
+  max-width: 420px;
+  margin: auto 0;
+  animation: auth-layout-enter var(--duration-slow) var(--easing-standard);
+}
+
+.auth-layout__loading {
+  display: grid;
+  place-items: center;
+  min-height: 240px;
+}
+
+.auth-layout__footer {
+  margin-top: var(--space-8);
+}
+
+@keyframes auth-layout-enter {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+
+@keyframes auth-layout-brand-in {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+}
+
+@keyframes auth-layout-fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes auth-layout-rays {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes auth-layout-float {
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes auth-layout-glow {
+  50% {
+    opacity: 0.55;
+    transform: scale(1.12);
+  }
+}
+
+/* Tablet: el formulario pasa a ser una tarjeta */
+@media (min-width: 768px) {
+  .auth-layout__main {
+    padding: var(--space-8) var(--space-6);
+  }
+
+  .auth-layout__card {
+    padding: var(--space-10) var(--space-8);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
+    background-color: var(--color-surface);
+    box-shadow: var(--shadow-md);
+  }
+}
+
+/* Laptop: panel de marca a la izquierda, a toda la altura */
+@media (min-width: 1024px) {
+  .auth-layout {
+    flex-direction: row;
+  }
+
+  .auth-layout__brand {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44%;
+    padding: var(--space-12);
+  }
+
+  .auth-layout__brand::after {
+    display: none;
+  }
+
+  .auth-layout__brand-inner {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-5);
+    max-width: 380px;
+    /* Sube un poco para dejar espacio a las colinas y los animales */
+    margin-bottom: 18vh;
+  }
+
+  .auth-layout__scene {
+    position: absolute;
+    inset: 0;
+    display: block;
+    animation: auth-layout-brand-in 1s var(--easing-standard) both;
+  }
+
+  /* Rayos de sol que giran lentamente detrás del emblema */
+  .auth-layout__emblem-wrap::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 520px;
+    height: 520px;
+    margin: -260px 0 0 -260px;
+    border-radius: var(--radius-full);
+    background: repeating-conic-gradient(rgba(255, 201, 40, 0.13) 0deg 7deg, transparent 7deg 22deg);
+    mask-image: radial-gradient(circle, #000 25%, transparent 68%);
+    /* Aparecen junto con el emblema y luego giran sin parar */
+    animation:
+      auth-layout-fade-in 1.2s var(--easing-standard) 300ms both,
+      auth-layout-rays 60s linear infinite;
+    pointer-events: none;
+  }
+
+  .auth-layout__emblem {
+    position: relative;
+  }
+
+  .auth-layout__emblem {
+    width: 300px;
+    height: 200px;
+    border-radius: var(--radius-xl);
+    box-shadow: 0 18px 50px rgba(0, 0, 0, 0.35);
+    /* Flota suavemente: da vida al panel sin distraer */
+    animation:
+      auth-layout-brand-in 700ms var(--easing-standard) both,
+      auth-layout-float 6s ease-in-out 700ms infinite;
+  }
+
+  .auth-layout__name {
+    animation: auth-layout-brand-in 700ms var(--easing-standard) 120ms both;
+  }
+
+  .auth-layout__tagline {
+    animation: auth-layout-brand-in 700ms var(--easing-standard) 240ms both;
+  }
+
+  /* El mensaje de temporada entra después del lema */
+  .auth-layout__season {
+    animation: auth-layout-brand-in 700ms var(--easing-standard) 360ms both;
+  }
+
+  /* Resplandor de sol que "respira" detrás del panel */
+  .auth-layout__brand::before {
+    content: '';
+    position: absolute;
+    top: -20%;
+    right: -20%;
+    width: 70%;
+    aspect-ratio: 1;
+    border-radius: var(--radius-full);
+    background: radial-gradient(circle, rgba(255, 201, 40, 0.28) 0%, transparent 65%);
+    animation: auth-layout-glow 8s ease-in-out infinite;
+    pointer-events: none;
+  }
+
+  .auth-layout__name {
+    font-size: var(--font-size-3xl);
+  }
+
+  .auth-layout__tagline {
+    display: block;
+    font-size: var(--font-size-lg);
+    color: var(--palette-green-100);
+  }
+
+  .auth-layout__main {
+    flex: 1;
+    justify-content: center;
+  }
+
+  .auth-layout__card {
+    margin: auto;
+  }
+}

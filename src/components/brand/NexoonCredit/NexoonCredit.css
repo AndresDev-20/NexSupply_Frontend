@@ -1,0 +1,18 @@
+/* Bloque: nexoon-credit */
+.nexoon-credit {
+  font-size: var(--font-size-xs);
+  letter-spacing: 0.02em;
+  /* text-muted y no text-subtle: el gris más claro no llegaba al contraste mínimo (4,5:1)
+     sobre el fondo claro; revisado con axe en el navegador (Fase 16) */
+  color: var(--color-text-muted);
+}
+
+.nexoon-credit__brand {
+  font-weight: var(--font-weight-bold);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.nexoon-credit--inverse {
+  color: var(--color-sidebar-text-muted);
+}

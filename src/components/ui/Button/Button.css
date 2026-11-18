@@ -1,0 +1,111 @@
+/* Bloque: button */
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  min-height: 44px; /* área táctil mínima recomendada en celular */
+  padding: 0 var(--space-5);
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  line-height: 1;
+  white-space: nowrap;
+  transition:
+    background-color var(--duration-fast) var(--easing-standard),
+    border-color var(--duration-fast) var(--easing-standard),
+    transform var(--duration-fast) var(--easing-standard);
+}
+
+.button:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.button__icon {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+.button__icon--spin {
+  animation: button-spin 0.8s linear infinite;
+}
+
+/* Modificadores de variante */
+.button--primary {
+  background-color: var(--color-primary);
+  color: var(--color-text-on-primary);
+}
+
+.button--primary:hover:not(:disabled) {
+  background-color: var(--color-primary-hover);
+}
+
+.button--accent {
+  background-color: var(--color-accent);
+  color: var(--color-text-on-accent);
+}
+
+.button--accent:hover:not(:disabled) {
+  background-color: var(--color-accent-hover);
+}
+
+.button--secondary {
+  background-color: var(--color-surface);
+  border-color: var(--color-border-strong);
+  color: var(--color-text);
+}
+
+.button--secondary:hover:not(:disabled) {
+  background-color: var(--color-surface-muted);
+}
+
+.button--ghost {
+  background-color: transparent;
+  color: var(--color-text);
+}
+
+.button--ghost:hover:not(:disabled) {
+  background-color: var(--color-surface-muted);
+}
+
+.button--danger {
+  background-color: var(--color-danger);
+  color: var(--palette-white);
+}
+
+/* Modificadores de tamaño */
+.button--sm {
+  min-height: 36px;
+  padding: 0 var(--space-3);
+  font-size: var(--font-size-xs);
+}
+
+.button--lg {
+  min-height: 52px;
+  padding: 0 var(--space-6);
+  font-size: var(--font-size-md);
+}
+
+@keyframes button-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .button__icon--spin {
+    animation-duration: 2.4s;
+  }
+}
+
+/* Modificador: ícono después del texto (ej. "Siguiente →") */
+.button--icon-end {
+  flex-direction: row-reverse;
+}

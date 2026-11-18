@@ -1,0 +1,146 @@
+/* Transferencias entre sedes (Fase 18) */
+
+/* Ruta "Centro → Norte": la sede activa resaltada */
+.transfer-route {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-1);
+  font-size: var(--font-size-sm);
+}
+
+.transfer-route svg {
+  width: 16px;
+  height: 16px;
+  color: var(--color-text-muted);
+}
+
+.transfer-route__here {
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-primary);
+}
+
+/* Línea del envío: presentación y cantidad */
+.transfer-line__fields {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 160px), 1fr));
+  gap: var(--space-3);
+  align-items: start;
+}
+
+.transfer-form__error {
+  margin-top: var(--space-2);
+  font-size: var(--font-size-xs);
+  color: var(--color-danger);
+}
+
+/* Detalle */
+.transfer-detail {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.transfer-detail__summary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-4);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+.transfer-detail__notes {
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
+  background-color: var(--color-surface-muted);
+}
+
+.transfer-detail__scroll {
+  overflow-x: auto;
+}
+
+.transfer-detail__table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--font-size-sm);
+}
+
+.transfer-detail__table th,
+.transfer-detail__table td {
+  padding: var(--space-2) var(--space-3);
+  border-bottom: 1px solid var(--color-border);
+  text-align: left;
+  vertical-align: top;
+}
+
+.transfer-detail__table th {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-muted);
+}
+
+.transfer-detail__table .numeric {
+  text-align: right;
+  white-space: nowrap;
+}
+
+/* Recibir */
+.transfer-receive {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.transfer-receive__intro {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+.transfer-receive__list {
+  display: grid;
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.transfer-receive__item {
+  display: grid;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  transition: border-color var(--duration-fast) var(--easing-standard);
+}
+
+.transfer-receive__item--difference {
+  border-color: color-mix(in srgb, var(--color-warning) 60%, var(--color-border));
+  background-color: color-mix(in srgb, var(--color-warning) 6%, var(--color-surface));
+}
+
+.transfer-receive__name {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: var(--space-1) var(--space-3);
+  font-size: var(--font-size-sm);
+}
+
+.transfer-receive__missing {
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-danger);
+}
+
+.transfer-receive__fields {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 150px), 1fr));
+  gap: var(--space-3);
+  align-items: start;
+}
+
+.transfer-receive__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--space-2);
+}

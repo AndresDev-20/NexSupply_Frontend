@@ -1,0 +1,179 @@
+/* Bloque: welcome-overlay — bienvenida tras iniciar sesión */
+.welcome-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-toast);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-6);
+  color: var(--palette-white);
+  text-align: center;
+  background:
+    radial-gradient(60% 50% at 50% 42%, color-mix(in srgb, var(--palette-yellow-500) 22%, transparent) 0%, transparent 70%),
+    radial-gradient(90% 80% at 50% 120%, color-mix(in srgb, var(--palette-green-400) 35%, transparent) 0%, transparent 60%),
+    linear-gradient(160deg, var(--palette-green-800), var(--palette-green-950));
+  animation: welcome-overlay-in 320ms var(--easing-standard) both;
+}
+
+/* Salida: se agranda levemente y se desvanece, revelando el sistema */
+.welcome-overlay--exiting {
+  animation: welcome-overlay-out 450ms var(--easing-standard) forwards;
+}
+
+.welcome-overlay__content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+/* ---------- Insignia con check ---------- */
+.welcome-overlay__badge {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 120px;
+  height: 120px;
+  margin-bottom: var(--space-4);
+}
+
+/* Ondas que se expanden desde el check, como el sol del logo */
+.welcome-overlay__ring {
+  position: absolute;
+  inset: 0;
+  border: 2px solid var(--palette-yellow-400);
+  border-radius: var(--radius-full);
+  opacity: 0;
+  animation: welcome-overlay-ring 1.4s var(--easing-standard) forwards;
+}
+
+.welcome-overlay__ring--1 {
+  animation-delay: 450ms;
+}
+
+.welcome-overlay__ring--2 {
+  animation-delay: 650ms;
+}
+
+.welcome-overlay__ring--3 {
+  animation-delay: 850ms;
+}
+
+.welcome-overlay__check {
+  position: relative;
+  width: 96px;
+  height: 96px;
+  border-radius: var(--radius-full);
+  animation: welcome-overlay-pop 500ms var(--easing-emphasized) 550ms both;
+}
+
+/* El círculo y el check se "dibujan" animando el trazo */
+.welcome-overlay__check-circle {
+  fill: none;
+  stroke: var(--palette-yellow-400);
+  stroke-width: 2.5;
+  stroke-dasharray: 151;
+  stroke-dashoffset: 151;
+  animation: welcome-overlay-draw 600ms var(--easing-standard) 100ms forwards;
+}
+
+.welcome-overlay__check-mark {
+  fill: none;
+  stroke: var(--palette-white);
+  stroke-width: 4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 36;
+  stroke-dashoffset: 36;
+  animation: welcome-overlay-draw 380ms var(--easing-standard) 550ms forwards;
+}
+
+/* ---------- Textos ---------- */
+.welcome-overlay__title {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-extrabold);
+  letter-spacing: -0.02em;
+  animation: welcome-overlay-rise 500ms var(--easing-standard) 700ms both;
+}
+
+.welcome-overlay__subtitle {
+  color: var(--palette-green-100);
+  animation: welcome-overlay-rise 500ms var(--easing-standard) 850ms both;
+}
+
+.welcome-overlay__credit {
+  position: absolute;
+  bottom: var(--space-6);
+  animation: welcome-overlay-rise 500ms var(--easing-standard) 1s both;
+}
+
+@media (min-width: 768px) {
+  .welcome-overlay__title {
+    font-size: var(--font-size-3xl);
+  }
+}
+
+/* ---------- Animaciones ---------- */
+@keyframes welcome-overlay-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes welcome-overlay-out {
+  to {
+    opacity: 0;
+    transform: scale(1.04);
+    visibility: hidden;
+  }
+}
+
+@keyframes welcome-overlay-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes welcome-overlay-pop {
+  0% {
+    transform: scale(1);
+  }
+  40% {
+    transform: scale(1.12);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes welcome-overlay-ring {
+  0% {
+    opacity: 0.8;
+    transform: scale(0.8);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(2.2);
+  }
+}
+
+@keyframes welcome-overlay-rise {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+}
+
+/* Con "reducir movimiento": sin trazos ni ondas, todo visible de inmediato */
+@media (prefers-reduced-motion: reduce) {
+  .welcome-overlay__ring {
+    display: none;
+  }
+
+  .welcome-overlay__check-circle,
+  .welcome-overlay__check-mark {
+    stroke-dashoffset: 0;
+  }
+}

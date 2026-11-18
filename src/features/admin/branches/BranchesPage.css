@@ -1,0 +1,46 @@
+/* Bloque: branches-usage — "1 de 1 sucursal en el plan Básico" */
+.branches-usage {
+  margin-top: var(--space-2);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+.branches-usage__count {
+  font-weight: var(--font-weight-bold);
+  color: var(--color-primary);
+}
+
+.branches-page__notice {
+  margin-bottom: var(--space-4);
+}
+
+/* Bloque: branch-cell */
+.branch-cell {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.branch-cell__icon {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-md);
+  color: var(--color-primary);
+  background-color: var(--color-primary-soft);
+}
+
+.branch-cell__text {
+  display: grid;
+}
+
+.branch-cell__name {
+  font-weight: var(--font-weight-semibold);
+}
+
+.branch-cell__code {
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}

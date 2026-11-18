@@ -1,0 +1,155 @@
+/* Bloque: user-badge — carné de vista previa (siempre verde oscuro: es la marca) */
+.user-badge {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: var(--space-6) var(--space-5) var(--space-5);
+  overflow: hidden;
+  border-radius: var(--radius-xl);
+  color: var(--palette-white);
+  text-align: center;
+  background:
+    radial-gradient(80% 50% at 50% 0%, rgba(255, 201, 40, 0.3) 0%, transparent 70%),
+    radial-gradient(90% 60% at 50% 100%, color-mix(in srgb, var(--palette-green-400) 25%, transparent) 0%, transparent 70%),
+    linear-gradient(170deg, var(--palette-green-700), var(--palette-green-950));
+  box-shadow: var(--shadow-lg);
+}
+
+/* Ranura para la cinta del carné */
+.user-badge__hanger {
+  position: absolute;
+  top: 10px;
+  width: 54px;
+  height: 7px;
+  border-radius: var(--radius-full);
+  background-color: rgba(0, 0, 0, 0.35);
+}
+
+.user-badge__brand {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-extrabold);
+  letter-spacing: -0.01em;
+}
+
+.user-badge__emblem {
+  width: 30px;
+  height: 20px;
+  object-fit: cover;
+  border-radius: 4px;
+  background-color: var(--palette-white);
+}
+
+.user-badge__brand-accent {
+  color: var(--palette-yellow-400);
+}
+
+.user-badge__avatar {
+  display: grid;
+  place-items: center;
+  width: 84px;
+  height: 84px;
+  margin-top: var(--space-5);
+  border: 4px solid var(--palette-yellow-400);
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-extrabold);
+  color: var(--palette-green-900);
+  background-color: var(--palette-white);
+  box-shadow: 0 0 0 6px rgba(255, 201, 40, 0.18);
+  transition: transform var(--duration-base) var(--easing-emphasized);
+}
+
+.user-badge__avatar--empty {
+  color: var(--palette-green-600);
+  background-color: var(--palette-green-100);
+}
+
+.user-badge__name {
+  margin-top: var(--space-4);
+  max-width: 100%;
+  overflow: hidden;
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.user-badge__name--placeholder {
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.user-badge__role {
+  margin-top: var(--space-2);
+  padding: 3px var(--space-3);
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  color: var(--palette-green-900);
+  background-color: var(--palette-yellow-400);
+}
+
+.user-badge__role--empty {
+  color: rgba(255, 255, 255, 0.7);
+  background-color: rgba(255, 255, 255, 0.12);
+}
+
+.user-badge__details {
+  display: grid;
+  gap: var(--space-2);
+  width: 100%;
+  margin: var(--space-5) 0 0;
+  padding-top: var(--space-4);
+  border-top: 1px dashed rgba(255, 255, 255, 0.25);
+  font-size: var(--font-size-xs);
+}
+
+.user-badge__row {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.user-badge__row dt {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.user-badge__row dd {
+  min-width: 0;
+  margin: 0;
+  overflow: hidden;
+  font-weight: var(--font-weight-semibold);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.user-badge__status {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  margin-top: var(--space-5);
+  padding: 4px var(--space-3);
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+}
+
+.user-badge__status--accent {
+  color: var(--palette-yellow-400);
+  background-color: rgba(255, 201, 40, 0.15);
+  border: 1px solid rgba(255, 201, 40, 0.4);
+}
+
+.user-badge__status--success {
+  color: var(--palette-green-200);
+  background-color: color-mix(in srgb, var(--palette-green-400) 20%, transparent);
+}
+
+.user-badge__status--muted {
+  color: rgba(255, 255, 255, 0.6);
+  background-color: rgba(255, 255, 255, 0.1);
+}

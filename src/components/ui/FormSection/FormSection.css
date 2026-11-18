@@ -1,0 +1,70 @@
+/* Bloque: form-section */
+.form-section {
+  /* Las columnas dependen del ancho de la sección, no de la pantalla: la misma sección
+     puede estar en un modal, junto a una vista previa o a lo ancho de la página */
+  container-type: inline-size;
+  padding: var(--space-5);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background-color: var(--color-surface);
+  animation: form-section-in var(--duration-slow) var(--easing-standard);
+}
+
+.form-section + .form-section {
+  margin-top: var(--space-4);
+}
+
+.form-section__header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-5);
+}
+
+.form-section__icon {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  flex-shrink: 0;
+  border-radius: var(--radius-md);
+  color: var(--color-primary);
+  background-color: var(--color-primary-soft);
+}
+
+.form-section__icon svg {
+  width: 20px;
+  height: 20px;
+}
+
+.form-section__title {
+  font-size: var(--font-size-md);
+}
+
+.form-section__description {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
+
+.form-section__fields {
+  display: grid;
+  gap: var(--space-4);
+}
+
+@keyframes form-section-in {
+  from {
+    opacity: 0;
+    transform: translateX(12px);
+  }
+}
+
+@container (min-width: 520px) {
+  .form-section__fields--cols-2 {
+    grid-template-columns: 1fr 1fr;
+    column-gap: var(--space-4);
+  }
+
+  .form-section__full {
+    grid-column: 1 / -1;
+  }
+}

@@ -1,0 +1,50 @@
+# ---------------------------------------------------------------------
+# NexSupply · Frontend — lo que NO se sube al repositorio
+# ---------------------------------------------------------------------
+
+# Dependencias (se instalan con npm install)
+node_modules/
+
+# Compilado para producción (se genera con npm run build)
+dist/
+dist-ssr/
+
+# Variables de entorno locales. Solo se sube el ejemplo.
+.env
+.env.*
+!.env.example
+*.local
+
+# Caché de Vite y reportes de pruebas
+.vite/
+coverage/
+
+# Registros
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Sistema operativo y editores
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/*
+!.vscode/extensions.json
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Asistentes de IA (configuración local, no es parte del sistema)
+CLAUDE.md
+.claude/
+AGENTS.md
+.cursor/
+.cursorrules
+.aider*
+.github/copilot-instructions.md

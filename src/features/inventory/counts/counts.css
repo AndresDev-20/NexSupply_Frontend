@@ -1,0 +1,275 @@
+/* Inventario físico (Fase 8, D-INV-15) */
+
+/* ---------- Banner del conteo en curso ---------- */
+.count-banner {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  margin-bottom: var(--space-5);
+  padding: var(--space-4) var(--space-5);
+  border: 1px solid color-mix(in srgb, var(--color-info) 35%, var(--color-border));
+  border-radius: var(--radius-xl);
+  color: inherit;
+  text-decoration: none;
+  background: linear-gradient(120deg, color-mix(in srgb, var(--color-info) 14%, var(--color-surface)), var(--color-surface) 75%);
+  box-shadow: var(--shadow-sm);
+  transition:
+    transform var(--duration-fast) var(--easing-standard),
+    box-shadow var(--duration-fast) var(--easing-standard);
+  animation: cash-rise var(--duration-slow) var(--easing-standard) both;
+}
+
+.count-banner:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.count-banner__icon {
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-lg);
+  color: var(--color-info);
+  background-color: color-mix(in srgb, var(--color-info) 18%, transparent);
+}
+
+.count-banner__icon svg {
+  width: 26px;
+  height: 26px;
+}
+
+.count-banner__text {
+  display: grid;
+  flex: 1;
+  gap: 4px;
+  min-width: 0;
+}
+
+.count-banner__title {
+  font-weight: var(--font-weight-bold);
+}
+
+.count-banner__detail {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+.count-banner__action {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-weight: var(--font-weight-semibold);
+  white-space: nowrap;
+  color: var(--color-primary);
+}
+
+.count-banner__action svg {
+  width: 18px;
+  height: 18px;
+  transition: transform var(--duration-fast) var(--easing-standard);
+}
+
+.count-banner:hover .count-banner__action svg {
+  transform: translateX(3px);
+}
+
+@media (max-width: 599px) {
+  .count-banner {
+    flex-wrap: wrap;
+    padding: var(--space-4);
+  }
+
+  .count-banner__action {
+    width: 100%;
+    justify-content: flex-end;
+  }
+}
+
+/* ---------- Barra de avance ---------- */
+.count-progress {
+  display: block;
+  height: 8px;
+  overflow: hidden;
+  border-radius: var(--radius-full);
+  background-color: var(--color-surface-sunken, color-mix(in srgb, var(--color-text) 8%, transparent));
+}
+
+.count-progress__bar {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--color-primary), var(--color-accent));
+  transition: width var(--duration-slow) var(--easing-standard);
+}
+
+/* ---------- Encabezado del conteo ---------- */
+.count-hero {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-4);
+  margin-bottom: var(--space-4);
+  padding: var(--space-5);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  background:
+    radial-gradient(60% 140% at 100% 0%, color-mix(in srgb, var(--color-accent) 18%, transparent), transparent 60%),
+    var(--color-surface);
+  box-shadow: var(--shadow-sm);
+}
+
+.count-hero__icon {
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  border-radius: var(--radius-lg);
+  color: var(--color-text-on-primary);
+  background-color: var(--color-primary);
+}
+
+.count-hero__icon svg {
+  width: 28px;
+  height: 28px;
+}
+
+.count-hero__text {
+  display: grid;
+  flex: 1;
+  gap: var(--space-1);
+  min-width: 220px;
+}
+
+.count-hero__title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+  font-size: var(--font-size-2xl);
+  line-height: var(--line-height-tight);
+}
+
+.count-hero__meta {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+.count-hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.count-page__alert {
+  margin-bottom: var(--space-4);
+}
+
+/* ---------- Tarjeta de avance ---------- */
+.count-progress-card {
+  display: grid;
+  gap: var(--space-2);
+  margin-bottom: var(--space-4);
+  padding: var(--space-4) var(--space-5);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  background-color: var(--color-surface);
+}
+
+.count-progress-card__head {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-3);
+  font-size: var(--font-size-sm);
+}
+
+.count-progress-card__head strong {
+  font-size: var(--font-size-lg);
+}
+
+.count-progress-card__note {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+.count-progress-card__note svg {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  margin-top: 2px;
+  color: var(--color-info);
+}
+
+/* ---------- Búsqueda / escáner ---------- */
+.count-search {
+  max-width: 560px;
+  margin-bottom: var(--space-4);
+}
+
+/* ---------- Celdas ---------- */
+.count-cell__pending {
+  font-size: var(--font-size-sm);
+  font-style: italic;
+  color: var(--color-text-muted);
+}
+
+.count-cell__counted {
+  font-weight: var(--font-weight-semibold);
+}
+
+/* ---------- Casilla de conteo en la fila ---------- */
+.count-editor {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.count-editor__input,
+.count-editor__unit {
+  height: 36px;
+  padding: 0 var(--space-2);
+  border: 1px solid var(--color-border-strong, var(--color-border));
+  border-radius: var(--radius-md);
+  font: inherit;
+  font-size: var(--font-size-sm);
+  color: var(--color-text);
+  background-color: var(--color-surface);
+}
+
+.count-editor__input {
+  flex: 1 1 72px;
+  width: 92px;
+  max-width: 110px;
+  min-width: 64px;
+  font-variant-numeric: tabular-nums;
+  text-align: end;
+}
+
+.count-editor__unit {
+  flex: 0 1 auto;
+  min-width: 0;
+  max-width: 130px;
+}
+
+.count-editor__input:focus-visible,
+.count-editor__unit:focus-visible {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary) 25%, transparent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .count-banner,
+  .count-banner:hover {
+    transform: none;
+    animation: none;
+  }
+}

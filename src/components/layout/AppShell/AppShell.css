@@ -1,0 +1,85 @@
+/* Bloque: app-shell */
+.app-shell {
+  min-height: 100dvh;
+}
+
+.app-shell__overlay {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-overlay);
+  background-color: var(--color-overlay);
+  animation: app-shell-fade-in var(--duration-base) var(--easing-standard);
+}
+
+.app-shell__main {
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+}
+
+.app-shell__content {
+  flex: 1;
+  width: 100%;
+  max-width: var(--layout-content-max-width);
+  margin: 0 auto;
+  padding: var(--space-5) var(--space-4) var(--space-8);
+}
+
+/* Entrada suave de cada pantalla (Fase 15). Sin movimiento si el sistema lo pide. */
+.app-shell__page {
+  animation: app-shell-page-in var(--duration-slow) var(--easing-standard) both;
+}
+
+@keyframes app-shell-page-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app-shell__page {
+    animation: none;
+  }
+}
+
+.app-shell__footer {
+  display: flex;
+  justify-content: center;
+  padding: var(--space-4);
+  border-top: 1px solid var(--color-border);
+}
+
+@keyframes app-shell-fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@media (min-width: 768px) {
+  .app-shell__content {
+    padding: var(--space-8) var(--space-6) var(--space-10);
+  }
+}
+
+/* Laptop: el contenido deja espacio al menú fijo y el overlay no hace falta */
+@media (min-width: 1024px) {
+  .app-shell__main {
+    margin-left: var(--layout-sidebar-width);
+  }
+
+  .app-shell__overlay {
+    display: none;
+  }
+
+  .app-shell__footer {
+    justify-content: flex-end;
+    padding: var(--space-4) var(--space-8);
+  }
+}
+
+@media (min-width: 1440px) {
+  .app-shell__content {
+    padding: var(--space-10) var(--space-10) var(--space-12);
+  }
+}

@@ -1,0 +1,192 @@
+/* Bloque: receipt-preview — tirilla de papel con borde dentado */
+.receipt-preview {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-3);
+  margin: 0;
+}
+
+.receipt-preview__paper {
+  --receipt-width: 280px;
+  position: relative;
+  width: min(100%, var(--receipt-width));
+  padding: var(--space-5) var(--space-4) var(--space-6);
+  /* El papel es siempre blanco, también en modo oscuro: así se imprime */
+  color: #1b1b1b;
+  background-color: var(--palette-white);
+  font-family: var(--font-family-mono);
+  font-size: 11px;
+  line-height: 1.45;
+  box-shadow: var(--shadow-md);
+  transition: width var(--duration-slow) var(--easing-standard);
+}
+
+/* Borde inferior dentado, como una tirilla recién cortada */
+.receipt-preview__paper::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  bottom: -8px;
+  left: 0;
+  height: 8px;
+  background: linear-gradient(-45deg, transparent 6px, var(--palette-white) 0) 0 0 / 12px 8px repeat-x,
+    linear-gradient(45deg, transparent 6px, var(--palette-white) 0) 0 0 / 12px 8px repeat-x;
+}
+
+.receipt-preview__paper--58mm {
+  --receipt-width: 210px;
+  font-size: 10px;
+}
+
+.receipt-preview__paper--letter {
+  --receipt-width: 340px;
+  padding: var(--space-6);
+  font-family: var(--font-family-base);
+}
+
+.receipt-preview__header {
+  display: grid;
+  justify-items: center;
+  gap: 1px;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+
+.receipt-preview__logo {
+  max-width: 60%;
+  max-height: 56px;
+  margin-bottom: var(--space-2);
+  object-fit: contain;
+}
+
+.receipt-preview__business {
+  font-size: 1.25em;
+  font-weight: var(--font-weight-bold);
+}
+
+.receipt-preview__regime {
+  font-style: italic;
+}
+
+.receipt-preview__divider {
+  margin: var(--space-2) 0;
+  border-top: 1px dashed #9a9a9a;
+}
+
+.receipt-preview__title {
+  font-weight: var(--font-weight-bold);
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.receipt-preview__meta {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: var(--space-1);
+}
+
+.receipt-preview__items {
+  display: grid;
+  gap: var(--space-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.receipt-preview__item {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.receipt-preview__item > :last-child {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.receipt-preview__item-name {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.receipt-preview__total {
+  display: flex;
+  justify-content: space-between;
+  font-size: 1.2em;
+  font-weight: var(--font-weight-bold);
+}
+
+.receipt-preview__payment {
+  color: #555;
+}
+
+.receipt-preview__footer {
+  margin-top: var(--space-3);
+  font-weight: var(--font-weight-semibold);
+  text-align: center;
+  white-space: pre-line;
+}
+
+.receipt-preview__contact {
+  display: grid;
+  margin-top: var(--space-2);
+  text-align: center;
+}
+
+.receipt-preview__legal {
+  margin-top: var(--space-3);
+  font-size: 0.85em;
+  color: #666;
+  text-align: center;
+}
+
+.receipt-preview__caption {
+  margin-top: var(--space-2);
+  font-size: var(--font-size-xs);
+  color: var(--color-text-subtle);
+}
+
+/* Bloque: email-preview */
+.email-preview {
+  display: grid;
+  gap: var(--space-2);
+  margin-top: var(--space-6);
+  padding: var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background-color: var(--color-surface);
+  font-size: var(--font-size-sm);
+  box-shadow: var(--shadow-sm);
+}
+
+.email-preview__from {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
+
+.email-preview__subject {
+  font-weight: var(--font-weight-bold);
+}
+
+.email-preview__body {
+  color: var(--color-text-muted);
+  white-space: pre-line;
+}
+
+.email-preview__attachment {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  justify-self: start;
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-xs);
+  background-color: var(--color-surface-muted);
+}
+
+.email-preview__attachment svg {
+  width: 14px;
+  height: 14px;
+}

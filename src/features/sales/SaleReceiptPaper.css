@@ -1,0 +1,387 @@
+/* ==========================================================================
+   Comprobante de venta (D10, D-CFG-6)
+   En pantalla: colores de la marca, sombra y borde de papel rasgado.
+   Al imprimir: el mismo diseño con sus fondos, sin sombra ni borde rasgado.
+   ========================================================================== */
+.rcpt {
+  --rcpt-ink: #14251a;
+  --rcpt-muted: #5c6b61;
+  --rcpt-line: #d7ded9;
+  --rcpt-brand: #1f7a3a;
+  --rcpt-brand-2: #2f9e44;
+  --rcpt-accent: #f2b705;
+  --rcpt-soft: #f1f6f2;
+  position: relative;
+  display: grid;
+  gap: 12px;
+  margin: 0 auto 14px;
+  padding: 22px 18px 26px;
+  font-family: var(--font-family-base, system-ui, sans-serif);
+  font-size: 12px;
+  line-height: 1.4;
+  font-variant-numeric: tabular-nums;
+  color: var(--rcpt-ink);
+  background: #fff;
+  border-radius: 6px 6px 0 0;
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.06),
+    0 18px 40px -18px rgba(0, 0, 0, 0.45);
+  animation: rcpt-in 420ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* Borde inferior de papel rasgado */
+.rcpt::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  bottom: -10px;
+  left: 0;
+  height: 10px;
+  background:
+    linear-gradient(135deg, #fff 33.33%, transparent 33.33%) 0 0 / 14px 10px,
+    linear-gradient(225deg, #fff 33.33%, transparent 33.33%) 0 0 / 14px 10px;
+}
+
+@keyframes rcpt-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.98);
+  }
+}
+
+.rcpt p {
+  margin: 0;
+}
+
+.rcpt--58mm {
+  width: 58mm;
+  padding: 16px 10px 20px;
+  font-size: 10px;
+}
+
+.rcpt--80mm {
+  width: 80mm;
+}
+
+/* ---------- Encabezado del negocio ---------- */
+.rcpt__brand {
+  display: grid;
+  justify-items: center;
+  gap: 2px;
+  text-align: center;
+}
+
+.rcpt__logo {
+  display: block;
+  max-width: 60%;
+  max-height: 64px;
+  margin-bottom: 6px;
+  object-fit: contain;
+}
+
+.rcpt__monogram {
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  margin-bottom: 6px;
+  border-radius: 50%;
+  font-size: 16px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  color: #fff;
+  background: linear-gradient(135deg, var(--rcpt-brand-2), var(--rcpt-brand));
+  box-shadow: 0 0 0 3px #fff, 0 0 0 4px var(--rcpt-accent);
+}
+
+.rcpt__business {
+  font-size: 1.45em;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  line-height: 1.15;
+}
+
+.rcpt__muted {
+  font-size: 0.92em;
+  color: var(--rcpt-muted);
+}
+
+/* ---------- Número del comprobante ---------- */
+.rcpt__doc {
+  display: grid;
+  justify-items: center;
+  gap: 1px;
+  padding: 10px 8px;
+  border-radius: 10px;
+  text-align: center;
+  color: #fff;
+  background:
+    radial-gradient(80% 140% at 100% 0%, rgba(242, 183, 5, 0.35), transparent 60%),
+    linear-gradient(120deg, var(--rcpt-brand), var(--rcpt-brand-2));
+}
+
+.rcpt__doc-label {
+  font-size: 0.8em;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  opacity: 0.9;
+}
+
+.rcpt__doc-number {
+  font-size: 1.7em;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+}
+
+.rcpt__doc-date {
+  font-size: 0.92em;
+  opacity: 0.92;
+}
+
+/* Venta anulada (D-DEV-2): se ve aunque se imprima */
+.rcpt__void {
+  display: grid;
+  justify-items: center;
+  gap: 2px;
+  padding: 8px;
+  border: 2px solid #c53030;
+  border-radius: 10px;
+  text-align: center;
+  color: #c53030;
+}
+
+.rcpt__void strong {
+  font-size: 1.2em;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+/* ---------- Datos de la venta ---------- */
+.rcpt__meta {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px 10px;
+  margin: 0;
+  padding: 10px;
+  border-radius: 10px;
+  background: var(--rcpt-soft);
+}
+
+.rcpt__meta div {
+  min-width: 0;
+}
+
+.rcpt__meta dt {
+  font-size: 0.78em;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--rcpt-muted);
+}
+
+.rcpt__meta dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+  font-weight: 600;
+}
+
+.rcpt--58mm .rcpt__meta {
+  grid-template-columns: 1fr;
+}
+
+/* ---------- Productos ---------- */
+.rcpt__items {
+  display: grid;
+}
+
+.rcpt__items-head {
+  display: flex;
+  justify-content: space-between;
+  padding-bottom: 5px;
+  border-bottom: 2px solid var(--rcpt-ink);
+  font-size: 0.78em;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.rcpt__item {
+  display: grid;
+  gap: 1px;
+  padding: 7px 0;
+  border-bottom: 1px dashed var(--rcpt-line);
+}
+
+.rcpt__item-main {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.rcpt__item-name {
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.rcpt__item-total {
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.rcpt__item-detail {
+  font-size: 0.92em;
+  color: var(--rcpt-muted);
+}
+
+.rcpt__item-discount {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.92em;
+  font-weight: 600;
+  color: var(--rcpt-brand);
+}
+
+/* ---------- Totales ---------- */
+.rcpt__totals,
+.rcpt__payments {
+  display: grid;
+  gap: 3px;
+}
+
+.rcpt__row {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.rcpt__row > span:first-child {
+  color: var(--rcpt-muted);
+}
+
+.rcpt__row--strong {
+  font-weight: 700;
+}
+
+.rcpt__row--strong > span:first-child {
+  color: var(--rcpt-ink);
+}
+
+.rcpt__row--saving > span:last-child {
+  font-weight: 600;
+  color: var(--rcpt-brand);
+}
+
+.rcpt__total {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  border-radius: 10px;
+  color: #fff;
+  background: var(--rcpt-ink);
+}
+
+.rcpt__total span {
+  font-size: 0.85em;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.rcpt__total strong {
+  font-size: 1.6em;
+  font-weight: 800;
+}
+
+.rcpt__payment {
+  display: grid;
+  gap: 2px;
+  padding: 6px 0;
+  border-bottom: 1px dashed var(--rcpt-line);
+}
+
+.rcpt__payment:last-child {
+  border-bottom: 0;
+}
+
+.rcpt__credit {
+  display: grid;
+  justify-items: center;
+  gap: 1px;
+  padding: 8px;
+  border: 2px dashed var(--rcpt-accent);
+  border-radius: 10px;
+  text-align: center;
+  background: #fff9e6;
+}
+
+.rcpt__credit span {
+  font-size: 0.8em;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.rcpt__credit strong {
+  font-size: 1.4em;
+}
+
+.rcpt__credit small {
+  color: var(--rcpt-muted);
+}
+
+/* ---------- Pie ---------- */
+.rcpt__foot {
+  display: grid;
+  gap: 4px;
+  padding-top: 10px;
+  border-top: 1px dashed var(--rcpt-line);
+  text-align: center;
+}
+
+.rcpt__thanks {
+  font-size: 1.1em;
+  font-weight: 700;
+  color: var(--rcpt-brand);
+}
+
+.rcpt__legal {
+  font-size: 0.82em;
+  color: var(--rcpt-muted);
+}
+
+.rcpt__dev {
+  font-size: 0.78em;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: var(--rcpt-muted);
+}
+
+/* ---------- Impresión: igual que en pantalla ----------
+   print-color-adjust obliga al navegador a imprimir los fondos (franja verde, barra del total)
+   aunque "Gráficos de fondo" esté apagado. En una térmica los colores salen en tonos de gris. */
+@media print {
+  .rcpt,
+  .rcpt * {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .rcpt {
+    margin: 0;
+    border-radius: 0;
+    box-shadow: none;
+    animation: none;
+  }
+
+  .rcpt::after {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rcpt {
+    animation: none;
+  }
+}

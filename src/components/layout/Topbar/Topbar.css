@@ -1,0 +1,78 @@
+/* Bloque: topbar */
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: var(--z-topbar);
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  height: var(--layout-topbar-height);
+  padding: 0 var(--space-4);
+  border-bottom: 1px solid var(--color-border);
+  background-color: color-mix(in srgb, var(--color-surface) 88%, transparent);
+  backdrop-filter: saturate(1.4) blur(10px);
+}
+
+.topbar__menu-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background-color: var(--color-surface);
+}
+
+.topbar__menu-button:hover {
+  background-color: var(--color-surface-muted);
+}
+
+.topbar__title {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  font-size: var(--font-size-lg);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* En celular la fecha se oculta para dejar espacio al título */
+.topbar__date {
+  display: none;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-muted);
+  background-color: var(--color-surface-muted);
+}
+
+.topbar__date-icon {
+  width: 16px;
+  height: 16px;
+  color: var(--color-accent-strong);
+}
+
+@media (min-width: 768px) {
+  .topbar {
+    padding: 0 var(--space-6);
+  }
+
+  .topbar__date {
+    display: inline-flex;
+  }
+}
+
+@media (min-width: 1024px) {
+  .topbar__menu-button {
+    display: none;
+  }
+
+  .topbar__title {
+    font-size: var(--font-size-xl);
+  }
+}

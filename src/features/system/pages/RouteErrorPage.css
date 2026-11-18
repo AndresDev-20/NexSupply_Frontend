@@ -1,0 +1,13 @@
+/* Bloque: route-error-page */
+.route-error-page {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 100dvh;
+  padding: var(--space-6) 0;
+}
+
+.route-error-page__credit {
+  display: flex;
+  justify-content: center;
+}

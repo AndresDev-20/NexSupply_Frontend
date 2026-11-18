@@ -1,0 +1,138 @@
+/* Bloque: option-cards */
+.option-cards {
+  container: option-cards / inline-size;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: none;
+}
+
+.option-cards__legend {
+  /* float: evita que la leyenda se monte sobre el borde del fieldset */
+  float: left;
+  width: 100%;
+  margin-bottom: var(--space-2);
+  padding: 0;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+}
+
+.option-cards__hint {
+  clear: both;
+  margin-bottom: var(--space-3);
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
+
+.option-cards__grid {
+  clear: both;
+  display: grid;
+  gap: var(--space-3);
+}
+
+.option-cards__card {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: 56px;
+  padding: var(--space-3) var(--space-4);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background-color: var(--color-surface);
+  cursor: pointer;
+  transition:
+    border-color var(--duration-fast) var(--easing-standard),
+    background-color var(--duration-fast) var(--easing-standard),
+    box-shadow var(--duration-fast) var(--easing-standard);
+}
+
+.option-cards__card:hover {
+  border-color: var(--color-border-strong);
+}
+
+.option-cards__card--selected {
+  border-color: var(--color-primary);
+  background-color: var(--color-primary-soft);
+  box-shadow: inset 0 0 0 1px var(--color-primary);
+}
+
+.option-cards__card:has(.option-cards__input:focus-visible) {
+  outline: 3px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+fieldset:disabled .option-cards__card {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.option-cards__input {
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+}
+
+.option-cards__icon {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+  border-radius: var(--radius-sm);
+  color: var(--color-primary);
+  background-color: var(--color-surface-muted);
+}
+
+.option-cards__icon svg {
+  width: 18px;
+  height: 18px;
+}
+
+.option-cards__text {
+  display: grid;
+  flex: 1;
+  gap: 2px;
+  min-width: 0;
+}
+
+.option-cards__label {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+}
+
+.option-cards__description {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
+
+.option-cards__aside {
+  flex-shrink: 0;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+  font-variant-numeric: tabular-nums;
+  color: var(--color-primary);
+}
+
+/* Columnas según el ancho disponible del grupo (no de la pantalla): funciona igual
+   en un modal, junto a una vista previa o a lo ancho de la página */
+@container option-cards (min-width: 440px) {
+  .option-cards__grid--cols-2,
+  .option-cards__grid--cols-3,
+  .option-cards__grid--cols-4 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@container option-cards (min-width: 640px) {
+  .option-cards__grid--cols-3 {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@container option-cards (min-width: 820px) {
+  .option-cards__grid--cols-4 {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}

@@ -1,0 +1,118 @@
+/* Bloque: status-tile */
+.status-tile {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-4) var(--space-5);
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background-color: var(--color-surface);
+  box-shadow: var(--shadow-sm);
+  transition:
+    box-shadow var(--duration-base) var(--easing-standard),
+    transform var(--duration-base) var(--easing-standard);
+}
+
+.status-tile:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
+}
+
+/* Franja de color a la izquierda según el estado */
+.status-tile::before {
+  content: '';
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 4px;
+  background-color: var(--color-border-strong);
+}
+
+.status-tile__icon-wrap {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  border-radius: var(--radius-md);
+  color: var(--color-text-muted);
+  background-color: var(--color-surface-muted);
+}
+
+.status-tile__icon {
+  width: 22px;
+  height: 22px;
+}
+
+.status-tile__body {
+  min-width: 0;
+}
+
+.status-tile__label {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-text-subtle);
+}
+
+.status-tile__value {
+  margin-top: var(--space-1);
+  overflow-wrap: anywhere;
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-semibold);
+}
+
+.status-tile__skeleton {
+  color: var(--color-text-subtle);
+  animation: status-tile-pulse 1.4s ease-in-out infinite;
+}
+
+/* Modificadores de estado */
+.status-tile--ok::before {
+  background-color: var(--color-success);
+}
+
+.status-tile--ok .status-tile__icon-wrap {
+  color: var(--color-success);
+  background-color: var(--color-success-soft);
+}
+
+.status-tile--error::before {
+  background-color: var(--color-danger);
+}
+
+.status-tile--error .status-tile__icon-wrap {
+  color: var(--color-danger);
+  background-color: var(--color-danger-soft);
+}
+
+.status-tile--error .status-tile__value {
+  color: var(--color-danger);
+}
+
+.status-tile--neutral::before {
+  background-color: var(--color-accent);
+}
+
+.status-tile--neutral .status-tile__icon-wrap {
+  color: var(--color-accent-strong);
+  background-color: var(--color-accent-soft);
+}
+
+@keyframes status-tile-pulse {
+  50% {
+    opacity: 0.45;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .status-tile:hover {
+    transform: none;
+  }
+
+  .status-tile__skeleton {
+    animation: none;
+  }
+}

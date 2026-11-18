@@ -1,0 +1,320 @@
+/* Pantalla de categorías: lista y detalle.
+   Todas las filas de la lista y todas las tarjetas de subcategoría tienen el mismo
+   tamaño, sin importar cuántas subcategorías tenga cada categoría. */
+
+.categories-page__state {
+  display: grid;
+  place-items: center;
+  min-height: 280px;
+}
+
+/* Bloque: categories-toolbar */
+.categories-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--space-3) var(--space-6);
+  margin-bottom: var(--space-4);
+}
+
+.categories-toolbar > :first-child {
+  flex: 1 1 280px;
+  max-width: 480px;
+}
+
+.categories-toolbar__switch {
+  min-width: 200px;
+  padding-bottom: var(--space-3);
+}
+
+/* Bloque: categories-layout — una columna en celular; lista + detalle desde laptop */
+.categories-layout {
+  display: grid;
+  gap: var(--space-4);
+}
+
+@media (min-width: 1024px) {
+  .categories-layout {
+    grid-template-columns: minmax(260px, 340px) 1fr;
+    align-items: start;
+  }
+}
+
+/* Bloque: categories-list */
+.categories-list {
+  padding: var(--space-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  background-color: var(--color-surface);
+}
+
+@media (min-width: 1024px) {
+  /* La lista queda fija al hacer scroll y se desplaza por dentro si es larga */
+  .categories-list {
+    position: sticky;
+    top: calc(var(--layout-topbar-height) + var(--space-4));
+    max-height: calc(100dvh - var(--layout-topbar-height) - var(--space-8));
+    overflow-y: auto;
+  }
+}
+
+.categories-list__items {
+  display: grid;
+  gap: var(--space-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.categories-list__item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  /* Altura fija: todas las filas iguales */
+  min-height: 64px;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid transparent;
+  border-radius: var(--radius-lg);
+  text-align: left;
+  color: var(--color-text);
+  background: transparent;
+  cursor: pointer;
+  transition:
+    background-color var(--duration-fast) var(--easing-standard),
+    border-color var(--duration-fast) var(--easing-standard);
+}
+
+.categories-list__item:hover {
+  background-color: var(--color-surface-muted);
+}
+
+.categories-list__item:focus-visible {
+  outline: 3px solid var(--color-focus-ring);
+  outline-offset: 1px;
+}
+
+.categories-list__item--selected {
+  border-color: var(--color-accent);
+  background-color: var(--color-accent-soft);
+  box-shadow: inset 3px 0 0 var(--color-accent);
+}
+
+.categories-list__item--inactive {
+  opacity: 0.6;
+}
+
+.categories-list__text {
+  display: grid;
+  flex: 1;
+  gap: 2px;
+  min-width: 0;
+}
+
+/* Nombres largos: una sola línea con puntos suspensivos (la fila no crece) */
+.categories-list__name {
+  overflow: hidden;
+  font-weight: var(--font-weight-semibold);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.categories-list__meta {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
+
+.categories-list__chevron {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  color: var(--color-text-subtle);
+  transition: transform var(--duration-fast) var(--easing-standard);
+}
+
+.categories-list__item--selected .categories-list__chevron {
+  color: var(--color-accent-strong);
+  transform: translateX(2px);
+}
+
+.categories-list__empty {
+  padding: var(--space-4);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+/* Bloque: category-detail */
+.category-detail {
+  min-width: 0;
+  padding: var(--space-5);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  background-color: var(--color-surface);
+  scroll-margin-top: calc(var(--layout-topbar-height) + var(--space-4));
+  animation: category-detail-in var(--duration-slow) var(--easing-standard);
+}
+
+.category-detail__header {
+  margin: calc(var(--space-5) * -1) calc(var(--space-5) * -1) 0;
+  padding: var(--space-5);
+  border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+  background: linear-gradient(120deg, var(--cat-soft), transparent 75%);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: var(--space-3);
+}
+
+.category-detail__title {
+  display: grid;
+  flex: 1;
+  gap: var(--space-2);
+  min-width: 200px;
+}
+
+.category-detail__name {
+  font-size: var(--font-size-xl);
+  overflow-wrap: anywhere;
+}
+
+.category-detail__badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.category-detail__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.category-detail__stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-5);
+  margin: var(--space-4) 0;
+  padding: var(--space-3) 0;
+  border-top: 1px solid var(--color-border);
+  border-bottom: 1px solid var(--color-border);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+.category-detail__stats span {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.category-detail__stats svg {
+  width: 16px;
+  height: 16px;
+  color: var(--color-primary);
+}
+
+.category-detail__empty {
+  display: grid;
+  justify-items: start;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border: 1px dashed var(--color-border-strong);
+  border-radius: var(--radius-lg);
+  color: var(--color-text-muted);
+}
+
+/* Bloque: subcategory-grid — tarjetas del mismo alto, columnas según el espacio */
+.subcategory-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  /* Todas las filas con la altura de la tarjeta más alta: la cuadrícula queda pareja */
+  grid-auto-rows: 1fr;
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Dos franjas: arriba ícono + nombre (todo el ancho), abajo datos + acciones */
+.subcategory-card {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-2) var(--space-2) var(--space-3);
+  border: 1px solid var(--color-border);
+  border-left: 3px solid var(--cat-color);
+  border-radius: var(--radius-md);
+  background-color: var(--color-surface);
+  transition:
+    box-shadow var(--duration-fast) var(--easing-standard),
+    transform var(--duration-fast) var(--easing-standard);
+  animation: subcategory-card-in var(--duration-slow) var(--easing-standard) both;
+}
+
+.subcategory-card:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
+}
+
+.subcategory-card--inactive {
+  opacity: 0.6;
+  border-left-color: var(--color-border-strong);
+}
+
+.subcategory-card__head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-width: 0;
+  padding-right: var(--space-1);
+}
+
+/* El pie queda siempre abajo: todas las tarjetas alinean sus botones */
+.subcategory-card__foot {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+/* Hasta dos líneas para el nombre: las tarjetas no crecen sin control */
+.subcategory-card__name {
+  min-width: 0;
+  display: -webkit-box;
+  overflow: hidden;
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-tight);
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+}
+
+.subcategory-card__meta {
+  min-width: 0;
+  padding-bottom: var(--space-1);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
+
+.subcategory-card__actions {
+  display: flex;
+  flex-shrink: 0;
+}
+
+@keyframes category-detail-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+
+@keyframes subcategory-card-in {
+  from {
+    opacity: 0;
+  }
+}

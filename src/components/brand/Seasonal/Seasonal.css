@@ -1,0 +1,71 @@
+/* Adornos de temporada (Fase 15). Decoración pura: no reciben clics ni foco. */
+.seasonal {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  pointer-events: none;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.seasonal--banner {
+  height: 44px;
+}
+
+.seasonal--compact {
+  height: 30px;
+}
+
+.seasonal__item {
+  transform-box: fill-box;
+  transform-origin: 50% 0;
+}
+
+.seasonal__item--twinkle {
+  animation: seasonal-twinkle 2.4s ease-in-out infinite;
+}
+
+.seasonal__item--sway {
+  animation: seasonal-sway 3.2s ease-in-out infinite;
+}
+
+@keyframes seasonal-twinkle {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.45;
+  }
+}
+
+@keyframes seasonal-sway {
+  0%,
+  100% {
+    transform: rotate(-6deg);
+  }
+  50% {
+    transform: rotate(6deg);
+  }
+}
+
+.seasonal-message {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  justify-self: start;
+  width: fit-content;
+  padding: 2px var(--space-3);
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-on-accent);
+  background: var(--palette-yellow-400);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .seasonal__item--twinkle,
+  .seasonal__item--sway {
+    animation: none;
+  }
+}

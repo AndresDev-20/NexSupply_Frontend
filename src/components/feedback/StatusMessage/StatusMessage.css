@@ -1,0 +1,48 @@
+/* Bloque: status-message */
+.status-message {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 480px;
+  margin: var(--space-10) auto;
+  padding: 0 var(--space-4);
+  text-align: center;
+}
+
+.status-message__icon-wrap {
+  display: grid;
+  place-items: center;
+  width: 72px;
+  height: 72px;
+  margin-bottom: var(--space-5);
+  border-radius: var(--radius-xl);
+  color: var(--color-primary);
+  background-color: var(--color-primary-soft);
+}
+
+.status-message--danger .status-message__icon-wrap {
+  color: var(--color-danger);
+  background-color: var(--color-danger-soft);
+}
+
+.status-message__icon {
+  width: 32px;
+  height: 32px;
+}
+
+.status-message__title {
+  font-size: var(--font-size-xl);
+}
+
+.status-message__description {
+  margin-top: var(--space-2);
+  color: var(--color-text-muted);
+}
+
+.status-message__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-3);
+  margin-top: var(--space-6);
+}

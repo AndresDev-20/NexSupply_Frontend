@@ -1,0 +1,127 @@
+/* Estilos compartidos de las pantallas de configuración */
+
+.settings-loader {
+  display: grid;
+  place-items: center;
+  min-height: 320px;
+}
+
+/* Bloque: settings-form — formulario de ajustes a página completa */
+.settings-form__alert {
+  margin-bottom: var(--space-4);
+}
+
+.settings-form__after {
+  margin-top: var(--space-4);
+}
+
+/* Aviso fijo dentro de una sección (ej. aviso legal del comprobante) */
+.settings-note {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  background-color: var(--color-surface-muted);
+}
+
+.settings-note svg {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  margin-top: 1px;
+  color: var(--color-primary);
+}
+
+.settings-note strong {
+  color: var(--color-text);
+}
+
+/* Separación entre campos que van debajo de un interruptor */
+.settings-subfields {
+  display: grid;
+  gap: var(--space-4);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--color-border);
+  animation: settings-subfields-in var(--duration-slow) var(--easing-standard);
+}
+
+@keyframes settings-subfields-in {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+}
+
+/* Marcadores clicables del correo: {negocio}, {cliente}, {numero} */
+.placeholder-chips {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
+
+.placeholder-chips__chip {
+  padding: 2px var(--space-2);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-full);
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size-xs);
+  color: var(--color-primary);
+  background-color: var(--color-surface);
+  cursor: pointer;
+}
+
+.placeholder-chips__chip:hover {
+  border-color: var(--color-primary);
+  background-color: var(--color-primary-soft);
+}
+
+.placeholder-chips__chip:focus-visible {
+  outline: 3px solid var(--color-focus-ring);
+  outline-offset: 1px;
+}
+
+/* Bloque: catalog-cell — ícono + nombre en las tablas de catálogos (métodos de pago, unidades) */
+.catalog-cell {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.catalog-cell__icon {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+  border-radius: var(--radius-md);
+  color: var(--color-primary);
+  background-color: var(--color-primary-soft);
+}
+
+.catalog-cell__icon--cash {
+  color: var(--color-text-on-accent);
+  background-color: var(--color-accent);
+}
+
+.catalog-cell__name {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  font-weight: var(--font-weight-semibold);
+}
+
+.catalog-cell__symbol {
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size-xs);
+  background-color: var(--color-surface-muted);
+}

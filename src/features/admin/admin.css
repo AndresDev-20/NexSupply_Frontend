@@ -1,0 +1,116 @@
+/* Estilos compartidos de las pantallas de administración */
+
+/* Bloque: admin-form — formularios dentro de modales */
+.admin-form {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.admin-form__row {
+  display: grid;
+  gap: var(--space-4);
+}
+
+@media (min-width: 768px) {
+  .admin-form__row {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* Bloque: row-actions — botones de acción de una fila */
+.row-actions {
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: flex-end;
+  gap: var(--space-1);
+}
+
+/* Bloque: temporary-password */
+.temporary-password {
+  display: grid;
+  gap: var(--space-4);
+}
+
+/* Bloque: person — avatar + nombre + detalle */
+.person {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.person__avatar {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  flex-shrink: 0;
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-primary);
+  background-color: var(--color-primary-soft);
+}
+
+.person__avatar--support {
+  color: var(--color-text-on-accent);
+  background-color: var(--color-accent);
+}
+
+.person__text {
+  display: grid;
+  min-width: 0;
+}
+
+.person__name {
+  overflow: hidden;
+  font-weight: var(--font-weight-semibold);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.person__detail {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
+
+/* Mensaje de error general arriba de los formularios por pasos */
+.admin-form__alert {
+  margin-bottom: var(--space-4);
+}
+
+/* Otras sucursales del usuario (Fase 17) */
+.user-branches {
+  display: grid;
+  gap: var(--space-2);
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.user-branches__legend {
+  margin-bottom: var(--space-1);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+}
+
+.user-branches__hint {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
+
+.user-branches__list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: var(--space-2);
+}
+
+.user-branches__error {
+  font-size: var(--font-size-xs);
+  color: var(--color-danger);
+}

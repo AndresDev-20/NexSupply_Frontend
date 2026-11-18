@@ -1,0 +1,33 @@
+/* Bloque: filter-bar — en celular apilado; desde tablet en fila.
+   Nota: no se usa grid con "2fr repeat(auto-fit, …)": CSS no permite mezclar
+   pistas flexibles (fr) con repeticiones automáticas y el navegador ignora la regla. */
+.filter-bar {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+}
+
+@media (min-width: 768px) {
+  .filter-bar {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: flex-end;
+  }
+
+  /* La búsqueda (primer filtro) ocupa más espacio que las listas */
+  .filter-bar > * {
+    flex: 1 1 180px;
+  }
+
+  .filter-bar > :first-child {
+    flex: 2 1 280px;
+  }
+
+  /* Sin búsqueda principal: todos iguales, caben cuatro en una fila de laptop */
+  .filter-bar--even > *,
+  .filter-bar--even > :first-child {
+    flex: 1 1 150px;
+    min-width: 0;
+  }
+}
