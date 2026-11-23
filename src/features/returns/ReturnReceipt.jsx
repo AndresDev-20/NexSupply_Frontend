@@ -1,4 +1,5 @@
 import { useRef } from 'react'
+import { BRANDING_LOGO_SRC } from '../../config/env'
 import { createPortal } from 'react-dom'
 import { Printer, RotateCw, Undo2 } from 'lucide-react'
 import { Modal } from '../../components/ui/Modal/Modal'
@@ -31,7 +32,7 @@ export function ReturnReceiptPaper({ saleReturn, business, receipt }) {
     <article className={`rcpt rcpt--${ticketFormat(receipt)}`} aria-label={`Comprobante de devolución ${saleReturn.number}`}>
       <header className="rcpt__brand">
         {receipt.showLogo && business.hasLogo ? (
-          <img className="rcpt__logo" src="/api/v1/branding/logo" alt="" />
+          <img className="rcpt__logo" src={BRANDING_LOGO_SRC} alt="" />
         ) : (
           <span className="rcpt__monogram" aria-hidden="true">
             {initialsOf(business.name)}

@@ -1,4 +1,5 @@
 import { formatCurrency, formatDate, formatQuantity } from '../../utils/format'
+import { BRANDING_LOGO_SRC } from '../../config/env'
 import { formatDay } from '../purchases/purchaseOptions'
 import { contactLine, customerDocument, initialsOf, receiptDate, ticketFormat } from '../sales/receiptHelpers'
 import '../sales/SaleReceiptPaper.css'
@@ -26,7 +27,7 @@ export function LayawayReceiptPaper({ layaway, business, receipt }) {
     <article className={`rcpt rcpt--${ticketFormat(receipt)}`} aria-label={`Comprobante de apartado ${layaway.number}`}>
       <header className="rcpt__brand">
         {receipt.showLogo && business.hasLogo ? (
-          <img className="rcpt__logo" src="/api/v1/branding/logo" alt="" />
+          <img className="rcpt__logo" src={BRANDING_LOGO_SRC} alt="" />
         ) : (
           <span className="rcpt__monogram" aria-hidden="true">
             {initialsOf(business.name)}

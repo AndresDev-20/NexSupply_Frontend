@@ -1,4 +1,5 @@
 import { formatCurrency, formatQuantity } from '../../utils/format'
+import { BRANDING_LOGO_SRC } from '../../config/env'
 import { contactLine, customerDocument, customerName, initialsOf, isCreditSale, receiptDate, ticketFormat } from './receiptHelpers'
 import './SaleReceiptPaper.css'
 
@@ -27,7 +28,7 @@ export function SaleReceiptPaper({ sale, business, receipt }) {
     <article className={`rcpt rcpt--${ticketFormat(receipt)}`} aria-label={`${receipt.title} ${sale.number}`}>
       <header className="rcpt__brand">
         {receipt.showLogo && business.hasLogo ? (
-          <img className="rcpt__logo" src="/api/v1/branding/logo" alt="" />
+          <img className="rcpt__logo" src={BRANDING_LOGO_SRC} alt="" />
         ) : (
           <span className="rcpt__monogram" aria-hidden="true">
             {initialsOf(business.name)}

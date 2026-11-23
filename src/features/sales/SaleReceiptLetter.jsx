@@ -1,4 +1,5 @@
 import { formatCurrency, formatQuantity } from '../../utils/format'
+import { BRANDING_LOGO_SRC } from '../../config/env'
 import { contactLine, customerDocument, customerName, initialsOf, isCreditSale, receiptDate } from './receiptHelpers'
 import './SaleReceiptLetter.css'
 
@@ -26,7 +27,7 @@ export function SaleReceiptLetter({ sale, business, receipt }) {
       <header className="rcl__head">
         <div className="rcl__brand">
           {receipt.showLogo && business.hasLogo ? (
-            <img className="rcl__logo" src="/api/v1/branding/logo" alt="" />
+            <img className="rcl__logo" src={BRANDING_LOGO_SRC} alt="" />
           ) : (
             <span className="rcl__monogram" aria-hidden="true">
               {initialsOf(business.name)}

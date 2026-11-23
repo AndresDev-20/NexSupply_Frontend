@@ -1,4 +1,5 @@
 import { formatCurrency, formatDateTime } from '../../../utils/format'
+import { BRANDING_LOGO_SRC } from '../../../config/env'
 import { contactLine, initialsOf } from '../../sales/receiptHelpers'
 import { DENOMINATIONS, denominationLabel } from '../denominations'
 import './CashClosingPaper.css'
@@ -80,7 +81,7 @@ export function CashClosingPaper({ session, business = {}, format = '80mm' }) {
       <header className="ccp-head">
         <div className="ccp-brand">
           {business.showLogo !== false && business.hasLogo ? (
-            <img className="ccp-logo" src="/api/v1/branding/logo" alt="" />
+            <img className="ccp-logo" src={BRANDING_LOGO_SRC} alt="" />
           ) : (
             <span className="ccp-monogram" aria-hidden="true">
               {initialsOf(name)}
