@@ -1,6 +1,6 @@
 // Caja (rediseño D-CAJA-9 a D-CAJA-13): Mis cajas de hoy, Turnos, Historial y Cajas,
 // con el ciclo abrir → cerrar turno → contar → recibir. Backend simulado.
-import { screen, within } from '@testing-library/react'
+import { waitFor, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { renderApp } from '../../test/renderWithProviders'
 import { BASIC_PLAN, buildUser, fail, healthyResponse, mockApi, ok, restoreApi, session as authSession } from '../../test/mockApi'
@@ -66,6 +66,7 @@ const baseRoutes = (permissions = ALL, plan = BASIC_PLAN) => ({
   'GET /health': healthyResponse,
   'GET /notifications/unread-count': ok({ unread: 0 }),
   'GET /branding': ok({ name: 'Agro El Campo', logo: null }),
+  'GET /settings': ok({ values: { 'receipt.paper_format': '80mm' }, fixed: {} }),
   'GET /me/preferences': ok({ theme: 'system' }),
   'GET /cash-registers': ok([REGISTER]),
   'GET /cash-closed-days': ok([]),
@@ -123,7 +124,7 @@ describe('mis cajas de hoy', () => {
     const dialog = await screen.findByRole('dialog', { name: 'Abrir turno' })
     expect(within(dialog).getByText('La base fija con que arranca la caja cada día')).toBeInTheDocument()
     await user.click(within(dialog).getByRole('button', { name: 'Está completa' }))
-    expect(within(dialog).getByLabelText(/^Efectivo en la caja/)).toHaveValue('200.000')
+    expect(within(dialog).getByText('La base está completa: $ 200.000')).toBeInTheDocument()
     await user.click(within(dialog).getByRole('button', { name: 'Abrir turno' }))
 
     expect(await within(dialog).findByText(/día sin abrir \(Festivo\)/)).toBeInTheDocument()
@@ -181,8 +182,14 @@ describe('contar la caja', () => {
 
     await user.click(await screen.findByRole('button', { name: 'Contar caja' }))
     const dialog = await screen.findByRole('dialog', { name: 'Contar la caja' })
-    await user.type(within(dialog).getByLabelText(/^Efectivo contado/), '848.000')
-    expect(within(dialog).getByRole('status')).toHaveTextContent('Faltante de $ 2.000')
+    // Conteo por billetes y monedas (D-CAJA-14): 8 × 100.000 + 2 × 20.000 + 5.000 + 2.000 + 1.000 = 848.000
+    await user.type(within(dialog).getByLabelText('Billete de $ 100.000'), '8')
+    await user.type(within(dialog).getByLabelText('Billete de $ 20.000'), '2')
+    await user.type(within(dialog).getByLabelText('Billete de $ 5.000'), '1')
+    await user.type(within(dialog).getByLabelText('Billete de $ 2.000'), '1')
+    await user.type(within(dialog).getByLabelText('Moneda de $ 1.000'), '1')
+    expect(within(dialog).getByText(/Total contado/)).toHaveTextContent('$ 848.000')
+    expect(within(dialog).getByText('Faltante de $ 2.000')).toBeInTheDocument()
     expect(within(dialog).getByText('$ 648.000')).toBeInTheDocument()
     await user.click(within(dialog).getByRole('button', { name: 'Revisar' }))
     expect(within(dialog).getByText('Lo contado no coincide con lo esperado: explica qué pasó')).toBeInTheDocument()
@@ -191,10 +198,21 @@ describe('contar la caja', () => {
     await user.click(within(dialog).getByRole('button', { name: 'Revisar' }))
     const confirm = await screen.findByRole('dialog', { name: 'Confirmar el conteo' })
     expect(within(confirm).getByLabelText('Resumen del conteo')).toHaveTextContent('Para entregar$ 648.000')
+    expect(within(confirm).getByLabelText('Resumen del conteo')).toHaveTextContent('8 × billete de $ 100.000')
     await user.click(within(confirm).getByRole('button', { name: 'Confirmar conteo' }))
 
     expect(await screen.findByText('Caja contada (CJ-000004). Para entregar: $ 648.000')).toBeInTheDocument()
-    expect(calls.find((call) => call.url === '/cash-sessions/8/count').data).toEqual({ countedCash: '848000', differenceNotes: 'Cambio mal dado', onBehalfReason: null })
+    expect(calls.find((call) => call.url === '/cash-sessions/8/count').data).toEqual({
+      breakdown: [
+        { value: 100000, kind: 'bill', quantity: 8 },
+        { value: 20000, kind: 'bill', quantity: 2 },
+        { value: 5000, kind: 'bill', quantity: 1 },
+        { value: 2000, kind: 'bill', quantity: 1 },
+        { value: 1000, kind: 'coin', quantity: 1 },
+      ],
+      differenceNotes: 'Cambio mal dado',
+      onBehalfReason: null,
+    })
   })
 
   it('un turno contado muestra su arqueo y no permite movimientos', async () => {
@@ -205,6 +223,36 @@ describe('contar la caja', () => {
     expect(screen.getByRole('button', { name: 'Recibir dinero' })).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Retiro' })).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Contar caja' })).not.toBeInTheDocument()
+  })
+
+  it('el informe de cierre trae ventas, billetes y lo que se deja; con permiso se reabre con motivo', async () => {
+    const user = userEvent.setup()
+    const counted = {
+      ...COUNTED,
+      countBreakdown: [
+        { value: 100000, kind: 'bill', quantity: 8, subtotal: '800000.00' },
+        { value: 50, kind: 'coin', quantity: 0, subtotal: '0.00' },
+      ],
+      summary: { openingCash: '200000.00', cashIn: '650000.00', cashOut: '0.00', byType: [{ type: 'sale', label: 'Venta', count: 3, total: '650000.00' }], byPaymentMethod: [], sales: { count: 3, total: '650000.00', credit: '0.00', returned: '0.00', cancelledCount: 0, byType: [{ type: 'cash', label: 'Contado', count: 3, total: '650000.00' }] } },
+    }
+    const calls = mockApi({ ...baseRoutes([...ALL, 'cash.reopen']), ...sessionRoutes(counted), 'POST /cash-sessions/8/reopen': ok(buildSession({ status: 'open', reopenedAt: '2026-11-16T23:30:00.000Z', reopenCount: 1 }), 'Caja principal quedó abierta otra vez: ya se puede vender') })
+    renderApp('/caja/turnos/8')
+
+    const paper = await screen.findByLabelText('Así sale impreso')
+    expect(paper).toHaveTextContent('Cierre de caja')
+    expect(paper).toHaveTextContent('Total vendido (3 ventas)$ 650.000')
+    expect(paper).toHaveTextContent('Billete de $ 100.000× 8$ 800.000')
+    expect(paper).toHaveTextContent('Se deja en la caja (base)$ 200.000')
+    expect(paper).toHaveTextContent('Se saca para entregar$ 648.000')
+    expect(screen.getByRole('button', { name: 'Imprimir tirilla' })).toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: 'Reabrir turno' }))
+    const dialog = await screen.findByRole('dialog', { name: 'Reabrir turno' })
+    await user.click(within(dialog).getByRole('button', { name: 'Reabrir turno' }))
+    expect(within(dialog).getByText('Escribe por qué se reabre el turno')).toBeInTheDocument()
+    await user.type(within(dialog).getByLabelText(/^¿Por qué se reabre\?/), 'Llegó un cliente')
+    await user.click(within(dialog).getByRole('button', { name: 'Reabrir turno' }))
+    await waitFor(() => expect(calls.find((call) => call.url === '/cash-sessions/8/reopen')?.data).toEqual({ reason: 'Llegó un cliente' }))
   })
 
   it('sin permiso para turnos de otros, no aparecen cerrar ni contar', async () => {

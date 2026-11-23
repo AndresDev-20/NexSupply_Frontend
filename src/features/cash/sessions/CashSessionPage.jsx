@@ -1,7 +1,8 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
+import { createPortal, flushSync } from 'react-dom'
 import { Link, useParams } from 'react-router-dom'
-import { ArrowDownToLine, ArrowLeft, ArrowUpFromLine, Banknote, CircleCheck, CreditCard, HandCoins, Lock, Power, Printer, RotateCw, TriangleAlert } from 'lucide-react'
-import { useGetCashMovementsQuery, useGetCashSessionQuery } from '../cashApi'
+import { ArrowDownToLine, ArrowLeft, ArrowUpFromLine, Banknote, CircleCheck, CreditCard, HandCoins, History, Lock, LockOpen, Power, Printer, RotateCw, TriangleAlert } from 'lucide-react'
+import { useGetCashMovementsQuery, useGetCashSessionQuery, useReopenCashSessionMutation } from '../cashApi'
 import { differenceInfo, sessionState } from '../cashOptions'
 import { Lifecycle } from '../Lifecycle'
 import { OpeningCountModal } from '../OpeningCountModal'
@@ -18,7 +19,70 @@ import { DataTable } from '../../../components/ui/DataTable/DataTable'
 import { Pagination } from '../../../components/ui/Pagination/Pagination'
 import { formatCurrency, formatDateTime } from '../../../utils/format'
 import { ROUTES } from '../../../routes/paths'
+import { Modal } from '../../../components/ui/Modal/Modal'
+import { TextAreaField } from '../../../components/ui/TextAreaField/TextAreaField'
+import { useGetBrandingQuery, useGetSettingsQuery } from '../../settings/settingsApi'
+import { printReceipt } from '../../sales/printReceipt'
+import { CashClosingPaper } from './CashClosingPaper'
+import { DENOMINATIONS, denominationLabel } from '../denominations'
+import '../../sales/sales.css'
 import '../cash.css'
+
+/** Reabrir un turno contado que no se ha recibido (D-CAJA-15): el conteo se anula y queda en el historial. */
+function ReopenModal({ session, onClose, onDone }) {
+  const [reason, setReason] = useState('')
+  const [localError, setLocalError] = useState(null)
+  const [reopen, { isLoading, error }] = useReopenCashSessionMutation()
+  const handleSubmit = async (event) => {
+    event.preventDefault()
+    if (reason.trim().length < 3) return setLocalError('Escribe por qué se reabre el turno')
+    try {
+      onDone(await reopen({ sessionId: session.id, reason: reason.trim() }).unwrap())
+    } catch {
+      // Se muestra desde `error`
+    }
+    return undefined
+  }
+  return (
+    <Modal
+      isOpen
+      onClose={onClose}
+      isBusy={isLoading}
+      icon={LockOpen}
+      title="Reabrir turno"
+      description={`${session.register?.name ?? 'Caja'} · ${session.closingNumber}. El conteo de ${formatCurrency(session.countedCash)} se anula (queda en el historial) y el turno vuelve a recibir ventas. Al terminar, se cierra y se cuenta otra vez.`}
+      footer={
+        <>
+          <Button variant="secondary" onClick={onClose} disabled={isLoading}>
+            Cancelar
+          </Button>
+          <Button type="submit" form="reopen-session-form" icon={LockOpen} isLoading={isLoading}>
+            Reabrir turno
+          </Button>
+        </>
+      }
+    >
+      <form id="reopen-session-form" onSubmit={handleSubmit} noValidate>
+        {error && (
+          <div className="admin-form__alert">
+            <Alert tone="danger">{error.message}</Alert>
+          </div>
+        )}
+        <TextAreaField
+          label="¿Por qué se reabre?"
+          placeholder="Ej.: llegó un cliente después de contar"
+          rows={2}
+          maxLength={255}
+          data-autofocus
+          value={reason}
+          onChange={(event) => setReason(event.target.value)}
+          error={localError}
+          required
+        />
+      </form>
+    </Modal>
+  )
+}
 
 function Figure({ label, value, detail, tone, strong = false, index = 0 }) {
   return (
@@ -37,7 +101,12 @@ function SignedAmount({ value }) {
 }
 
 const MOVEMENT_COLUMNS = [
-  { key: 'date', header: 'Fecha', primary: true, render: (row) => formatDateTime(row.createdAt) },
+  {
+    key: 'date',
+    header: 'Fecha',
+    primary: true,
+    render: (row) => formatDateTime(row.createdAt),
+  },
   { key: 'type', header: 'Movimiento', render: (row) => row.typeLabel },
   {
     key: 'method',
@@ -49,9 +118,22 @@ const MOVEMENT_COLUMNS = [
       </span>
     ),
   },
-  { key: 'amount', header: 'Monto', align: 'end', render: (row) => <SignedAmount value={row.amount} /> },
-  { key: 'reason', header: 'Motivo o referencia', render: (row) => row.reason || row.paymentReference || '—' },
-  { key: 'user', header: 'Registró', render: (row) => row.user?.fullName ?? 'Sistema' },
+  {
+    key: 'amount',
+    header: 'Monto',
+    align: 'end',
+    render: (row) => <SignedAmount value={row.amount} />,
+  },
+  {
+    key: 'reason',
+    header: 'Motivo o referencia',
+    render: (row) => row.reason || row.paymentReference || '—',
+  },
+  {
+    key: 'user',
+    header: 'Registró',
+    render: (row) => row.user?.fullName ?? 'Sistema',
+  },
 ]
 
 /**
@@ -63,10 +145,33 @@ export default function CashSessionPage() {
   const toast = useToast()
   const canMove = useCan('cash.movements')
   const canOpen = useCan('cash.open')
+  const canReopen = useCan('cash.reopen')
+  // Informe de cierre para imprimir (D-CAJA-14): en el formato de tirilla configurado o en carta
+  const { data: branding } = useGetBrandingQuery()
+  const { data: settings } = useGetSettingsQuery()
+  const ticket = settings?.values?.['receipt.paper_format'] === '58mm' ? '58mm' : '80mm'
+  // Datos del negocio para el encabezado del informe (como en los comprobantes de venta)
+  const business = {
+    name: branding?.name ?? settings?.values?.['business.name'],
+    nit: settings?.values?.['business.nit'],
+    address: settings?.values?.['business.address'],
+    phone: settings?.values?.['business.phone'],
+    whatsapp: settings?.values?.['business.whatsapp'],
+    taxRegime: settings?.fixed?.taxRegimeText,
+    hasLogo: Boolean(branding?.logo),
+    showLogo: settings?.values?.['receipt.show_logo'] !== false,
+  }
+  const [printFormat, setPrintFormat] = useState('80mm')
+  const printRef = useRef(null)
+  const [isReopening, setIsReopening] = useState(false)
   const perms = useSessionPermissions()
   const [page, setPage] = useState(1)
   const { data: session, isLoading, error, refetch } = useGetCashSessionQuery(id)
-  const movements = useGetCashMovementsQuery({ sessionId: id, page, pageSize: 20 })
+  const movements = useGetCashMovementsQuery({
+    sessionId: id,
+    page,
+    pageSize: 20,
+  })
   const [dialog, setDialog] = useState(null) // 'deposit' | 'withdrawal' | 'confirm'
   const [action, setAction] = useState(null)
 
@@ -172,11 +277,21 @@ export default function CashSessionPage() {
             Recibir dinero
           </Button>
         )}
+        {canReopen && session.status === 'counted' && (
+          <Button variant="secondary" icon={LockOpen} onClick={() => setIsReopening(true)}>
+            Reabrir turno
+          </Button>
+        )}
       </div>
 
       {/* ---------- Efectivo ---------- */}
       <section className="cash-figures" aria-label="Efectivo del turno">
-        <Figure index={0} label="Base inicial" value={formatCurrency(summary?.openingCash)} detail={session.openingDifference && session.openingDifference !== '0.00' ? `Esperada ${formatCurrency(session.openingExpected)}` : 'La base fija de la caja'} />
+        <Figure
+          index={0}
+          label="Base inicial"
+          value={formatCurrency(summary?.openingCash)}
+          detail={session.openingDifference && session.openingDifference !== '0.00' ? `Esperada ${formatCurrency(session.openingExpected)}` : 'La base fija de la caja'}
+        />
         <Figure index={1} label="Entradas en efectivo" value={formatCurrency(summary?.cashIn)} tone="success" />
         <Figure index={2} label="Salidas en efectivo" value={formatCurrency(summary?.cashOut)} tone="danger" />
         <Figure index={3} label="Efectivo esperado" value={formatCurrency(session.expectedCash)} strong />
@@ -193,9 +308,30 @@ export default function CashSessionPage() {
                 {session.receivedAt && ` · Recibido el ${formatDateTime(session.receivedAt)} por ${session.receivedBy?.fullName ?? '—'}`}
               </p>
             </div>
-            <Button variant="secondary" size="sm" icon={Printer} onClick={() => window.print()} className="no-print">
-              Imprimir
-            </Button>
+            <span className="cash-session__print no-print">
+              <Button
+                variant="secondary"
+                size="sm"
+                icon={Printer}
+                onClick={() => {
+                  flushSync(() => setPrintFormat(ticket))
+                  printReceipt(printRef.current?.firstElementChild, ticket)
+                }}
+              >
+                Imprimir tirilla
+              </Button>
+              <Button
+                variant="secondary"
+                size="sm"
+                icon={Printer}
+                onClick={() => {
+                  flushSync(() => setPrintFormat('letter'))
+                  printReceipt(printRef.current?.firstElementChild, 'letter', { margin: 0 })
+                }}
+              >
+                Imprimir carta
+              </Button>
+            </span>
           </header>
           <dl className="closing-summary">
             <div>
@@ -245,9 +381,58 @@ export default function CashSessionPage() {
                 <dd>{session.openingNotes}</dd>
               </div>
             )}
+            {session.countBreakdown?.some((item) => item.quantity > 0) && (
+              <div className="closing-summary__note">
+                <dt>Billetes y monedas</dt>
+                <dd>
+                  {DENOMINATIONS.map((denomination) => {
+                    const row = session.countBreakdown.find((item) => item.value === denomination.value && item.kind === denomination.kind && item.quantity > 0)
+                    return row ? `${row.quantity} × ${denominationLabel(denomination).toLowerCase()}` : null
+                  })
+                    .filter(Boolean)
+                    .join(' · ')}
+                </dd>
+              </div>
+            )}
           </dl>
+          <div className="ccp-preview" aria-label="Así sale impreso">
+            <CashClosingPaper session={session} business={business} format={ticket} />
+          </div>
         </section>
       )}
+
+      {session.reopenedAt && isOpen && (
+        <Alert tone="info">Este turno se reabrió el {formatDateTime(session.reopenedAt)}: recibe ventas hasta que se cierre otra vez, sin importar la hora de cierre.</Alert>
+      )}
+
+      {session.countHistory?.length > 0 && (
+        <section className="cash-panel" aria-labelledby="count-history-title">
+          <h3 className="cash-panel__title" id="count-history-title">
+            <History aria-hidden="true" /> Conteos anulados al reabrir
+          </h3>
+          <ul className="method-list">
+            {session.countHistory.map((previous, index) => (
+              <li key={index} className="method-list__item">
+                <span className="method-list__name">
+                  Contado {formatCurrency(previous.countedCash)} de {formatCurrency(previous.expectedCash)} esperado
+                  <span className="method-list__detail">
+                    {previous.countedAt ? formatDateTime(previous.countedAt) : ''}
+                    {previous.countedBy ? ` · ${previous.countedBy.fullName}` : ''} · Reabierto el {formatDateTime(previous.reopenedAt)}: {previous.reason}
+                  </span>
+                </span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
+      {isCounted &&
+        createPortal(
+          <div className={`sale-print-root sale-print-root--${printFormat}`} ref={printRef} aria-hidden="true">
+            <CashClosingPaper session={session} business={business} format={printFormat} />
+          </div>,
+          document.body,
+        )}
 
       {/* ---------- Medios de pago ---------- */}
       <section className="cash-panel" aria-labelledby="payment-methods-title">
@@ -315,6 +500,16 @@ export default function CashSessionPage() {
         />
       )}
       <SessionActionDialogs action={action} onClose={() => setAction(null)} />
+      {isReopening && (
+        <ReopenModal
+          session={session}
+          onClose={() => setIsReopening(false)}
+          onDone={(result) => {
+            setIsReopening(false)
+            toast.success(result.message ?? 'Turno reabierto: ya se puede vender')
+          }}
+        />
+      )}
     </div>
   )
 }

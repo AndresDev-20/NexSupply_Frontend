@@ -10,7 +10,8 @@ const AFTER_SALE = ['Sale', { type: 'Product', id: 'LIST' }, 'Product', 'Movemen
 export const salesApi = baseApi.injectEndpoints({
   endpoints: (build) => ({
     searchSaleCatalog: build.query({
-      query: (search) => ({ url: '/sales/catalog', params: { search } }),
+      // arg: el texto, o { search, customerId?, priceListId? } para los precios de la lista (D-PRE-1)
+      query: (arg) => ({ url: '/sales/catalog', params: typeof arg === 'string' ? { search: arg } : arg }),
       keepUnusedDataFor: 5,
     }),
     previewSale: build.mutation({
@@ -22,6 +23,12 @@ export const salesApi = baseApi.injectEndpoints({
     createSale: build.mutation({
       query: (body) => ({ url: '/sales', method: 'POST', data: body }),
       invalidatesTags: AFTER_SALE,
+    }),
+    // Libro de fórmulas veterinarias (D-VET-1)
+    getPrescriptions: build.query({
+      query: (params) => ({ url: '/sales/prescriptions', params }),
+      transformResponse: paginated,
+      providesTags: ['Sale'],
     }),
     getSales: build.query({
       query: (params) => ({ url: '/sales', params }),
@@ -63,6 +70,7 @@ export const {
   useAuthorizeSaleMutation,
   useCreateSaleMutation,
   useGetSalesQuery,
+  useGetPrescriptionsQuery,
   useGetSaleQuery,
   useGetSaleReceiptQuery,
   useEmailSaleReceiptMutation,

@@ -1,0 +1,260 @@
+/* Conteo por billetes y monedas (D-CAJA-14): dos tarjetas lado a lado y el total destacado abajo.
+   Las animaciones usan los tokens de duración, que valen 0 con prefers-reduced-motion. */
+
+.denominations {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.denominations__groups {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-4);
+  align-items: start;
+}
+
+.denominations__group {
+  margin: 0;
+  min-width: 0;
+  padding: var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-sm);
+  animation: denominations-card-in var(--duration-slow) var(--easing-standard) both;
+}
+
+.denominations__group--coin {
+  animation-delay: 60ms;
+}
+
+.denominations__legend {
+  float: left; /* saca la leyenda del borde del fieldset para que quede dentro de la tarjeta */
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
+  padding: 0;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+.denominations__legend svg {
+  width: 16px;
+  height: 16px;
+  color: var(--color-primary);
+}
+
+.denominations__group--coin .denominations__legend svg {
+  color: var(--color-accent-strong);
+}
+
+.denominations__rows {
+  clear: both;
+  display: grid;
+  gap: var(--space-1);
+}
+
+.denominations__row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 72px minmax(0, 1fr);
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-md);
+  cursor: text;
+  transition: background-color var(--duration-base) var(--easing-standard);
+  animation: denominations-row-in var(--duration-slow) var(--easing-standard) both;
+  animation-delay: calc(var(--row-index, 0) * 35ms + 80ms);
+}
+
+.denominations__row:hover {
+  background: var(--color-surface-muted);
+}
+
+.denominations__row:focus-within,
+.denominations__row--filled {
+  background: var(--color-primary-soft);
+}
+
+.denominations__value {
+  font-weight: var(--font-weight-extrabold);
+  font-variant-numeric: tabular-nums;
+  color: var(--color-text);
+  white-space: nowrap;
+}
+
+.denominations__input {
+  width: 100%;
+  height: 36px;
+  padding: 0 var(--space-2);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font: inherit;
+  font-weight: var(--font-weight-semibold);
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+  transition:
+    border-color var(--duration-fast) var(--easing-standard),
+    box-shadow var(--duration-fast) var(--easing-standard),
+    transform var(--duration-fast) var(--easing-standard);
+}
+
+.denominations__input::placeholder {
+  color: var(--color-text-subtle);
+  opacity: 0.6;
+}
+
+.denominations__input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-focus-ring) 45%, transparent);
+  transform: scale(1.04);
+}
+
+.denominations__subtotal {
+  text-align: right;
+  font-weight: var(--font-weight-semibold);
+  font-variant-numeric: tabular-nums;
+  color: var(--color-primary);
+  white-space: nowrap;
+  animation: denominations-pop var(--duration-slow) var(--easing-emphasized);
+}
+
+.denominations__subtotal--zero {
+  color: var(--color-text-subtle);
+  font-weight: var(--font-weight-regular);
+  animation: none;
+}
+
+.denominations__group-total {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin: var(--space-3) 0 0;
+  padding-top: var(--space-3);
+  border-top: 1px dashed var(--color-border);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+.denominations__group-total strong {
+  font-variant-numeric: tabular-nums;
+  color: var(--color-text);
+}
+
+/* Total contado: tarjeta destacada en el verde de la marca, con acento amarillo cuando hay dinero */
+.denominations__total {
+  position: relative;
+  overflow: hidden;
+  padding: var(--space-4) var(--space-5);
+  border-radius: var(--radius-lg);
+  background: linear-gradient(135deg, var(--palette-green-800), var(--palette-green-700)); /* fijo: igual de legible en claro y oscuro */
+  color: var(--palette-white);
+  box-shadow: var(--shadow-md);
+  animation: denominations-card-in var(--duration-slow) var(--easing-standard) 120ms both;
+}
+
+.denominations__total::after {
+  content: '';
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 4px;
+  background: var(--color-accent);
+  transform: scaleY(0);
+  transform-origin: bottom;
+  transition: transform var(--duration-slow) var(--easing-emphasized);
+}
+
+.denominations__total--filled::after {
+  transform: scaleY(1);
+}
+
+.denominations__total-main {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--space-4);
+  margin: 0;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.95;
+}
+
+.denominations__total-main strong {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-extrabold);
+  letter-spacing: 0;
+  font-variant-numeric: tabular-nums;
+  text-transform: none;
+}
+
+.denominations__total--filled .denominations__total-main strong {
+  color: var(--palette-yellow-400);
+}
+
+.denominations__pieces {
+  display: block;
+  margin-top: var(--space-1);
+  font-size: var(--font-size-xs);
+  opacity: 0.8;
+}
+
+.denominations__error {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  color: var(--color-danger);
+}
+
+@keyframes denominations-card-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+@keyframes denominations-row-in {
+  from {
+    opacity: 0;
+    transform: translateX(-6px);
+  }
+}
+
+@keyframes denominations-pop {
+  0% {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(1.08);
+  }
+}
+
+/* El retraso por fila también se quita si el sistema pide menos movimiento */
+@media (prefers-reduced-motion: reduce) {
+  .denominations__group,
+  .denominations__row,
+  .denominations__total {
+    animation-delay: 0ms;
+  }
+}
+
+/* Celular: una tarjeta debajo de la otra */
+@media (max-width: 640px) {
+  .denominations__groups {
+    grid-template-columns: 1fr;
+  }
+
+  .denominations__total-main strong {
+    font-size: var(--font-size-xl);
+  }
+}

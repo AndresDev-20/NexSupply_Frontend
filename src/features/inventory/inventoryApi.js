@@ -59,12 +59,14 @@ export const inventoryApi = baseApi.injectEndpoints({
     }),
     createProduct: build.mutation({
       query: (body) => ({ url: '/products', method: 'POST', data: body }),
-      invalidatesTags: [{ type: 'Product', id: 'LIST' }, 'Category', 'Supplier', 'Audit'],
+      // Con «¿A qué compra va?» también cambia esa compra (D-COMP-9)
+      invalidatesTags: (result, error, body) => [{ type: 'Product', id: 'LIST' }, 'Category', 'Supplier', 'Audit', ...(body?.purchase ? ['PurchaseGroup', { type: 'Purchase', id: 'LIST' }] : [])],
     }),
     updateProduct: build.mutation({
       // confirmBelowCost: el usuario confirmó un precio menor al costo (D-INV-10)
       query: ({ id, ...body }) => ({ url: `/products/${id}`, method: 'PATCH', data: body }),
-      invalidatesTags: (result, error, { id }) => [...productTags(id), 'Category', 'Supplier', 'PriceHistory'],
+      // Con «¿A qué compra va?» también cambia esa compra (D-COMP-9)
+      invalidatesTags: (result, error, { id, purchase }) => [...productTags(id), 'Category', 'Supplier', 'PriceHistory', ...(purchase ? ['PurchaseGroup', { type: 'Purchase', id: 'LIST' }] : [])],
     }),
     setProductActive: build.mutation({
       query: ({ id, active }) => ({ url: `/products/${id}/${active ? 'activate' : 'deactivate'}`, method: 'POST' }),
@@ -96,6 +98,23 @@ export const inventoryApi = baseApi.injectEndpoints({
       query: ({ productId, ...body }) => ({ url: `/products/${productId}/adjustments`, method: 'POST', data: body }),
       invalidatesTags: (result, error, { productId }) => [...productTags(productId), 'Movement'],
     }),
+    // Lotes de animales (D-ANI-1): precio que sube cada día, recibir, corregir precio y muertes
+    getAnimalLots: build.query({
+      query: ({ productId, includeEmpty = false }) => ({ url: `/products/${productId}/animal-lots`, params: includeEmpty ? { includeEmpty: 'true' } : undefined }),
+      providesTags: ['AnimalLot'],
+    }),
+    receiveAnimalLot: build.mutation({
+      query: ({ productId, ...body }) => ({ url: `/products/${productId}/animal-lots`, method: 'POST', data: body }),
+      invalidatesTags: (result, error, { productId }) => [...productTags(productId), 'AnimalLot', 'Movement'],
+    }),
+    updateAnimalLot: build.mutation({
+      query: ({ productId, lotId, ...body }) => ({ url: `/products/${productId}/animal-lots/${lotId}`, method: 'PATCH', data: body }),
+      invalidatesTags: (result, error, { productId }) => [...productTags(productId), 'AnimalLot'],
+    }),
+    registerAnimalDeath: build.mutation({
+      query: ({ productId, lotId, ...body }) => ({ url: `/products/${productId}/animal-lots/${lotId}/deaths`, method: 'POST', data: body }),
+      invalidatesTags: (result, error, { productId }) => [...productTags(productId), 'AnimalLot', 'Movement'],
+    }),
     getMovements: build.query({
       query: ({ productId, ...params }) => ({ url: `/products/${productId}/movements`, params }),
       transformResponse: paginated,
@@ -104,6 +123,21 @@ export const inventoryApi = baseApi.injectEndpoints({
     getPriceHistory: build.query({
       query: (productId) => ({ url: `/products/${productId}/price-history` }),
       providesTags: ['PriceHistory'],
+    }),
+    // Etiquetas con código de barras (D-INV-21): crea códigos internos a lo que no tenga
+    prepareLabels: build.mutation({
+      query: (body) => ({ url: '/products/labels', method: 'POST', data: body }),
+      transformResponse: (data, meta) => ({ ...data, message: meta?.message ?? null }),
+      invalidatesTags: [{ type: 'Product', id: 'LIST' }, 'Product', 'Audit'],
+    }),
+    // Subir precios en bloque (D-PRE-2): vista previa y aplicar
+    previewBulkPrices: build.mutation({
+      query: (body) => ({ url: '/products/bulk-prices/preview', method: 'POST', data: body }),
+    }),
+    applyBulkPrices: build.mutation({
+      query: (body) => ({ url: '/products/bulk-prices/apply', method: 'POST', data: body }),
+      transformResponse: (data, meta) => ({ ...data, message: meta?.message ?? null }),
+      invalidatesTags: [{ type: 'Product', id: 'LIST' }, 'Product', 'PriceHistory', 'PriceList', 'Audit'],
     }),
 
     // ---------- Documentos del producto (D-INV-18) ----------
@@ -161,11 +195,18 @@ export async function downloadImportTemplate() {
 }
 
 export const {
+  useGetAnimalLotsQuery,
+  useReceiveAnimalLotMutation,
+  useUpdateAnimalLotMutation,
+  useRegisterAnimalDeathMutation,
   useGetCategoriesQuery,
   useCreateCategoryMutation,
   useUpdateCategoryMutation,
   useSetCategoryActiveMutation,
   useGetSuppliersQuery,
+  usePreviewBulkPricesMutation,
+  usePrepareLabelsMutation,
+  useApplyBulkPricesMutation,
   useCreateSupplierMutation,
   useUpdateSupplierMutation,
   useSetSupplierActiveMutation,

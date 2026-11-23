@@ -20,6 +20,7 @@ import {
   TriangleAlert,
   Truck,
   Warehouse,
+  PackagePlus,
 } from 'lucide-react'
 import { useGetMovementsQuery, useGetPriceHistoryQuery, useGetProductQuery, useSetPresentationActiveMutation, useSetProductActiveMutation } from '../inventoryApi'
 import { EXPIRED_POLICY_OPTIONS } from '../inventoryOptions'
@@ -39,6 +40,7 @@ import { ConfirmDialog } from '../../../components/ui/ConfirmDialog/ConfirmDialo
 import { formatCurrency, formatDateTime, formatPercent, formatQuantity } from '../../../utils/format'
 import { ROUTES } from '../../../routes/paths'
 import { ProductFormModal } from './ProductFormModal'
+import { AnimalLotsTab, ReceiveAnimalLotModal } from './AnimalLots'
 import { PresentationFormModal } from './PresentationFormModal'
 import { InitialStockModal } from './InitialStockModal'
 import { AdjustStockModal } from './AdjustStockModal'
@@ -117,6 +119,7 @@ function PriceHistoryTab({ productId }) {
         <span className="stock-cell">
           <span className="numeric">{formatCurrency(row.newPrice)}</span>
           {row.belowCost && <Badge tone="danger">Bajo el costo</Badge>}
+          {row.reason === 'bulk' && <Badge tone="info">Cambio en bloque</Badge>}
         </span>
       ),
     },
@@ -136,10 +139,11 @@ export default function ProductDetailPage() {
     initialStock: useCan('inventory.initial_stock'),
     adjust: useCan('inventory.adjust'),
     viewCost: useCan('inventory.cost_view'),
+    prices: useCan('inventory.prices'),
   }
   // Los lotes llegan con las compras (funcionalidad del plan 'purchases')
   const hasPurchases = useHasFeature('purchases')
-  const [tab, setTab] = useState('presentations')
+  const [tab, setTab] = useState(null) // la primera pestaña depende del tipo de producto
   const [movementsPage, setMovementsPage] = useState(1)
   const [modal, setModal] = useState(null) // 'edit' | 'stock' | 'adjust' | { presentation }
   const [confirmToggle, setConfirmToggle] = useState(false)
@@ -171,6 +175,9 @@ export default function ProductDetailPage() {
   }
 
   const symbol = product.unit.symbol
+  // Animal (D-ANI-1): se maneja por lotes con precio que sube cada día
+  const isAnimal = product.productKind === 'animal'
+  const activeTab = tab ?? (isAnimal ? 'animalLots' : 'presentations')
   const hasMovements = (movements.data?.pagination?.total ?? 0) > 0
   const canLoadStock = can.initialStock && product.isActive && movements.data && !hasMovements
   // Existencia en la presentación más grande que alcance: "10 × Bulto 40 kg"
@@ -201,7 +208,8 @@ export default function ProductDetailPage() {
   const presentationColumns = [
     { key: 'name', header: 'Presentación', primary: true, render: (row) => <span className="entity-cell__name">{row.name}</span> },
     { key: 'factor', header: 'Contenido', render: (row) => <span className="numeric">{formatQuantity(row.factor)} {symbol}</span> },
-    { key: 'price', header: 'Precio', render: (row) => <span className="numeric">{formatCurrency(row.salePrice)}</span> },
+    // Un empaque que no se vende completo solo sirve para comprar (D-INV-20)
+    { key: 'price', header: 'Precio', render: (row) => (row.isSoldWhole === false ? <Badge tone="neutral">Solo compra · se vende por {symbol}</Badge> : <span className="numeric">{formatCurrency(row.salePrice)}</span>) },
     ...(can.viewCost
       ? [
           { key: 'purchase', header: 'Compra', render: (row) => <span className="numeric">{formatCurrency(row.purchasePrice)}</span> },
@@ -209,9 +217,13 @@ export default function ProductDetailPage() {
             key: 'profit',
             header: 'Ganancia',
             render: (row) => (
-              <span className={`numeric${row.profit?.startsWith('-') ? ' margin--negative' : ''}`}>
-                {formatCurrency(row.profit)} {row.profitPercent !== null && <small>({formatPercent(row.profitPercent)})</small>}
-              </span>
+              row.isSoldWhole === false ? (
+                '—'
+              ) : (
+                <span className={`numeric${row.profit?.startsWith('-') ? ' margin--negative' : ''}`}>
+                  {formatCurrency(row.profit)} {row.profitPercent !== null && <small>({formatPercent(row.profitPercent)})</small>}
+                </span>
+              )
             ),
           },
         ]
@@ -236,7 +248,7 @@ export default function ProductDetailPage() {
   ]
 
   const tabs = [
-    { id: 'presentations', label: 'Presentaciones', icon: Boxes, count: product.presentations.length },
+    ...(isAnimal ? [{ id: 'animalLots', label: 'Lotes', icon: PackagePlus }] : [{ id: 'presentations', label: 'Presentaciones', icon: Boxes, count: product.presentations.length }]),
     { id: 'suppliers', label: 'Proveedores', icon: Truck, count: product.suppliers.length },
     ...(product.tracksBatches && hasPurchases ? [{ id: 'batches', label: 'Lotes', icon: CalendarX2 }] : []),
     ...(product.isVeterinary || product.veterinaryInfo ? [{ id: 'vet', label: 'Ficha veterinaria', icon: Stethoscope }] : []),
@@ -276,6 +288,7 @@ export default function ProductDetailPage() {
             )}
             <Badge tone="info">{product.taxRateLabel}</Badge>
             {product.tracksBatches && <Badge tone="accent">Maneja lotes</Badge>}
+            {isAnimal && <Badge tone="accent">Animal · precio por lote</Badge>}
             {product.isVeterinary && (
               <Badge tone="info" icon={Stethoscope}>
                 Veterinario
@@ -290,12 +303,17 @@ export default function ProductDetailPage() {
           </div>
         </div>
         <div className="product-hero__actions">
-          {canLoadStock && (
+          {isAnimal && can.initialStock && can.viewCost && product.isActive && (
+            <Button variant="accent" icon={PackagePlus} onClick={() => setModal('receiveLot')}>
+              Recibir lote
+            </Button>
+          )}
+          {!isAnimal && canLoadStock && (
             <Button variant="accent" icon={Warehouse} onClick={() => setModal('stock')}>
               Existencia inicial
             </Button>
           )}
-          {can.adjust && product.isActive && (
+          {!isAnimal && can.adjust && product.isActive && (
             <Button variant="secondary" icon={Scale} onClick={() => setModal('adjust')}>
               Ajustar existencia
             </Button>
@@ -320,9 +338,14 @@ export default function ProductDetailPage() {
           detail={[packStock, Number(product.minStock) > 0 ? `Mínimo ${formatQuantity(product.minStock)} ${symbol}` : 'Sin mínimo'].filter(Boolean).join(' · ')}
           tone={product.isOutOfStock ? 'danger' : product.isLowStock ? 'warning' : undefined}
         />
-        {can.viewCost && <Stat label="Precio de compra" value={formatCurrency(product.purchasePrice)} detail={`por ${symbol}`} />}
-        <Stat label="Precio de venta" value={formatCurrency(product.salePrice)} detail={`por ${symbol}`} />
-        {can.viewCost && (
+        {can.viewCost && !isAnimal && <Stat label="Precio de compra" value={formatCurrency(product.purchasePrice)} detail={`por ${symbol}`} />}
+        {can.viewCost && isAnimal && <Stat label="Costo promedio" value={formatCurrency(product.averageCost)} detail="De los animales que hay" />}
+        {isAnimal ? (
+          <Stat label="Precio de venta" value="Por lote" detail="Sube cada día: mira la pestaña Lotes" />
+        ) : (
+          <Stat label="Precio de venta" value={formatCurrency(product.salePrice)} detail={`por ${symbol}`} />
+        )}
+        {can.viewCost && !isAnimal && (
           <>
             <Stat
               label={product.profit?.startsWith('-') ? 'Pérdida' : 'Ganancia'}
@@ -338,8 +361,9 @@ export default function ProductDetailPage() {
 
       {product.description && <p className="product-detail__description">{product.description}</p>}
 
-      <Tabs tabs={tabs} active={tab} onChange={setTab} label="Información del producto">
-        {tab === 'presentations' && (
+      <Tabs tabs={tabs} active={activeTab} onChange={setTab} label="Información del producto">
+        {activeTab === 'animalLots' && <AnimalLotsTab product={product} can={can} onMessage={(message) => toast.success(message)} />}
+        {activeTab === 'presentations' && (
           <>
             {can.update && product.isActive && (
               <div className="product-detail__tab-actions">
@@ -357,7 +381,7 @@ export default function ProductDetailPage() {
             />
           </>
         )}
-        {tab === 'suppliers' &&
+        {activeTab === 'suppliers' &&
           (product.suppliers.length === 0 ? (
             <StatusMessage icon={Truck} title="Sin proveedores" description={can.update ? 'Asócialos desde "Editar".' : undefined} />
           ) : (
@@ -378,20 +402,31 @@ export default function ProductDetailPage() {
               ))}
             </ul>
           ))}
-        {tab === 'movements' && <MovementsTab product={product} movements={movements} onPageChange={setMovementsPage} canViewCost={can.viewCost} />}
-        {tab === 'batches' && <BatchesTab product={product} canViewCost={can.viewCost} />}
-        {tab === 'prices' && <PriceHistoryTab productId={product.id} />}
-        {tab === 'vet' && <VeterinaryTab product={product} canEdit={can.update} />}
-        {tab === 'documents' && <DocumentsTab product={product} canEdit={can.update} />}
+        {activeTab === 'movements' && <MovementsTab product={product} movements={movements} onPageChange={setMovementsPage} canViewCost={can.viewCost} />}
+        {activeTab === 'batches' && <BatchesTab product={product} canViewCost={can.viewCost} />}
+        {activeTab === 'prices' && <PriceHistoryTab productId={product.id} />}
+        {activeTab === 'vet' && <VeterinaryTab product={product} canEdit={can.update} />}
+        {activeTab === 'documents' && <DocumentsTab product={product} canEdit={can.update} />}
       </Tabs>
 
       {modal === 'edit' && (
         <ProductFormModal
           product={product}
           onClose={() => setModal(null)}
+          onSaved={(saved, isEdit, extra) => {
+            setModal(null)
+            toast.success(`${saved.name} actualizado${extra?.purchaseGroupName ? ` y agregado a «${extra.purchaseGroupName}»` : ''}`)
+          }}
+        />
+      )}
+      {modal === 'receiveLot' && (
+        <ReceiveAnimalLotModal
+          product={product}
+          onClose={() => setModal(null)}
           onSaved={(saved) => {
             setModal(null)
-            toast.success(`${saved.name} actualizado`)
+            setTab('animalLots')
+            toast.success(`Lote ${saved.lotNumber} recibido: ${formatQuantity(saved.receivedQuantity)} a ${formatCurrency(saved.priceToday)} hoy`)
           }}
         />
       )}

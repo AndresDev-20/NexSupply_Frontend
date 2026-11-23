@@ -1,4 +1,4 @@
-import { ArrowLeftRight, Archive, Undo2, ShieldAlert, Receipt, Repeat, ChartColumnBig, Banknote, ReceiptText, ScanBarcode, Contact, Wallet, BellRing, ClipboardCheck, Building2, CalendarClock, CalendarX2, HandCoins, ShoppingCart, CreditCard, FileSpreadsheet, FolderTree, Hash, History, House, Landmark, Package, Percent, Ruler, ScrollText, ShieldCheck, Store, Truck, Users, Palette } from 'lucide-react'
+import { ArrowLeftRight, Archive, Undo2, ShieldAlert, Receipt, Repeat, ChartColumnBig, Banknote, ReceiptText, ScanBarcode, Contact, Wallet, BellRing, BadgePercent, DatabaseBackup, FileText, Stethoscope, Tag, ClipboardCheck, Building2, CalendarClock, CalendarX2, HandCoins, ShoppingCart, CreditCard, FileSpreadsheet, FolderTree, Hash, History, House, Landmark, Package, Percent, Ruler, ScrollText, ShieldCheck, Store, Truck, Users, Palette } from 'lucide-react'
 import { ROUTES } from '../routes/paths'
 
 // Menú lateral. Cada entrada declara el permiso y la funcionalidad del plan que
@@ -14,8 +14,10 @@ export const NAVIGATION = [
     items: [
       { to: ROUTES.pos, label: 'Punto de venta', icon: ScanBarcode, permission: 'sales.create', feature: 'sales' },
       { to: ROUTES.sales, label: 'Ventas', icon: ReceiptText, permission: 'sales.view', feature: 'sales', end: true },
+      { to: ROUTES.quotes, label: 'Cotizaciones', icon: FileText, permission: 'quotes.view', feature: 'sales' },
       { to: ROUTES.layaways, label: 'Apartados', icon: Archive, permission: 'layaways.view', feature: 'sales' },
       { to: ROUTES.saleReturns, label: 'Devoluciones', icon: Undo2, permission: 'sales.view', feature: 'sales' },
+      { to: ROUTES.prescriptions, label: 'Fórmulas veterinarias', icon: Stethoscope, permission: 'sales.view', feature: 'sales' },
     ],
   },
   {
@@ -36,6 +38,7 @@ export const NAVIGATION = [
     items: [
       { to: ROUTES.expenses, label: 'Gastos', icon: Receipt, permission: 'expenses.view', feature: 'expenses', end: true },
       { to: ROUTES.recurringExpenses, label: 'Gastos fijos', icon: Repeat, permission: 'expenses.view', feature: 'expenses' },
+      { to: ROUTES.porters, label: 'Coteros', icon: Truck, permission: 'porters.view', feature: 'expenses' },
     ],
   },
   {
@@ -43,6 +46,7 @@ export const NAVIGATION = [
     items: [
       { to: ROUTES.customers, label: 'Clientes', icon: Contact, permission: 'customers.view', feature: 'customers' },
       { to: ROUTES.receivables, label: 'Cartera', icon: Wallet, permission: 'receivables.view', feature: 'customers' },
+      { to: ROUTES.priceLists, label: 'Listas de precios', icon: BadgePercent, permission: 'price_lists.manage', feature: 'sales' },
     ],
   },
   {
@@ -50,6 +54,7 @@ export const NAVIGATION = [
     items: [
       { to: ROUTES.purchases, label: 'Compras', icon: ShoppingCart, permission: 'purchases.view', feature: 'purchases', end: true },
       { to: ROUTES.payables, label: 'Cuentas por pagar', icon: HandCoins, permission: 'purchases.view', feature: 'purchases' },
+      { to: ROUTES.reorder, label: 'Pedido sugerido', icon: ClipboardCheck, permission: 'purchases.create', feature: 'purchases' },
     ],
   },
   {
@@ -63,6 +68,7 @@ export const NAVIGATION = [
       // Fase 18: solo en el plan intermedio
       { to: ROUTES.transfers, label: 'Transferencias', icon: ArrowLeftRight, permission: ['transfers.view', 'transfers.send', 'transfers.receive'], feature: 'branch_transfers' },
       { to: ROUTES.suppliers, label: 'Proveedores', icon: Truck, permission: 'suppliers.view', feature: 'inventory' },
+      { to: ROUTES.labels, label: 'Etiquetas', icon: Tag, permission: 'inventory.update', feature: 'inventory' },
       { to: ROUTES.productImport, label: 'Importar desde Excel', icon: FileSpreadsheet, permission: 'inventory.import', feature: 'inventory' },
     ],
   },
@@ -83,8 +89,10 @@ export const NAVIGATION = [
       { to: ROUTES.paymentMethods, label: 'Métodos de pago', icon: CreditCard, permission: 'payment_methods.manage', feature: 'settings' },
       { to: ROUTES.units, label: 'Unidades de medida', icon: Ruler, permission: 'units.manage', feature: 'settings' },
       { to: ROUTES.alertSettings, label: 'Avisos', icon: BellRing, permission: 'settings.update', feature: 'settings' },
+      { to: ROUTES.salesSettings, label: 'Cotizaciones y apartados', icon: FileText, permission: 'settings.update', feature: 'settings' },
       { to: ROUTES.appearanceSettings, label: 'Apariencia', icon: Palette, permission: 'settings.update', feature: 'settings' },
       { to: ROUTES.sequences, label: 'Consecutivos', icon: Hash, permission: 'document_sequences.manage', feature: 'settings' },
+      { to: ROUTES.backups, label: 'Copias de seguridad', icon: DatabaseBackup, permission: 'backups.manage', feature: 'settings' },
     ],
   },
 ]

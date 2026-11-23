@@ -237,14 +237,29 @@ Solo adapta lo que se ve: el backend vuelve a verificar cada petición. `canAcce
 | Ruta | Permiso | Pantalla |
 |---|---|---|
 | `/compras` | `purchases.view` | Compras con filtros por estado, proveedor y pago |
-| `/compras/nueva` | `purchases.create` | Editor de una compra nueva |
+| `/compras/nueva` | `purchases.create` | Editor de una compra a un solo proveedor (botón «Compra a un proveedor») |
+| `/compras/grupos/:id` | `purchases.view` | Compra con varios proveedores (D-COMP-9): cada proveedor con sus productos y su total, total de todo y «Revisar y confirmar» por proveedor |
 | `/compras/:id` | `purchases.view` | Borrador: editor (con `purchases.create`). Confirmada o anulada: detalle con pagos |
 | `/compras/cuentas-por-pagar` | `purchases.view` | Saldo por proveedor, estado de cuenta y compras por pagar |
 | `/inventario/lotes` | `inventory.view` (+ plan `purchases`) | Lotes por vencer y vencidos |
 
 | Pieza | Uso |
 |---|---|
-| `features/purchases/purchasesApi.js` | Endpoints de compras, pagos, cuentas por pagar y lotes; `openPurchaseAttachment()` |
+| `features/purchases/purchasesApi.js` | Endpoints de compras, compras agrupadas (`/purchase-groups`), pagos, cuentas por pagar y lotes; `openPurchaseAttachment()` |
+| `features/purchases/groups/` | `NewPurchaseGroupModal` («Nueva compra») y `PurchaseGroupPage` (detalle de una compra con varios proveedores) |
+| `features/inventory/products/ProductFormModal.jsx` | Nuevo y editar producto. «¿Cómo lo compras?» (suelto o en empaque, D-INV-20), «Empaque y cantidad» y «¿A qué compra va?» (D-COMP-9) |
+| `features/cash/DenominationCounter.jsx` · `denominations.js` · `sessions/CashClosingPaper.jsx` | Conteo por billetes y monedas e informe de cierre impreso (D-CAJA-14); reabrir turno en `CashSessionPage.jsx` (D-CAJA-15) |
+| `features/reports/AccountingBook.jsx` | Libro para el contador (D-CON-1), arriba en Informes |
+| `features/expenses/porters/` | Coteros (D-CTR-1): lista, ficha con viajes y pagos, modales de cotero, viaje y pago; «Lo lleva un cotero» está en `SaleReceiptModal.jsx` |
+| `features/inventory/labels/` | Etiquetas con código de barras (D-INV-21) en hoja carta; `Barcode.jsx` usa JsBarcode |
+| `features/sales/PrescriptionsPage.jsx` | Libro de fórmulas veterinarias (D-VET-1); los campos de la fórmula están en `CheckoutPanel.jsx` |
+| `features/purchases/reorder/ReorderPage.jsx` | Pedido sugerido al proveedor (D-COMP-10): cantidades editables, compra en borrador y WhatsApp |
+| `features/quotes/` | Cotizaciones (D-COT-1): lista, ficha con PDF, WhatsApp, correo, Vender y Anular; el modo «Cotizar» está en `CheckoutPanel.jsx` y la carga de una cotización en `PosPage.jsx` |
+| `features/settings/backups/` | Copias de seguridad (D-SEG-1): estado, lista, descargar y «Sacar copia ahora» |
+| `features/inventory/products/BulkPricesPage.jsx` | Cambiar precios en bloque (D-PRE-2): filtros, % o $, vista previa, desmarcar y aplicar |
+| `features/customers/priceLists/` | Precios por tipo de cliente (D-PRE-1): Listas de precios, detalle con precios especiales, `priceListOptions.js` (vista previa del precio de la lista) |
+| `features/sales/pos/PosPriceList.jsx` | Franja del punto de venta con la lista de la venta; con `sales.change_price_list`, selector para cambiarla |
+| `features/inventory/products/AnimalLots.jsx` · `animalPricing.js` | Animales (D-ANI-1): pestaña Lotes, Recibir lote, Registrar muerte, Corregir precio y vista previa del precio que sube cada día |
 | `features/purchases/detail/PurchaseEditor.jsx` | Editor del borrador (buscador, líneas, lotes, resumen y cálculo del sistema) |
 | `features/purchases/detail/ConfirmPurchaseModal.jsx` | Confirmar de contado o a crédito |
 | `features/purchases/detail/PaymentFields.jsx` · `paymentHelpers.js` | Método, referencia y caja de un pago a proveedor |

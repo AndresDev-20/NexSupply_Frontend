@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react'
 import { createPortal, flushSync } from 'react-dom'
-import { FileDown, FileText, Mail, MessageCircle, Printer, ReceiptText, RotateCw, Send } from 'lucide-react'
+import { FileDown, FileText, Mail, MessageCircle, Printer, ReceiptText, RotateCw, Send, Truck } from 'lucide-react'
 import { Modal } from '../../components/ui/Modal/Modal'
 import { Button } from '../../components/ui/Button/Button'
 import { TextField } from '../../components/ui/TextField/TextField'
@@ -15,6 +15,8 @@ import { SaleReceiptPaper } from './SaleReceiptPaper'
 import { SaleReceiptLetter } from './SaleReceiptLetter'
 import { ticketFormat } from './receiptHelpers'
 import { printReceipt } from './printReceipt'
+import { TripModal } from '../expenses/porters/PorterModals'
+import { useCan } from '../../hooks/usePermissions'
 import './sales.css'
 
 const VIEWS = [
@@ -54,6 +56,9 @@ export function SaleReceiptModal({ saleId, onClose, onNewSale, change = null }) 
   const printRef = useRef(null)
   const emailRef = useRef(null)
   const [sharing, setSharing] = useState(false)
+  // Coteros (D-CTR-1): quien lleva la mercancía al carro de línea
+  const canAddTrip = useCan('porters.trips')
+  const [isAddingTrip, setIsAddingTrip] = useState(false)
   const [sendEmail, emailState] = useEmailSaleReceiptMutation()
   const { fieldErrors, formError } = splitApiError(emailState.error)
 
@@ -157,7 +162,19 @@ export function SaleReceiptModal({ saleId, onClose, onNewSale, change = null }) 
               onClick={focusEmail}
               disabled={!data.emailEnabled}
             />
+            {canAddTrip && <ActionTile icon={Truck} label="Lo lleva un cotero" hint="Anotar el viaje al carro de línea" onClick={() => setIsAddingTrip(true)} />}
           </div>
+          {isAddingTrip && (
+            <TripModal
+              saleId={sale.id}
+              saleLabel={`la venta ${sale.number}${sale.customer && !sale.customer.isFinalConsumer ? ` (${sale.customer.name})` : ''}`}
+              onClose={() => setIsAddingTrip(false)}
+              onSaved={(result) => {
+                setIsAddingTrip(false)
+                toast.success(result.message ?? 'Viaje anotado')
+              }}
+            />
+          )}
 
           <div className="sale-preview">
             <div className="sale-preview__bar">

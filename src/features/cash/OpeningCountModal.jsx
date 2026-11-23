@@ -2,16 +2,16 @@ import { useState } from 'react'
 import { Banknote, CircleCheck, KeyRound, Wallet } from 'lucide-react'
 import { Modal } from '../../components/ui/Modal/Modal'
 import { Button } from '../../components/ui/Button/Button'
-import { TextField } from '../../components/ui/TextField/TextField'
 import { TextAreaField } from '../../components/ui/TextAreaField/TextAreaField'
 import { FormSection } from '../../components/ui/FormSection/FormSection'
 import { Alert } from '../../components/feedback/Alert/Alert'
 import { splitApiError } from '../../utils/formErrors'
 import { formatCurrency } from '../../utils/format'
-import { MONEY_PATTERN, toApiNumber, toInputMoney } from '../../utils/numberInput'
 import { previewSubtract } from '../../utils/moneyPreview'
 import { useConfirmCashOpeningMutation, useOpenCashSessionMutation } from './cashApi'
 import { differenceInfo } from './cashOptions'
+import { DenominationCounter } from './DenominationCounter'
+import { countTotal, toBreakdown } from './denominations'
 import '../admin/admin.css'
 import './cash.css'
 
@@ -26,7 +26,8 @@ export function OpeningCountModal({ mode, register, session, onClose, onSaved })
   const isConfirm = mode === 'confirm'
   const expected = isConfirm ? session.openingExpected : register.baseAmount
   const registerName = isConfirm ? session.register?.name : register.name
-  const [form, setForm] = useState({ countedCash: '', notes: '' })
+  // Conteo por billetes y monedas (D-CAJA-14); «Está completa» = la base esperada sin detalle
+  const [form, setForm] = useState({ quantities: {}, complete: false, notes: '' })
   const [localErrors, setLocalErrors] = useState({})
   const [openSession, openState] = useOpenCashSessionMutation()
   const [confirmOpening, confirmState] = useConfirmCashOpeningMutation()
@@ -36,8 +37,8 @@ export function OpeningCountModal({ mode, register, session, onClose, onSaved })
   const { fieldErrors: serverErrors, formError } = splitApiError(closedDay ? null : error)
   const fieldErrors = { ...serverErrors, ...localErrors }
 
-  const counted = toApiNumber(form.countedCash)
-  const hasCount = MONEY_PATTERN.test(counted)
+  const counted = form.complete ? String(Number(expected)) : String(countTotal(form.quantities))
+  const hasCount = form.complete || toBreakdown(form.quantities).length > 0 || Number(expected) === 0
   const difference = hasCount ? previewSubtract(counted, expected) : null
   const diff = differenceInfo(difference)
   const needsNote = Boolean(diff) && diff.label !== 'Cuadrada'
@@ -51,11 +52,12 @@ export function OpeningCountModal({ mode, register, session, onClose, onSaved })
   const handleSubmit = async (event) => {
     event.preventDefault()
     const errors = {}
-    if (!hasCount) errors.countedCash = 'Escribe cuánto efectivo hay en la caja (ej. 150.000)'
+    if (!hasCount) errors.countedCash = 'Cuenta los billetes y monedas del cajón, o pulsa «Está completa»'
     if (needsNote && !form.notes.trim()) errors.notes = 'Lo contado no coincide con la base esperada: explica la diferencia'
     setLocalErrors(errors)
     if (Object.keys(errors).length > 0) return
-    const body = { countedCash: counted, notes: form.notes.trim() || null, ...(closedDay && { confirmClosedDay: true }) }
+    const body = { ...(form.complete ? { countedCash: counted } : { breakdown: toBreakdown(form.quantities) }), notes: form.notes.trim() || null, ...(closedDay && { confirmClosedDay: true }) }
+    if (!form.complete && body.breakdown.length === 0) body.countedCash = '0'
     try {
       const saved = isConfirm
         ? await confirmOpening({ sessionId: session.id, ...body }).unwrap()
@@ -71,6 +73,7 @@ export function OpeningCountModal({ mode, register, session, onClose, onSaved })
       isOpen
       onClose={onClose}
       isBusy={isLoading}
+      size={form.complete ? 'md' : 'lg'}
       icon={isConfirm ? CircleCheck : KeyRound}
       title={isConfirm ? 'Confirmar la base' : 'Abrir turno'}
       description={
@@ -114,26 +117,29 @@ export function OpeningCountModal({ mode, register, session, onClose, onSaved })
             variant="secondary"
             size="sm"
             onClick={() => {
-              setForm((current) => ({ ...current, countedCash: toInputMoney(expected) }))
+              setForm((current) => ({ ...current, complete: !current.complete }))
               setLocalErrors((current) => ({ ...current, countedCash: undefined }))
             }}
           >
-            Está completa
+            {form.complete ? 'Contar billetes' : 'Está completa'}
           </Button>
         </div>
 
         <FormSection icon={Banknote} title="Lo que contaste" columns={1}>
-          <TextField
-            label="Efectivo en la caja"
-            icon={Banknote}
-            inputMode="decimal"
-            placeholder="Ej.: 150.000"
-            data-autofocus
-            value={form.countedCash}
-            onChange={change('countedCash')}
-            error={fieldErrors.countedCash}
-            required
-          />
+          {form.complete ? (
+            <p className="cash-diff cash-diff--success" role="status">
+              La base está completa: {formatCurrency(expected)}
+            </p>
+          ) : (
+            <DenominationCounter
+              quantities={form.quantities}
+              onChange={(quantities) => {
+                setForm((current) => ({ ...current, quantities }))
+                setLocalErrors((current) => ({ ...current, countedCash: undefined }))
+              }}
+              error={fieldErrors.countedCash}
+            />
+          )}
           {diff && (
             <p className={`cash-diff cash-diff--${diff.tone}`} role="status">
               {diff.label === 'Cuadrada' ? 'Coincide con la base esperada' : `${diff.label} de ${diff.amount} frente a la base esperada`}

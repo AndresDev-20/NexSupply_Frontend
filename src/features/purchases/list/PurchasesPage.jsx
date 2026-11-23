@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { Eye, FileText, Paperclip, Plus, Search, ShoppingCart } from 'lucide-react'
-import { useGetPurchasesQuery } from '../purchasesApi'
+import { ChevronRight, Eye, FileText, Layers, Paperclip, Plus, Search, ShoppingCart } from 'lucide-react'
+import { useGetPurchaseGroupsQuery, useGetPurchasesQuery } from '../purchasesApi'
+import { NewPurchaseGroupModal } from '../groups/NewPurchaseGroupModal'
 import { useGetSuppliersQuery } from '../../inventory/inventoryApi'
 import { PAYMENT_FILTER_OPTIONS, STATUS_TABS, formatDay, purchaseState, supplierName } from '../purchaseOptions'
 import { useCan } from '../../../hooks/usePermissions'
@@ -13,14 +14,17 @@ import { SelectField } from '../../../components/ui/SelectField/SelectField'
 import { DataTable } from '../../../components/ui/DataTable/DataTable'
 import { Pagination } from '../../../components/ui/Pagination/Pagination'
 import { IconButton } from '../../../components/ui/IconButton/IconButton'
+import { Button } from '../../../components/ui/Button/Button'
+import { useToast } from '../../../components/feedback/Toast/toastContext'
 import { formatCurrency } from '../../../utils/format'
-import { ROUTES, purchasePath } from '../../../routes/paths'
+import { ROUTES, purchaseGroupPath, purchasePath } from '../../../routes/paths'
 import '../../cash/cash.css'
 import '../purchases.css'
 
 /** Compras a proveedores (D-COMP-1): borradores, confirmadas y anuladas, con su estado de pago. */
 export default function PurchasesPage() {
   const navigate = useNavigate()
+  const toast = useToast()
   const canCreate = useCan('purchases.create')
   const canSeeSuppliers = useCan('suppliers.view')
   const [status, setStatus] = useState('')
@@ -28,6 +32,8 @@ export default function PurchasesPage() {
   const [supplierId, setSupplierId] = useState('')
   const [search, setSearch] = useState('')
   const [page, setPage] = useState(1)
+  const [isCreatingGroup, setIsCreatingGroup] = useState(false)
+  const { data: groups = [] } = useGetPurchaseGroupsQuery()
   const debouncedSearch = useDebouncedValue(search.trim())
   const { data: suppliers } = useGetSuppliersQuery({ pageSize: 100, isActive: 'true' }, { skip: !canSeeSuppliers })
   const params = { page, pageSize: 20, ...(status && { status }), ...(paymentStatus && { paymentStatus }), ...(supplierId && { supplierId }), ...(debouncedSearch && { search: debouncedSearch }) }
@@ -92,13 +98,44 @@ export default function PurchasesPage() {
         description="Lo que le compras a tus proveedores. Guarda la compra como borrador mientras llega la mercancía y confírmala para que entre al inventario."
         actions={
           canCreate && (
-            <Link className="button button--primary button--md" to={ROUTES.purchaseNew}>
-              <Plus className="button__icon" aria-hidden="true" />
-              <span className="button__label">Nueva compra</span>
-            </Link>
+            <>
+              <Link className="button button--secondary button--md" to={ROUTES.purchaseNew}>
+                <FileText className="button__icon" aria-hidden="true" />
+                <span className="button__label">Compra a un proveedor</span>
+              </Link>
+              <Button icon={Plus} onClick={() => setIsCreatingGroup(true)}>
+                Nueva compra
+              </Button>
+            </>
           )
         }
       />
+
+      {groups.length > 0 && (
+        <section className="purchase-groups" aria-label="Compras con varios proveedores">
+          <h2 className="purchase-groups__title">
+            <Layers aria-hidden="true" /> Compras con varios proveedores
+          </h2>
+          <ul className="purchase-groups__list">
+            {groups.slice(0, 6).map((group) => (
+              <li key={group.id}>
+                <Link className="purchase-groups__card" to={purchaseGroupPath(group.id)}>
+                  <span className="purchase-groups__name">{group.name}</span>
+                  <span className="purchase-groups__meta">
+                    {group.suppliersCount} {group.suppliersCount === 1 ? 'proveedor' : 'proveedores'} · {group.productsCount} {group.productsCount === 1 ? 'producto' : 'productos'}
+                  </span>
+                  <span className="purchase-groups__total">{formatCurrency(group.total)}</span>
+                  <span className={`status-pill status-pill--${group.isOpen ? 'info' : 'success'}`}>
+                    <span className="status-pill__dot" aria-hidden="true" />
+                    {group.isOpen ? 'Abierta' : 'Confirmada'}
+                  </span>
+                  <ChevronRight className="purchase-groups__go" aria-hidden="true" />
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
 
       <div className="segmented" role="tablist" aria-label="Estado de las compras">
         {STATUS_TABS.map((tab) => (
@@ -131,6 +168,16 @@ export default function PurchasesPage() {
         <p className="purchase-hint">
           <ShoppingCart aria-hidden="true" /> Cada compra confirmada actualiza la existencia, el costo y el precio de compra de sus productos.
         </p>
+      )}
+      {isCreatingGroup && (
+        <NewPurchaseGroupModal
+          onClose={() => setIsCreatingGroup(false)}
+          onCreated={(group) => {
+            setIsCreatingGroup(false)
+            toast.success(`«${group.name}» creada: agrégale productos desde Nuevo producto`)
+            navigate(purchaseGroupPath(group.id))
+          }}
+        />
       )}
     </>
   )

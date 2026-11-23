@@ -34,6 +34,12 @@ export const baseApi = createApi({
   baseQuery: axiosBaseQuery(),
   // Etiquetas para invalidar el caché tras crear o editar. Cada fase agrega las suyas.
   tagTypes: [
+    'Porter',
+    'Quote',
+    'Backup',
+    'PriceList',
+    'AnimalLot',
+    'PurchaseGroup',
     'Health',
     'User',
     'Role',

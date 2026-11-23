@@ -6,7 +6,7 @@ import './ProductPreview.css'
 /**
  * Ficha del producto como se verá en el punto de venta, con los datos que se escriben.
  * profit: { profit, percent } de la vista previa (solo con permiso de costos).
- * pack: { name, salePrice } del bulto, si se vende por bulto. stock: cantidad inicial en unidad base.
+ * pack: { name, salePrice, soldWhole } del empaque (bulto, frasco…); soldWhole false: solo se compra así. stock: cantidad inicial en unidad base.
  */
 export function ProductPreview({ form, category, parentName, unit, profit = null, pack = null, stock }) {
   const price = toApiNumber(form.salePrice)
@@ -28,8 +28,8 @@ export function ProductPreview({ form, category, parentName, unit, profit = null
         </p>
       )}
       <p className="product-preview__price">
-        {price ? formatCurrency(price) : '$ —'}
-        {unit && <span className="product-preview__unit"> / {unit.symbol}</span>}
+        {form.productKind === 'animal' ? 'Precio por lote' : price ? formatCurrency(price) : '$ —'}
+        {unit && form.productKind !== 'animal' && <span className="product-preview__unit"> / {unit.symbol}</span>}
       </p>
       {profit && (
         <p className={`product-preview__profit${profit.profit.startsWith('-') ? ' product-preview__profit--loss' : ''}`}>
@@ -41,7 +41,7 @@ export function ProductPreview({ form, category, parentName, unit, profit = null
         <p className="product-preview__pack">
           <Boxes aria-hidden="true" />
           <span>{pack.name}</span>
-          <strong>{pack.salePrice ? formatCurrency(pack.salePrice) : '$ —'}</strong>
+          <strong>{pack.soldWhole === false ? `Se vende por ${unit?.symbol ?? 'unidad'}` : pack.salePrice ? formatCurrency(pack.salePrice) : '$ —'}</strong>
         </p>
       )}
       {stock !== undefined && (

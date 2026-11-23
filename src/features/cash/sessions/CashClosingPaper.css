@@ -1,0 +1,612 @@
+/* ==========================================================================
+   Informe de cierre de caja (D-CAJA-14). Mismo estilo que los comprobantes de venta
+   (SaleReceiptPaper / SaleReceiptLetter). Colores fijos: es papel.
+   En una impresora térmica los fondos salen en gris.
+   ========================================================================== */
+.ccp {
+  --ccp-ink: #14251a;
+  --ccp-muted: #5c6b61;
+  --ccp-line: #d7ded9;
+  --ccp-brand: #1f7a3a;
+  --ccp-brand-2: #2f9e44;
+  --ccp-accent: #f2b705;
+  --ccp-soft: #f1f6f2;
+  --ccp-red: #b42318;
+  box-sizing: border-box;
+  display: grid;
+  gap: 10px;
+  margin: 0 auto;
+  padding: 18px 14px 16px;
+  font-family: var(--font-family-base, system-ui, sans-serif);
+  font-size: 11px;
+  line-height: 1.4;
+  font-variant-numeric: tabular-nums;
+  color: var(--ccp-ink);
+  background: #fff;
+}
+
+.ccp *,
+.ccp *::before,
+.ccp *::after {
+  box-sizing: border-box;
+}
+
+.ccp--58mm {
+  width: 58mm;
+  padding: 12px 8px 14px;
+  font-size: 9.5px;
+}
+
+.ccp--80mm {
+  width: 80mm;
+}
+
+.ccp--letter {
+  width: 190mm;
+  gap: 16px;
+  padding: 26px 28px 22px;
+  font-size: 12px;
+}
+
+.ccp-muted {
+  color: var(--ccp-muted);
+}
+
+/* ---------- Encabezado: negocio y documento ---------- */
+.ccp-head {
+  position: relative;
+  display: grid;
+  gap: 10px;
+  padding-bottom: 12px;
+  border-bottom: 3px solid var(--ccp-brand);
+}
+
+.ccp-head::after {
+  content: '';
+  position: absolute;
+  bottom: -3px;
+  left: 0;
+  width: 56px;
+  height: 3px;
+  background: var(--ccp-accent);
+}
+
+.ccp-brand {
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  text-align: center;
+}
+
+.ccp-brand__text {
+  display: grid;
+  gap: 1px;
+}
+
+.ccp-logo {
+  display: block;
+  max-width: 60%;
+  max-height: 64px;
+  object-fit: contain;
+}
+
+.ccp-monogram {
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  color: #fff;
+  background: linear-gradient(135deg, var(--ccp-brand-2), var(--ccp-brand));
+  box-shadow:
+    0 0 0 3px #fff,
+    0 0 0 4px var(--ccp-accent);
+}
+
+.ccp-business {
+  font-size: 1.45em;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  line-height: 1.15;
+}
+
+.ccp-doc {
+  display: grid;
+  justify-items: center;
+  gap: 1px;
+  padding: 8px 12px;
+  border-radius: 10px;
+  text-align: center;
+  color: #fff;
+  background:
+    radial-gradient(80% 140% at 100% 0%, rgba(242, 183, 5, 0.35), transparent 60%),
+    linear-gradient(120deg, var(--ccp-brand), var(--ccp-brand-2));
+}
+
+.ccp-doc__label {
+  font-size: 0.78em;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  opacity: 0.92;
+}
+
+.ccp-doc__number {
+  font-size: 1.6em;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+}
+
+.ccp-doc__date {
+  font-size: 0.92em;
+  opacity: 0.92;
+}
+
+/* ---------- Estado del cuadre ---------- */
+.ccp-status {
+  justify-self: center;
+  padding: 3px 12px;
+  border-radius: 999px;
+  font-size: 0.85em;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.ccp-status--ok {
+  color: var(--ccp-brand);
+  background: #e3f2e7;
+  border: 1px solid #b9dcc3;
+}
+
+.ccp-status--alert {
+  color: #7a4b00;
+  background: #fff3cd;
+  border: 1px solid var(--ccp-accent);
+}
+
+.ccp-status--pending {
+  color: var(--ccp-muted);
+  background: var(--ccp-soft);
+  border: 1px solid var(--ccp-line);
+}
+
+/* ---------- Fechas y responsables ---------- */
+.ccp-meta {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px 10px;
+  margin: 0;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: var(--ccp-soft);
+}
+
+.ccp-meta dt {
+  font-size: 0.75em;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ccp-muted);
+}
+
+.ccp-meta dd {
+  display: grid;
+  margin: 0;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.ccp-meta small {
+  font-weight: 500;
+  color: var(--ccp-muted);
+}
+
+/* ---------- Cifras clave ---------- */
+.ccp-kpis {
+  display: grid;
+  grid-auto-columns: minmax(0, 1fr);
+  grid-auto-flow: column;
+  gap: 6px;
+}
+
+.ccp-kpi {
+  display: grid;
+  gap: 1px;
+  padding: 6px 8px;
+  border: 1px solid var(--ccp-line);
+  border-radius: 10px;
+  text-align: center;
+}
+
+.ccp-kpi span {
+  font-size: 0.72em;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ccp-muted);
+}
+
+.ccp-kpi strong {
+  font-size: 1.05em;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.ccp-kpi--accent {
+  border-color: var(--ccp-accent);
+  background: #fff9e6;
+}
+
+/* ---------- Secciones ---------- */
+.ccp-grid {
+  display: grid;
+  gap: 8px;
+}
+
+.ccp-box {
+  display: grid;
+  gap: 2px;
+  align-content: start;
+  padding: 8px 10px;
+  border: 1px solid var(--ccp-line);
+  border-radius: 10px;
+}
+
+.ccp-box__title {
+  margin: 0 0 3px;
+  font-size: 0.78em;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ccp-brand);
+}
+
+.ccp-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.ccp-row > span:first-child {
+  color: var(--ccp-muted);
+}
+
+.ccp-row > span:last-child {
+  text-align: right;
+  white-space: nowrap;
+  font-weight: 600;
+}
+
+.ccp-row--strong {
+  margin-top: 3px;
+  padding-top: 4px;
+  border-top: 1px dashed var(--ccp-line);
+  font-weight: 800;
+}
+
+.ccp-row--strong > span:first-child {
+  color: var(--ccp-ink);
+}
+
+.ccp-row--strong > span:last-child {
+  font-weight: 800;
+}
+
+.ccp-row--in > span:last-child {
+  color: var(--ccp-brand);
+}
+
+.ccp-row--out > span:last-child {
+  color: var(--ccp-red);
+}
+
+.ccp-row--alert > span:last-child {
+  font-weight: 800;
+  color: #7a4b00;
+}
+
+.ccp-note {
+  margin: 3px 0 0;
+  padding: 4px 8px;
+  border-left: 3px solid var(--ccp-accent);
+  border-radius: 4px;
+  background: #fff9e6;
+}
+
+/* ---------- Tabla de billetes y monedas ---------- */
+.ccp-table {
+  width: 100%;
+  margin-bottom: 2px;
+  border-collapse: collapse;
+}
+
+.ccp-table th {
+  padding: 4px 6px;
+  font-size: 0.75em;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-align: start;
+  text-transform: uppercase;
+  color: #fff;
+  background: var(--ccp-ink);
+}
+
+.ccp-table th:first-child {
+  border-radius: 6px 0 0 6px;
+}
+
+.ccp-table th:last-child {
+  border-radius: 0 6px 6px 0;
+}
+
+.ccp-table td {
+  padding: 3px 6px;
+  border-bottom: 1px dashed var(--ccp-line);
+}
+
+.ccp-table tbody tr:nth-child(even) td {
+  background: #fafcfa;
+}
+
+.ccp-num {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.ccp-table th.ccp-num {
+  text-align: right;
+}
+
+/* ---------- Lo que se deja y lo que se entrega ---------- */
+.ccp-final {
+  display: grid;
+  gap: 6px;
+}
+
+.ccp-final > .ccp-row {
+  padding: 0 4px;
+}
+
+.ccp-final__total .ccp-row {
+  align-items: center;
+  padding: 10px 12px;
+  border-radius: 10px;
+  color: #fff;
+  background: var(--ccp-ink);
+}
+
+.ccp-final__total .ccp-row > span:first-child {
+  font-size: 0.82em;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #fff;
+}
+
+.ccp-final__total .ccp-row > span:last-child {
+  font-size: 1.45em;
+  font-weight: 800;
+  color: var(--ccp-accent);
+}
+
+/* ---------- Firmas y pie ---------- */
+.ccp-signatures {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  padding-top: 26px;
+  font-size: 0.9em;
+  color: var(--ccp-muted);
+  text-align: center;
+}
+
+.ccp-line {
+  display: block;
+  margin-bottom: 3px;
+  border-top: 1px solid var(--ccp-ink);
+}
+
+.ccp-foot {
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  padding-top: 8px;
+  border-top: 1px dashed var(--ccp-line);
+  font-size: 0.85em;
+  text-align: center;
+}
+
+.ccp-credit {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px 3px 3px;
+  border: 1px solid var(--ccp-line);
+  border-radius: 999px;
+  font-size: 0.95em;
+  color: var(--ccp-muted);
+}
+
+.ccp-credit strong {
+  color: var(--ccp-ink);
+}
+
+.ccp-credit__mark {
+  display: grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  font-size: 10px;
+  font-weight: 800;
+  color: var(--ccp-accent);
+  background: var(--ccp-ink);
+}
+
+/* ---------- Carta: encabezado en dos lados y secciones en dos columnas ---------- */
+.ccp--letter .ccp-head {
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 16px;
+  padding-bottom: 16px;
+}
+
+.ccp--letter .ccp-head::after {
+  width: 72px;
+}
+
+.ccp--letter .ccp-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-align: start;
+}
+
+.ccp--letter .ccp-logo {
+  max-width: 120px;
+  max-height: 64px;
+}
+
+.ccp--letter .ccp-monogram {
+  width: 54px;
+  height: 54px;
+  font-size: 18px;
+}
+
+.ccp--letter .ccp-business {
+  font-size: 1.6em;
+}
+
+.ccp--letter .ccp-doc {
+  justify-items: end;
+  min-width: 190px;
+  padding: 12px 16px;
+  border-radius: 12px;
+  text-align: end;
+}
+
+.ccp--letter .ccp-doc__number {
+  font-size: 1.8em;
+}
+
+.ccp--letter .ccp-status {
+  justify-self: start;
+}
+
+.ccp--letter .ccp-meta {
+  grid-template-columns: none;
+  grid-auto-columns: minmax(0, 1fr);
+  grid-auto-flow: column;
+  padding: 12px 14px;
+  border-radius: 12px;
+}
+
+.ccp--letter .ccp-kpi {
+  padding: 10px 12px;
+  border-radius: 12px;
+}
+
+.ccp--letter .ccp-kpi strong {
+  font-size: 1.5em;
+}
+
+.ccp--letter .ccp-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.ccp--letter .ccp-box {
+  padding: 12px 14px;
+  border-radius: 12px;
+}
+
+.ccp--letter .ccp-box--wide {
+  grid-column: 1 / -1;
+}
+
+.ccp--letter .ccp-final {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  align-items: center;
+  gap: 12px;
+}
+
+.ccp--letter .ccp-final > .ccp-row {
+  padding: 12px 14px;
+  border: 1px solid var(--ccp-line);
+  border-radius: 12px;
+}
+
+.ccp--letter .ccp-signatures {
+  gap: 48px;
+  padding: 40px 40px 0;
+}
+
+/* ---------- Tirilla de 58 mm: lo mínimo apretado ---------- */
+.ccp--58mm .ccp-meta,
+.ccp--58mm .ccp-kpis {
+  grid-template-columns: 1fr;
+  grid-auto-flow: row;
+}
+
+/* ---------- Impresión: igual que en pantalla, con fondos ---------- */
+@media print {
+  .ccp,
+  .ccp * {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .ccp {
+    margin: 0 auto;
+    box-shadow: none;
+  }
+
+  /* En carta la hoja va sin márgenes (así el navegador no agrega fecha ni dirección): el margen lo pone el informe */
+  .ccp--letter {
+    width: 100%;
+    padding: 12mm 14mm;
+  }
+
+  .ccp-box,
+  .ccp-final,
+  .ccp-signatures {
+    break-inside: avoid;
+  }
+}
+
+/* ---------- Vista previa en pantalla ---------- */
+.ccp-preview {
+  display: flex;
+  justify-content: center;
+  overflow-x: auto;
+  padding: var(--space-4);
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-muted, var(--color-surface));
+}
+
+.ccp-preview .ccp {
+  border-radius: 6px;
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.06),
+    0 18px 40px -18px rgba(0, 0, 0, 0.45);
+  animation: ccp-in 420ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes ccp-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.98);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ccp-preview .ccp {
+    animation: none;
+  }
+}

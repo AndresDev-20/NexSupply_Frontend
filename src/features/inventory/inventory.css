@@ -86,3 +86,71 @@
 .adjust-stock__direction {
   margin-bottom: var(--space-4);
 }
+
+/* Cambiar precios en bloque (D-PRE-2) */
+.price-change__actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-block: var(--space-3) var(--space-5);
+}
+
+.price-change__result {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.price-change__product {
+  display: grid;
+  gap: 2px;
+  justify-items: start;
+}
+
+.price-change__product small {
+  color: var(--color-text-muted);
+}
+
+.price-change {
+  display: grid;
+  gap: 2px;
+}
+
+.price-change__line {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-1);
+  font-variant-numeric: tabular-nums;
+}
+
+.price-change__line svg {
+  width: 14px;
+  height: 14px;
+  color: var(--color-text-muted);
+}
+
+.price-change__line--pack {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+
+.price-change__footer {
+  position: sticky;
+  bottom: var(--space-3);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-sm);
+}
+
+.price-change__footer svg {
+  width: 16px;
+  height: 16px;
+  vertical-align: -3px;
+  color: var(--color-danger);
+}

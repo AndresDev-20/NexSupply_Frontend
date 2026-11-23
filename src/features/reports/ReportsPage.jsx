@@ -3,6 +3,8 @@ import { ChevronRight, FileDown, FileSpreadsheet } from 'lucide-react'
 import { useGetReportsCatalogQuery } from './reportsApi'
 import { AREA_STYLE } from './reportOptions'
 import { ReportView } from './ReportView'
+import { AccountingBook } from './AccountingBook'
+import { useCan } from '../../hooks/usePermissions'
 import { PageHeader } from '../../components/layout/PageHeader/PageHeader'
 import { Spinner } from '../../components/ui/Spinner/Spinner'
 import { Alert } from '../../components/feedback/Alert/Alert'
@@ -16,6 +18,7 @@ import './reports.css'
 export default function ReportsPage() {
   const [searchParams, setSearchParams] = useSearchParams()
   const { data: catalog = [], isLoading, error } = useGetReportsCatalogQuery()
+  const canExportBook = useCan('reports.accounting')
   const selectedKey = searchParams.get('informe')
   const group = catalog.find((item) => item.reports.some((report) => report.key === selectedKey))
   const selected = group?.reports.find((report) => report.key === selectedKey)
@@ -30,6 +33,7 @@ export default function ReportsPage() {
   return (
     <>
       <PageHeader description="Todo lo que pasa en el negocio, en números. Escoge un informe, ajusta las fechas y descárgalo en Excel o PDF." />
+      {canExportBook && <AccountingBook />}
       <div className="report-areas">
         {catalog.map((item) => {
           const style = AREA_STYLE[item.area] ?? AREA_STYLE.sales

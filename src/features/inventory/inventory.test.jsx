@@ -170,17 +170,17 @@ describe('crear producto', () => {
     await user.type(within(dialog).getByLabelText(/^Existencia mínima/), '2,5')
     await user.click(within(dialog).getByRole('button', { name: 'Siguiente' }))
 
-    // Bulto y cantidad: bulto de 40 kg (compra calculada 400.000) y 10 bultos en bodega
-    await user.click(within(dialog).getByRole('switch', { name: '¿Se vende también por bulto?' }))
+    // Empaque y cantidad: bulto de 40 kg (compra calculada 400.000) y 10 bultos en bodega
+    await user.click(within(dialog).getByRole('switch', { name: '¿Se vende también por bulto o empaque?' }))
     await user.click(within(dialog).getByRole('button', { name: 'Siguiente' }))
-    expect(within(dialog).getByText('Escribe cuántos kg trae el bulto (ej. 40)')).toBeInTheDocument()
-    await user.type(within(dialog).getByLabelText(/^kg por bulto/), '40')
+    expect(within(dialog).getByText('Escribe cuántos kg trae el empaque (ej. 40)')).toBeInTheDocument()
+    await user.type(within(dialog).getByLabelText(/^kg por empaque/), '40')
     expect(within(dialog).getByText('$ 400.000')).toBeInTheDocument()
-    await user.type(within(dialog).getByLabelText(/^Precio de venta del bulto/), '480.000')
-    expect(within(dialog).getByText('Ganancia por bulto')).toBeInTheDocument()
+    await user.type(within(dialog).getByLabelText(/^Precio de venta del empaque/), '480.000')
+    expect(within(dialog).getByText('Ganancia por empaque')).toBeInTheDocument()
     await user.type(within(dialog).getByLabelText(/^Cantidad/), '10')
     await user.selectOptions(within(dialog).getByLabelText('En'), 'pack')
-    expect(within(dialog).getByText('10 bultos = 400 kg')).toBeInTheDocument()
+    expect(within(dialog).getByText('10 × Bulto 40 kg = 400 kg')).toBeInTheDocument()
     expect(within(dialog).getByText('Hay 400 kg')).toBeInTheDocument()
     await user.click(within(dialog).getByRole('button', { name: 'Siguiente' }))
 
@@ -344,7 +344,7 @@ describe('ficha del producto', () => {
     const posts = calls.filter((call) => call.method === 'POST')
     expect(posts).toHaveLength(2)
     expect(posts[0].data).not.toHaveProperty('confirmBelowCost')
-    expect(posts[1].data).toEqual({ name: 'Bulto 40 kg', factor: '40', barcode: null, salePrice: '80000', confirmBelowCost: true })
+    expect(posts[1].data).toEqual({ name: 'Bulto 40 kg', factor: '40', barcode: null, isSoldWhole: true, salePrice: '80000', confirmBelowCost: true })
   })
 
   it('sin inventory.prices el precio no se puede editar ni se envía', async () => {

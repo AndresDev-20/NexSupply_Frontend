@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { Link } from 'react-router-dom'
-import { Banknote, Landmark, Percent, ShieldAlert, ShoppingCart, TriangleAlert, Wallet } from 'lucide-react'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { Banknote, FileText, Landmark, Percent, ShieldAlert, ShoppingCart, TriangleAlert, Wallet, X } from 'lucide-react'
 import { useGetCashSessionsQuery } from '../../cash/cashApi'
 import { useCan } from '../../../hooks/usePermissions'
 import { useDebouncedValue } from '../../../hooks/useDebouncedValue'
@@ -8,12 +8,16 @@ import { useToast } from '../../../components/feedback/Toast/toastContext'
 import { StatusMessage } from '../../../components/feedback/StatusMessage/StatusMessage'
 import { formatCurrency, formatDateTime } from '../../../utils/format'
 import { toApiNumber, toInputNumber } from '../../../utils/numberInput'
-import { ROUTES } from '../../../routes/paths'
-import { usePreviewSaleMutation } from '../salesApi'
+import { ROUTES, quotePath } from '../../../routes/paths'
+import { usePreviewSaleMutation, useLazySearchSaleCatalogQuery } from '../salesApi'
+import { quotesApi } from '../../quotes/quotesApi'
+import { customersApi } from '../../customers/customersApi'
+import '../../quotes/quotes.css'
 import { readPosSession, writePosSession } from '../saleOptions'
 import { PosSearch } from './PosSearch'
 import { PosCart } from './PosCart'
 import { PosCustomer } from './PosCustomer'
+import { PosPriceList } from './PosPriceList'
 import { CheckoutPanel } from './CheckoutPanel'
 import { useAnimatedNumber } from './useAnimatedNumber'
 import { SaleReceiptModal } from '../SaleReceiptModal'
@@ -31,6 +35,8 @@ function toRequestItems(lines) {
     .map((line) => ({
       productId: line.product.id,
       ...(line.presentationId && { presentationId: Number(line.presentationId) }),
+      // Animal (D-ANI-1): el lote que escogió el cajero; sin lote el servidor pide escogerlo
+      ...(line.animalLotId && { animalLotId: Number(line.animalLotId) }),
       quantity: toApiNumber(line.quantity),
       ...(toApiNumber(line.discountValue) && { discountType: line.discountType, discountValue: toApiNumber(line.discountValue) }),
     }))
@@ -48,12 +54,26 @@ function TotalAmount({ value }) {
  */
 export default function PosPage() {
   const toast = useToast()
+  const navigate = useNavigate()
+  const location = useLocation()
   const canViewCash = useCan('cash.view')
   const searchRef = useRef(null)
   const payRef = useRef(null)
   const [sessionId, setSessionId] = useState(readPosSession)
   const [lines, setLines] = useState([])
   const [customer, setCustomer] = useState(null)
+  // Lista de precios (D-PRE-1): undefined = la del cliente; null = precio normal; un id = otra lista
+  const [priceListChoice, setPriceListChoice] = useState(undefined)
+  // Cotizaciones (D-COT-1): modo «Cotizar» del cobro y la cotización que se está vendiendo
+  const [payMode, setPayMode] = useState('cash')
+  const [quoteSale, setQuoteSale] = useState(null) // { id, number }
+  const [fetchQuote] = quotesApi.useLazyGetQuoteQuery()
+  const [fetchCustomer] = customersApi.useLazyGetCustomerQuery()
+  const [searchCatalog] = useLazySearchSaleCatalogQuery()
+  const quoteToLoad = location.state?.quoteId ?? null
+  // Sin caja abierta solo se puede cotizar (una cotización no mueve dinero)
+  const canQuote = useCan('quotes.create')
+  const [quoteOnly, setQuoteOnly] = useState(false)
   const [globalDiscount, setGlobalDiscount] = useState('')
   const [previewResult, setPreview] = useState(null)
   const [previewFailure, setPreviewError] = useState(null)
@@ -65,7 +85,17 @@ export default function PosPage() {
   const session = sessions.find((row) => String(row.id) === String(sessionId)) ?? (sessions.length === 1 ? sessions[0] : null)
 
   const items = toRequestItems(lines)
-  const request = { items, ...(toApiNumber(globalDiscount) && { globalDiscount: toApiNumber(globalDiscount) }) }
+  const request = {
+    items,
+    ...(toApiNumber(globalDiscount) && { globalDiscount: toApiNumber(globalDiscount) }),
+    // El cliente define los precios de su lista; el servidor los calcula
+    ...(customer && { customerId: customer.id }),
+    ...(priceListChoice !== undefined && { priceListId: priceListChoice }),
+    // Cotizar no exige existencia; vender una cotización vigente respeta sus precios
+    ...(payMode === 'quote' && { forQuote: true }),
+    ...(quoteSale && payMode !== 'quote' && { quoteId: quoteSale.id }),
+  }
+  const pricing = { ...(customer && { customerId: customer.id }), ...(priceListChoice !== undefined && { priceListId: priceListChoice ?? 'none' }) }
   const requestKey = useDebouncedValue(JSON.stringify(request), 300)
   // Con el carrito vacío no se muestra ninguna vista previa anterior
   const preview = items.length > 0 ? previewResult : null
@@ -93,25 +123,79 @@ export default function PosPage() {
 
   const focusSearch = () => setTimeout(() => searchRef.current?.focus(), 50)
 
+  // «Vender esta cotización»: llena la venta con sus productos, cantidades y descuentos
+  useEffect(() => {
+    if (!quoteToLoad) return undefined
+    let cancelled = false
+    navigate(location.pathname, { replace: true, state: null })
+    ;(async () => {
+      try {
+        const quote = await fetchQuote(quoteToLoad).unwrap()
+        const buyer = quote.customer.id ? await fetchCustomer(quote.customer.id).unwrap() : null
+        const loaded = []
+        for (const item of quote.items) {
+          const found = await searchCatalog({ search: item.productCode, ...(buyer && { customerId: buyer.id }) }).unwrap()
+          const product = found.find((row) => row.id === item.productId)
+          if (!product) continue
+          lineCounter += 1
+          loaded.push({
+            key: `l${lineCounter}`,
+            product,
+            presentationId: item.presentationId ? String(item.presentationId) : '',
+            animalLotId: '',
+            quantity: toInputNumber(item.quantity),
+            discountType: item.discountType ?? 'percent',
+            discountValue: Number(item.discountValue) > 0 ? toInputNumber(item.discountValue) : '',
+          })
+        }
+        if (cancelled) return
+        setLines(loaded)
+        setCustomer(buyer)
+        setPriceListChoice(undefined)
+        setGlobalDiscount(Number(quote.globalDiscount) > 0 ? toInputNumber(quote.globalDiscount) : '')
+        if (quote.state === 'open') {
+          setQuoteSale({ id: quote.id, number: quote.number })
+          toast.info(`Cotización ${quote.number} cargada con sus precios`)
+        } else {
+          setQuoteSale(null)
+          toast.info(`La cotización ${quote.number} venció: se cargó con los precios de hoy`)
+        }
+        if (loaded.length < quote.items.length) toast.error('Algún producto de la cotización ya no está activo y no se cargó')
+      } catch (loadError) {
+        if (!cancelled) toast.error(loadError.message ?? 'No se pudo cargar la cotización')
+      }
+    })()
+    return () => {
+      cancelled = true
+    }
+    // Solo cuando se llega con una cotización
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [quoteToLoad])
+
   const addProduct = useCallback((product, presentationId) => {
+    // Un animal con un solo lote lo toma de una vez; con varios, el cajero escoge (D-ANI-1)
+    const lots = product.productKind === 'animal' ? (product.animalLots ?? []) : []
+    const animalLotId = lots.length === 1 ? String(lots[0].id) : ''
     setLines((current) => {
-      const same = current.find((line) => line.product.id === product.id && String(line.presentationId) === String(presentationId ?? ''))
+      const same = current.find((line) => line.product.id === product.id && String(line.presentationId) === String(presentationId ?? '') && (lots.length === 0 || line.animalLotId === animalLotId))
       if (same) return current.map((line) => (line === same ? { ...line, quantity: toInputNumber(String((Number(toApiNumber(line.quantity)) || 0) + 1)) } : line))
       lineCounter += 1
-      return [{ key: `l${lineCounter}`, product, presentationId: presentationId ? String(presentationId) : '', quantity: '1', discountType: 'percent', discountValue: '' }, ...current]
+      return [{ key: `l${lineCounter}`, product, presentationId: presentationId ? String(presentationId) : '', animalLotId, quantity: '1', discountType: 'percent', discountValue: '' }, ...current]
     })
   }, [])
 
   const clearSale = () => {
     setLines([])
     setCustomer(null)
+    setPriceListChoice(undefined)
+    setQuoteSale(null)
     setGlobalDiscount('')
     setRound((value) => value + 1)
     focusSearch()
   }
 
   const isPreviewCurrent = Boolean(preview) && requestKey === JSON.stringify(request) && !previewState.isLoading
-  const canCheckout = Boolean(session && items.length > 0 && isPreviewCurrent && !previewError)
+  const canCheckout = Boolean((session || payMode === 'quote') && items.length > 0 && isPreviewCurrent && !previewError)
 
   // Atajos: F2 cobra (como el botón), "/" lleva al buscador
   useEffect(() => {
@@ -132,13 +216,19 @@ export default function PosPage() {
   if (!canViewCash) {
     return <StatusMessage icon={Wallet} title="Necesitas ver la caja para vender" description="Toda venta va en un turno de caja abierto. Pide al administrador el permiso de ver la caja." />
   }
-  if (!isLoadingSessions && sessions.length === 0) {
+  if (!isLoadingSessions && sessions.length === 0 && !quoteOnly) {
     return (
-      <StatusMessage icon={Wallet} title="No hay ninguna caja abierta" description="Toda venta va en un turno de caja. Abre un turno para empezar a vender.">
+      <StatusMessage icon={Wallet} title="No hay ninguna caja abierta" description={canQuote ? 'Toda venta va en un turno de caja. Abre un turno para vender, o haz solo una cotización.' : 'Toda venta va en un turno de caja. Abre un turno para empezar a vender.'}>
         <Link className="button button--primary button--md" to={ROUTES.cash}>
           <Banknote className="button__icon" aria-hidden="true" />
           <span className="button__label">Ir a Mis cajas de hoy</span>
         </Link>
+        {canQuote && (
+          <button type="button" className="button button--secondary button--md" onClick={() => setQuoteOnly(true)}>
+            <FileText className="button__icon" aria-hidden="true" />
+            <span className="button__label">Hacer una cotización</span>
+          </button>
+        )}
       </StatusMessage>
     )
   }
@@ -175,11 +265,29 @@ export default function PosPage() {
             </span>
           </span>
         </label>
-        <PosCustomer customer={customer} onChange={setCustomer} />
+        <PosCustomer
+          customer={customer}
+          onChange={(next) => {
+            setCustomer(next)
+            setPriceListChoice(undefined)
+          }}
+        />
       </section>
+      {quoteSale && (
+        <div className="pos-quote-banner" role="status">
+          <span>
+            <FileText aria-hidden="true" />
+            Vendiendo la cotización <strong>{quoteSale.number}</strong> con sus precios.
+          </span>
+          <button type="button" className="pay__link" onClick={() => setQuoteSale(null)}>
+            <X aria-hidden="true" /> Vender al precio de hoy
+          </button>
+        </div>
+      )}
+      <PosPriceList customer={customer} applied={items.length > 0 ? (preview?.priceList ?? null) : undefined} choice={priceListChoice} onChange={setPriceListChoice} />
 
       <div className="pos">
-        <PosSearch ref={searchRef} onPick={addProduct} />
+        <PosSearch ref={searchRef} onPick={addProduct} pricing={pricing} />
 
         <section className="pos-panel pos-panel--sale" aria-label="Venta">
           <header className="pos-panel__head">
@@ -251,24 +359,35 @@ export default function PosPage() {
               <TriangleAlert aria-hidden="true" /> Incluye producto vencido: {preview.warnings.expired.map((item) => item.name).join(', ')}.{preview.requires.expired ? ' Se pedirá autorización.' : ''}
             </p>
           )}
-          {!session && <p className="pos-notice">Escoge arriba la caja donde vendes.</p>}
+          {!session && !quoteOnly && <p className="pos-notice">Escoge arriba la caja donde vendes.</p>}
+          {quoteOnly && <p className="pos-notice">No hay caja abierta: solo se puede cotizar.</p>}
 
           <CheckoutPanel
             key={round}
             ref={payRef}
             total={totals?.total ?? '0'}
             disabled={!canCheckout}
-            request={{ ...request, cashSessionId: session?.id, ...(customer && { customerId: customer.id }) }}
+            request={{ ...request, cashSessionId: session?.id }}
             customer={customer}
             onClear={clearSale}
+            onModeChange={setPayMode}
+            quoteOnly={quoteOnly && sessions.length === 0}
+            prescriptionProducts={[...new Set(lines.filter((line) => line.product.requiresPrescription).map((line) => line.product.name))]}
             onCompleted={(sale, { change, kind }) => {
+              if (kind === 'quote') {
+                toast.success(sale.replayed ? `La cotización ${sale.number} ya estaba registrada` : `Cotización ${sale.number} lista`)
+                clearSale()
+                navigate(quotePath(sale.id))
+                return
+              }
               if (kind === 'layaway') {
                 setCompleted({ layawayId: sale.id })
                 toast.success(sale.replayed ? `El apartado ${sale.number} ya estaba registrado` : `Apartado ${sale.number} registrado`)
                 return
               }
               setCompleted({ id: sale.id, change: sale.saleType === 'cash' ? change : null })
-              if (sale.creditWarning) toast.info(`Venta ${sale.number} registrada. Ojo: ${sale.creditWarning}`)
+              if (sale.prescriptionMissing) toast.info(`Venta ${sale.number} registrada sin fórmula veterinaria: quedó en el libro de fórmulas`)
+              else if (sale.creditWarning) toast.info(`Venta ${sale.number} registrada. Ojo: ${sale.creditWarning}`)
               else toast.success(sale.replayed ? `La venta ${sale.number} ya estaba registrada` : `Venta ${sale.number} registrada`)
             }}
           />

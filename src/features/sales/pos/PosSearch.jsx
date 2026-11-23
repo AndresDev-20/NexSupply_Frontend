@@ -33,16 +33,27 @@ function IdleState() {
  * resultado el producto entra directo a la venta (con la presentación del código si es la de
  * un bulto). Al escribir se listan coincidencias dentro de la tarjeta; ↑ ↓ y Enter para agregar.
  */
-export const PosSearch = forwardRef(function PosSearch({ onPick, disabled = false }, ref) {
+/** Precio de un animal en la búsqueda: el de su único lote o el rango entre lotes (D-ANI-1). */
+function animalPriceText(product) {
+  const prices = (product.animalLots ?? []).map((lot) => Number(lot.priceToday))
+  if (prices.length === 0) return 'Sin lotes'
+  const low = Math.min(...prices)
+  const high = Math.max(...prices)
+  return low === high ? formatCurrency(String(low)) : `${formatCurrency(String(low))} – ${formatCurrency(String(high))}`
+}
+
+export const PosSearch = forwardRef(function PosSearch({ onPick, disabled = false, pricing = {} }, ref) {
   const [text, setText] = useState('')
   const [highlight, setHighlight] = useState(0)
   const [search, { data: results = [], isFetching }] = useLazySearchSaleCatalogQuery()
   const debounced = useDebouncedValue(text.trim(), 250)
   const isSearching = debounced.length >= 2 && text.trim().length >= 2
 
+  // Los precios salen de la lista del cliente (D-PRE-1)
+  const pricingKey = JSON.stringify(pricing)
   useEffect(() => {
-    if (debounced.length >= 2) search(debounced, true)
-  }, [debounced, search])
+    if (debounced.length >= 2) search({ search: debounced, ...JSON.parse(pricingKey) }, true)
+  }, [debounced, search, pricingKey])
 
   const pick = (product) => {
     onPick(product, product.matchedPresentationId ?? '')
@@ -70,7 +81,7 @@ export const PosSearch = forwardRef(function PosSearch({ onPick, disabled = fals
       }
       // Lector de código de barras (o Enter rápido): se busca ya
       try {
-        const found = await search(value).unwrap()
+        const found = await search({ search: value, ...pricing }).unwrap()
         if (found.length === 1) pick(found[0])
       } catch {
         // La lista muestra "No se encontró"
@@ -136,7 +147,7 @@ export const PosSearch = forwardRef(function PosSearch({ onPick, disabled = fals
                     </small>
                   </span>
                   <span className="pos-result__price">
-                    {formatCurrency(product.salePrice)}
+                    {product.productKind === 'animal' ? animalPriceText(product) : formatCurrency(product.salePrice)}
                     <small className={outOfStock ? 'pos-result__stock--out' : undefined}>{outOfStock ? 'Agotado' : `Hay ${formatQuantity(product.stock)} ${product.unit.symbol}`}</small>
                   </span>
                   <span className="pos-result__add" aria-hidden="true">

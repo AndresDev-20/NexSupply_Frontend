@@ -2,7 +2,8 @@ import { useState } from 'react'
 import { Minus, Plus, ShoppingCart, Tag, Trash2 } from 'lucide-react'
 import { formatCurrency, formatQuantity } from '../../../utils/format'
 import { toApiNumber } from '../../../utils/numberInput'
-import { lineUnit, linePrice } from '../saleOptions'
+import { lineLot, lineUnit, linePrice } from '../saleOptions'
+import { formatDay } from '../../purchases/purchaseOptions'
 
 // Color del avatar de cada producto: estable por id (8 tonos de la paleta)
 const TONES = 8
@@ -89,6 +90,12 @@ export function PosCart({ lines, computed, onChange, onRemove }) {
         const result = computed?.[index]
         const outOfStock = Number(product.stock) <= 0
         const units = [{ id: '', name: product.unit.symbol }, ...product.presentations]
+        // Animal (D-ANI-1): se escoge el lote; cada uno tiene su precio de hoy
+        const isAnimal = product.productKind === 'animal'
+        const lot = isAnimal ? lineLot(product, line.animalLotId) : null
+        // El precio oficial (con la lista del cliente, D-PRE-1) viene del servidor en la vista previa
+        const price = !isAnimal && result?.unitPrice ? result.unitPrice : linePrice(product, line.presentationId, line.animalLotId)
+        const regular = !isAnimal && result?.regularUnitPrice && Number(result.regularUnitPrice) > Number(result.unitPrice) ? result.regularUnitPrice : null
         return (
           <li key={line.key} className="pos-item">
             <span className={`pos-avatar ${toneOf(product.id)}`} aria-hidden="true">
@@ -102,12 +109,43 @@ export function PosCart({ lines, computed, onChange, onRemove }) {
                 </span>
               </div>
               <p className="pos-item__meta">
-                {formatCurrency(linePrice(product, line.presentationId))} / {lineUnit(product, line.presentationId)}
-                <span className={`pos-item__stock${outOfStock ? ' pos-item__stock--out' : ''}`}>{outOfStock ? 'Agotado' : `Hay ${formatQuantity(product.stock)} ${product.unit.symbol}`}</span>
+                {price === null ? (
+                  <span className="pos-item__pick">Escoge el lote</span>
+                ) : (
+                  <>
+                    {regular && <s className="pos-item__regular">{formatCurrency(regular)}</s>}
+                    {`${formatCurrency(price)} / ${lineUnit(product, line.presentationId)}`}
+                  </>
+                )}
+                {isAnimal && lot ? (
+                  <span className="pos-item__stock">Lote {lot.lotNumber} · quedan {formatQuantity(lot.availableQuantity)}</span>
+                ) : (
+                  <span className={`pos-item__stock${outOfStock ? ' pos-item__stock--out' : ''}`}>{outOfStock ? 'Agotado' : `Hay ${formatQuantity(product.stock)} ${product.unit.symbol}`}</span>
+                )}
                 {result && Number(result.lineDiscount) > 0 && <span className="pos-item__saving">Ahorra {formatCurrency(result.lineDiscount)}</span>}
               </p>
               <div className="pos-item__controls">
-                {units.length > 1 && (
+                {isAnimal && (product.animalLots ?? []).length > 1 && (
+                  <div className="pos-units pos-units--lots" role="radiogroup" aria-label={`Lote de ${product.name}`}>
+                    {product.animalLots.map((option) => {
+                      const active = String(line.animalLotId) === String(option.id)
+                      return (
+                        <button
+                          key={option.id}
+                          type="button"
+                          role="radio"
+                          aria-checked={active}
+                          aria-label={`Lote ${option.lotNumber}, llegó el ${formatDay(option.receivedOn)}, ${formatCurrency(option.priceToday)}, quedan ${formatQuantity(option.availableQuantity)}`}
+                          className={`pos-units__option${active ? ' pos-units__option--active' : ''}`}
+                          onClick={() => onChange(line.key, { animalLotId: String(option.id) })}
+                        >
+                          {formatDay(option.receivedOn).slice(0, 5)} · {formatCurrency(option.priceToday)}
+                        </button>
+                      )
+                    })}
+                  </div>
+                )}
+                {!isAnimal && units.length > 1 && (
                   <div className="pos-units" role="radiogroup" aria-label={`Unidad de ${product.name}`}>
                     {units.map((unit) => {
                       const active = String(line.presentationId) === String(unit.id)

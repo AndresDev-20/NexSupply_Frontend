@@ -1,0 +1,82 @@
+/* Listas de precios (D-PRE-1) */
+
+.price-list-examples {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.price-list-examples li {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-muted, var(--color-surface));
+  font-variant-numeric: tabular-nums;
+}
+
+.price-list-examples li span:first-child {
+  color: var(--color-text-muted);
+}
+
+.price-list-examples li strong {
+  justify-self: end;
+  color: var(--color-primary);
+}
+
+.price-list-product {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.price-list-product small {
+  color: var(--color-text-muted);
+}
+
+.price-list-price {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+/* Punto de venta: la lista con que se cobra */
+.pos-pricelist {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-3);
+  padding: var(--space-2) var(--space-4);
+  border: 1px dashed color-mix(in srgb, var(--color-accent, var(--color-primary)) 55%, var(--color-border));
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--color-accent, var(--color-primary)) 8%, var(--color-surface));
+  font-size: var(--font-size-sm);
+}
+
+.pos-pricelist svg {
+  width: 18px;
+  height: 18px;
+  color: var(--color-primary);
+  flex: none;
+}
+
+.pos-pricelist select {
+  min-height: 34px;
+  padding: 0 var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  color: inherit;
+  font: inherit;
+}
+
+.pos-item__regular {
+  margin-inline-end: var(--space-1);
+  color: var(--color-text-muted);
+  text-decoration: line-through;
+}

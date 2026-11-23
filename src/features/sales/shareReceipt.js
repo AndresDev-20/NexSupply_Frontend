@@ -7,11 +7,12 @@ import { whatsappNumber } from '../customers/customerOptions'
  * 2. Si no, descarga el PDF y abre el chat del cliente en WhatsApp para adjuntarlo.
  * Devuelve 'shared', 'cancelled' o 'downloaded'.
  */
-export async function shareReceiptPdf({ file, sale, businessName }) {
-  const text = `${businessName ?? 'Agropecuaria'} · Comprobante ${sale.number}. ¡Gracias por su compra!`
+export async function shareReceiptPdf({ file, sale, businessName, text: customText, title = `Comprobante ${sale.number}` }) {
+  // customText: otro mensaje (ej. el de una cotización, D-COT-1)
+  const text = customText ?? `${businessName ?? 'Agropecuaria'} · Comprobante ${sale.number}. ¡Gracias por su compra!`
   if (navigator.canShare?.({ files: [file] })) {
     try {
-      await navigator.share({ files: [file], title: `Comprobante ${sale.number}`, text })
+      await navigator.share({ files: [file], title, text })
       return 'shared'
     } catch (error) {
       if (error?.name === 'AbortError') return 'cancelled'

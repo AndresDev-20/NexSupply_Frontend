@@ -38,6 +38,19 @@ export function previewMultiply(price, quantity) {
   return fromUnits((units * thousandths + 500n) / 1000n, 4)
 }
 
+/**
+ * División para vistas previas: valor ÷ cantidad (cantidad hasta 3 decimales), con 4 decimales.
+ * Costo por unidad de un empaque: "100000" ÷ "100" → "1000.0000". null si no es válido o es cero.
+ */
+export function previewDivide(amount, quantity) {
+  const units = toUnits(amount)
+  const match = /^(\d{1,11})(?:\.(\d{1,3}))?$/.exec(String(quantity ?? '').trim())
+  if (units === null || !match) return null
+  const thousandths = BigInt(match[1]) * 1000n + BigInt((match[2] ?? '').padEnd(3, '0'))
+  if (thousandths === 0n) return null
+  return fromUnits((units * 1000n * 2n + thousandths) / (thousandths * 2n), 4)
+}
+
 /** Suma para vistas previas, con 2 decimales. Los valores que no son números se ignoran. */
 export function previewSum(values) {
   const total = values.map(toUnits).filter((units) => units !== null).reduce((sum, units) => sum + units, 0n)

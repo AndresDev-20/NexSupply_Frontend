@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Cake, IdCard, MapPin, Phone, UserPlus, UserRound, Wallet } from 'lucide-react'
+import { BadgePercent, Cake, IdCard, MapPin, Phone, UserPlus, UserRound, Wallet } from 'lucide-react'
 import { Modal } from '../../components/ui/Modal/Modal'
 import { Button } from '../../components/ui/Button/Button'
 import { TextField } from '../../components/ui/TextField/TextField'
@@ -13,6 +13,9 @@ import { MONEY_PATTERN, toApiNumber, toInputMoney } from '../../utils/numberInpu
 import { SUPPLIER_DOCUMENT_TYPES } from '../inventory/inventoryOptions'
 import { todayIso } from '../purchases/purchaseOptions'
 import { useCreateCustomerMutation, useUpdateCustomerMutation } from './customersApi'
+import { useGetPriceListsQuery } from './priceLists/priceListsApi'
+import { priceListLabel } from './priceLists/priceListOptions'
+import { useCan } from '../../hooks/usePermissions'
 import '../admin/admin.css'
 
 function initialForm(customer) {
@@ -26,6 +29,7 @@ function initialForm(customer) {
     location: customer?.location ?? '',
     birthDate: customer?.birthDate ?? '',
     creditLimit: toInputMoney(customer?.creditLimit),
+    priceListId: customer?.priceList ? String(customer.priceList.id) : '',
     notes: customer?.notes ?? '',
   }
 }
@@ -45,6 +49,12 @@ function ageFrom(birthDate) {
 export function CustomerFormModal({ customer, onClose, onSaved }) {
   const isEdit = Boolean(customer)
   const [form, setForm] = useState(() => initialForm(customer))
+  // Asignar una lista de precios da precios más bajos: solo quien administra las listas (D-PRE-1)
+  const canAssignList = useCan('price_lists.manage')
+  const { data: priceLists = [] } = useGetPriceListsQuery(undefined, { skip: !canAssignList })
+  const listOptions = priceLists
+    .filter((list) => list.isActive || String(list.id) === form.priceListId)
+    .map((list) => ({ value: String(list.id), label: `${priceListLabel(list)}${list.isActive ? '' : ' (desactivada)'}` }))
   const [localErrors, setLocalErrors] = useState({})
   const [createCustomer, createState] = useCreateCustomerMutation()
   const [updateCustomer, updateState] = useUpdateCustomerMutation()
@@ -81,6 +91,8 @@ export function CustomerFormModal({ customer, onClose, onSaved }) {
       birthDate: form.birthDate || null,
       creditLimit: limit || null,
       notes: form.notes.trim() || null,
+      // Solo quien administra las listas la manda (el servidor también lo exige)
+      ...(canAssignList && { priceListId: form.priceListId ? Number(form.priceListId) : null }),
     }
     try {
       const saved = isEdit ? await updateCustomer({ id: customer.id, ...body }).unwrap() : await createCustomer(body).unwrap()
@@ -141,6 +153,11 @@ export function CustomerFormModal({ customer, onClose, onSaved }) {
           />
           <TextAreaField className="form-section__full" label="Notas" rows={2} maxLength={500} {...bind('notes')} />
         </FormSection>
+        {canAssignList && (listOptions.length > 0 || form.priceListId) && (
+          <FormSection icon={BadgePercent} title="Precios" description="Con una lista, el punto de venta le cobra sus precios al escogerlo.">
+            <SelectField label="Lista de precios" options={[{ value: '', label: 'Precio normal' }, ...listOptions]} {...bind('priceListId')} />
+          </FormSection>
+        )}
       </form>
     </Modal>
   )

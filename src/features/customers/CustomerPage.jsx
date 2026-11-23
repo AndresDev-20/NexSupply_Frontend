@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { AlarmClock, Archive, ArrowLeft, Ban, Cake, Gift, CalendarClock, Eye, HandCoins, IdCard, MapPin, MessageCircle, NotebookPen, Pencil, Phone, Power, ReceiptText, RotateCw, ScrollText, TriangleAlert, UserRound, Wallet } from 'lucide-react'
+import { AlarmClock, Archive, ArrowLeft, BadgePercent, Ban, Cake, Gift, CalendarClock, Eye, HandCoins, IdCard, MapPin, MessageCircle, NotebookPen, Pencil, Phone, Power, ReceiptText, RotateCw, ScrollText, TriangleAlert, UserRound, Wallet } from 'lucide-react'
 import {
   useCancelCustomerPaymentMutation,
   useCancelReceivableMutation,
@@ -12,6 +12,7 @@ import {
   useSetCustomerActiveMutation,
 } from './customersApi'
 import { INSTALLMENT_STATUS, birthdayLabel, receivableState, reminderLink } from './customerOptions'
+import { priceListLabel } from './priceLists/priceListOptions'
 import { CustomerFormModal } from './CustomerFormModal'
 import { DebtModal } from './DebtModal'
 import { PaymentModal } from './PaymentModal'
@@ -311,6 +312,12 @@ export default function CustomerPage() {
           </p>
           <div className="product-hero__badges">
             {!customer.isActive && <Badge tone="neutral">Inactivo</Badge>}
+            {customer.priceList && (
+              <Badge tone={customer.priceList.isActive ? 'info' : 'neutral'} icon={BadgePercent}>
+                {priceListLabel(customer.priceList)}
+                {customer.priceList.isActive ? '' : ' (desactivada)'}
+              </Badge>
+            )}
             {birthday && (
               <Badge tone="accent" icon={Cake}>
                 {birthday}

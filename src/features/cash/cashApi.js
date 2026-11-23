@@ -86,10 +86,17 @@ export const cashApi = baseApi.injectEndpoints({
       query: ({ sessionId, ...body }) => ({ url: `/cash-sessions/${sessionId}/receive`, method: 'POST', data: body }),
       invalidatesTags: (result, error, { sessionId }) => sessionTags(Number(sessionId)),
     }),
+    // D-CAJA-15: reabrir un turno contado que no se ha recibido
+    reopenCashSession: build.mutation({
+      query: ({ sessionId, reason }) => ({ url: `/cash-sessions/${sessionId}/reopen`, method: 'POST', data: { reason } }),
+      transformResponse: (data, meta) => ({ ...data, message: meta?.message ?? null }),
+      invalidatesTags: (result, error, { sessionId }) => sessionTags(Number(sessionId)),
+    }),
   }),
 })
 
 export const {
+  useReopenCashSessionMutation,
   useGetCashRegistersQuery,
   useCreateCashRegisterMutation,
   useUpdateCashRegisterMutation,

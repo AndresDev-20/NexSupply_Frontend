@@ -27,7 +27,13 @@ export function lineUnit(product, presentationId) {
   return pack ? pack.name : product.unit.symbol
 }
 
-export function linePrice(product, presentationId) {
+/** Lote escogido de un animal (D-ANI-1), o null. */
+export function lineLot(product, animalLotId) {
+  return (product.animalLots ?? []).find((lot) => String(lot.id) === String(animalLotId)) ?? null
+}
+
+export function linePrice(product, presentationId, animalLotId = null) {
+  if (product.productKind === 'animal') return lineLot(product, animalLotId)?.priceToday ?? null
   const pack = product.presentations.find((item) => String(item.id) === String(presentationId))
   return pack ? pack.salePrice : product.salePrice
 }

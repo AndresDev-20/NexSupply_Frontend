@@ -402,3 +402,55 @@
   align-self: center;
   margin-right: auto;
 }
+
+/* Libro para el contador (D-CON-1) */
+.accounting-book {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: var(--space-3) var(--space-4);
+  align-items: start;
+  margin-bottom: var(--space-5);
+  padding: var(--space-4) var(--space-5);
+  border: 1px solid color-mix(in srgb, var(--color-primary) 35%, var(--color-border));
+  border-radius: var(--radius-lg, var(--radius-md));
+  background: color-mix(in srgb, var(--color-primary) 6%, var(--color-surface));
+}
+
+.accounting-book__icon {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-md);
+  background: var(--color-primary);
+  color: var(--color-on-primary, #fff);
+}
+
+.accounting-book__text h2 {
+  margin: 0 0 var(--space-1);
+  font-size: var(--font-size-lg);
+}
+
+.accounting-book__text p {
+  margin: 0;
+  color: var(--color-text-muted);
+}
+
+.accounting-book__form {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--space-3);
+}
+
+@media (min-width: 900px) {
+  .accounting-book {
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+  }
+
+  .accounting-book__form {
+    grid-column: auto;
+  }
+}

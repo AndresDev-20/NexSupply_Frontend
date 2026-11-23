@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { FileSpreadsheet, Package, PackagePlus, PackageX, Pencil, Search, TriangleAlert } from 'lucide-react'
+import { TrendingUp, FileSpreadsheet, Package, PackagePlus, PackageX, Pencil, Search, TriangleAlert } from 'lucide-react'
 import { useGetCategoriesQuery, useGetProductsQuery } from '../inventoryApi'
 import { CategoryPicker } from '../categories/CategoryPicker'
 import { useCan } from '../../../hooks/usePermissions'
@@ -50,6 +50,7 @@ export default function ProductsPage() {
     update: useCan('inventory.update'),
     viewCost: useCan('inventory.cost_view'),
     import: useCan('inventory.import'),
+    prices: useCan('inventory.prices'),
   }
   const [search, setSearch] = useState('')
   const [categoryId, setCategoryId] = useState('')
@@ -128,21 +129,24 @@ export default function ProductsPage() {
       header: 'Precio',
       render: (product) => (
         <span className="numeric">
-          {formatCurrency(product.salePrice)} / {product.unit?.symbol}
+          {product.productKind === 'animal' ? 'Por lote · sube cada día' : `${formatCurrency(product.salePrice)} / ${product.unit?.symbol}`}
         </span>
       ),
     },
     ...(can.viewCost
       ? [
-          { key: 'purchase', header: 'Compra', render: (product) => <span className="numeric">{formatCurrency(product.purchasePrice)}</span> },
+          { key: 'purchase', header: 'Compra', render: (product) => <span className="numeric">{product.productKind === 'animal' ? '—' : formatCurrency(product.purchasePrice)}</span> },
           {
             key: 'profit',
             header: 'Ganancia',
-            render: (product) => (
+            render: (product) =>
+              product.productKind === 'animal' ? (
+                '—'
+              ) : (
               <span className={`numeric${product.profit?.startsWith('-') ? ' margin--negative' : ''}`}>
                 {formatCurrency(product.profit)} {product.profitPercent !== null && <small>({formatPercent(product.profitPercent)})</small>}
               </span>
-            ),
+              ),
           },
         ]
       : []),
@@ -165,6 +169,11 @@ export default function ProductsPage() {
         description="Productos del negocio con la existencia de tu sucursal. Busca por nombre, código o escaneando el código de barras."
         actions={
           <>
+            {can.prices && (
+              <Button variant="secondary" icon={TrendingUp} onClick={() => navigate(ROUTES.bulkPrices)}>
+                Cambiar precios
+              </Button>
+            )}
             {can.import && (
               <Button variant="secondary" icon={FileSpreadsheet} onClick={() => navigate(ROUTES.productImport)}>
                 Importar
@@ -209,9 +218,10 @@ export default function ProductsPage() {
         <ProductFormModal
           product={editing === 'new' ? null : editing}
           onClose={() => setEditing(null)}
-          onSaved={(saved, isEdit) => {
+          onSaved={(saved, isEdit, extra) => {
             setEditing(null)
-            toast.success(isEdit ? `${saved.name} actualizado` : `${saved.name} creado con el código ${saved.code}`)
+            const inPurchase = extra?.purchaseGroupName ? ` y agregado a «${extra.purchaseGroupName}»` : ''
+            toast.success(isEdit ? `${saved.name} actualizado${inPurchase}` : `${saved.name} creado con el código ${saved.code}${inPurchase}`)
             if (!isEdit) navigate(productPath(saved.id))
           }}
         />

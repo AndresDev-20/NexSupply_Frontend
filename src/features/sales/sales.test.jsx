@@ -192,6 +192,9 @@ describe('punto de venta', () => {
     await user.type(within(pay).getByLabelText(/Paga algo ahora/), '50.000')
     expect(within(pay).getByRole('radio', { name: 'Efectivo' })).toHaveAttribute('aria-checked', 'true')
     expect(within(pay).getByText('$ 150.000', { selector: 'strong' })).toBeInTheDocument()
+    // Con el cliente cambian los precios (su lista, D-PRE-1): se cobra con la vista previa nueva
+    await waitFor(() => expect(within(pay).getByRole('button', { name: /Registrar fiado/ })).toBeEnabled())
+    expect(calls.some((call) => call.url === '/sales/preview' && call.data.customerId === 4)).toBe(true)
     await user.click(within(pay).getByRole('button', { name: /Registrar fiado/ }))
 
     await screen.findByRole('dialog', { name: 'Comprobante V-000031' })

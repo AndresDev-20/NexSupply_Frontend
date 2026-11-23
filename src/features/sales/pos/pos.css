@@ -63,6 +63,10 @@ kbd {
     var(--color-surface);
   box-shadow: var(--shadow-sm);
   animation: pos-in 320ms var(--easing-standard) both;
+  /* La animación crea una capa propia: sin esto, la lista de clientes que se despliega
+     quedaba detrás del panel «Venta» (que se dibuja después). Por debajo de la barra superior (20) */
+  position: relative;
+  z-index: 5;
 }
 
 @container (min-width: 700px) {
@@ -1431,4 +1435,10 @@ kbd {
   height: 18px;
   flex-shrink: 0;
   color: var(--color-accent-strong);
+}
+
+/* Animales (D-ANI-1): falta escoger el lote */
+.pos-item__pick {
+  font-weight: var(--font-weight-bold);
+  color: var(--color-warning);
 }

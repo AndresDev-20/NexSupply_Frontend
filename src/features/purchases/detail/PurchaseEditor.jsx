@@ -8,6 +8,8 @@ import { COST_PATTERN, MONEY_PATTERN, QUANTITY_PATTERN, toApiNumber, toInputMone
 import { supplierName, todayIso } from '../purchaseOptions'
 import { ProductSearch } from './ProductSearch'
 import { ConfirmPurchaseModal } from './ConfirmPurchaseModal'
+import { PricingFields } from '../../inventory/products/AnimalLots'
+import { validatePricing } from '../../inventory/products/animalPricing'
 import { AttachmentBox } from './AttachmentBox'
 import { useCan } from '../../../hooks/usePermissions'
 import { useToast } from '../../../components/feedback/Toast/toastContext'
@@ -42,7 +44,7 @@ function lineFromProduct(product) {
   return {
     key: nextKey(),
     productId: product.id,
-    product: { id: product.id, code: product.code, name: product.name, tracksBatches: product.tracksBatches, unit: product.unit, presentations: product.presentations ?? [], purchasePrice: product.purchasePrice },
+    product: { id: product.id, code: product.code, name: product.name, tracksBatches: product.tracksBatches, productKind: product.productKind, unit: product.unit, presentations: product.presentations ?? [], purchasePrice: product.purchasePrice },
     presentationId: '',
     quantity: '',
     unitPrice: Number(product.purchasePrice) > 0 ? toInputMoney(product.purchasePrice) : '',
@@ -52,6 +54,8 @@ function lineFromProduct(product) {
     lotNumber: '',
     expirationDate: '',
     manufactureDate: '',
+    // Animales (D-ANI-1): precio del lote que nace al confirmar
+    animalPricing: { baseSalePrice: Number(product.salePrice) > 0 ? toInputMoney(product.salePrice) : '', dailyIncrease: '', maxSalePrice: '' },
   }
 }
 
@@ -69,6 +73,11 @@ function lineFromItem(item) {
     lotNumber: item.lotNumber ?? '',
     expirationDate: item.expirationDate ?? '',
     manufactureDate: item.manufactureDate ?? '',
+    animalPricing: {
+      baseSalePrice: item.animalPricing?.baseSalePrice ? toInputMoney(item.animalPricing.baseSalePrice) : '',
+      dailyIncrease: item.animalPricing?.dailyIncrease ? toInputMoney(item.animalPricing.dailyIncrease) : '',
+      maxSalePrice: item.animalPricing?.maxSalePrice ? toInputMoney(item.animalPricing.maxSalePrice) : '',
+    },
   }
 }
 
@@ -104,6 +113,8 @@ function bodyOf(header, lines) {
       lotNumber: line.lotNumber.trim() || null,
       expirationDate: line.expirationDate || null,
       manufactureDate: line.manufactureDate || null,
+      // El borrador se puede guardar sin el precio del lote; se exige al confirmar
+      ...(line.product.productKind === 'animal' && toApiNumber(line.animalPricing.baseSalePrice) && { animalPricing: validatePricing(line.animalPricing).body }),
     })),
   }
 }
@@ -125,6 +136,7 @@ function PurchaseLine({ line, index, errors, onChange, onRemove }) {
   const purchasePrice = product?.purchasePrice ?? line.product.purchasePrice
   const pack = packs.find((item) => String(item.id) === line.presentationId)
   const tracksBatches = product?.tracksBatches ?? line.product.tracksBatches
+  const isAnimal = (product?.productKind ?? line.product.productKind) === 'animal'
   const subtotal = lineSubtotal(line)
   const field = (name) => errors[`items[${index}].${name}`]
   const quantity = toApiNumber(line.quantity)
@@ -151,6 +163,7 @@ function PurchaseLine({ line, index, errors, onChange, onRemove }) {
           <span className="purchase-line__meta">
             {line.product.code} · se guarda en {unit?.symbol}
             {tracksBatches && <span className="purchase-line__tag">Con lotes</span>}
+            {isAnimal && <span className="purchase-line__tag">Animal</span>}
           </span>
         </span>
         <span className="purchase-line__subtotal">{subtotal === null ? '—' : formatCurrency(subtotal)}</span>
@@ -189,6 +202,15 @@ function PurchaseLine({ line, index, errors, onChange, onRemove }) {
         <SelectField label="IVA" options={TAX_RATE_OPTIONS} value={line.taxRate} onChange={(event) => set('taxRate', event.target.value)} error={field('taxRate')} />
       </div>
 
+      {isAnimal && (
+        <div className="purchase-line__lot">
+          <PricingFields
+            form={line.animalPricing}
+            errors={{ baseSalePrice: field('animalPricing.baseSalePrice'), dailyIncrease: field('animalPricing.dailyIncrease'), maxSalePrice: field('animalPricing.maxSalePrice') }}
+            onChange={(name, value) => onChange({ ...line, animalPricing: { ...line.animalPricing, [name]: value } })}
+          />
+        </div>
+      )}
       {tracksBatches && (
         <div className="purchase-line__lot">
           <TextField label="Lote" placeholder="Ej.: L-2045" maxLength={40} value={line.lotNumber} onChange={(event) => set('lotNumber', event.target.value)} error={field('lotNumber')} required />
@@ -249,6 +271,9 @@ export function PurchaseEditor({ purchase, onConfirmed, autoConfirm = false }) {
       if (!isPositive(toApiNumber(line.quantity))) found[key('quantity')] = 'Escribe la cantidad'
       if (!COST_PATTERN.test(toApiNumber(line.unitPrice))) found[key('unitPrice')] = 'Escribe el precio'
       if (line.discount && !MONEY_PATTERN.test(toApiNumber(line.discount))) found[key('discount')] = 'Valor en pesos'
+      if (line.product.productKind === 'animal' && (forConfirm || toApiNumber(line.animalPricing.baseSalePrice))) {
+        for (const [name, message] of Object.entries(validatePricing(line.animalPricing).errors)) found[key(`animalPricing.${name}`)] = message
+      }
       if (forConfirm && line.product.tracksBatches) {
         if (!line.lotNumber.trim()) found[key('lotNumber')] = 'Escribe el lote'
         if (!line.expirationDate) found[key('expirationDate')] = 'Escribe el vencimiento'

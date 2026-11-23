@@ -17,6 +17,7 @@ const purchaseTags = (id) => [
   'CashSession',
   'CashRegister',
   'Audit',
+  'PurchaseGroup',
 ]
 
 export const purchasesApi = baseApi.injectEndpoints({
@@ -30,17 +31,22 @@ export const purchasesApi = baseApi.injectEndpoints({
       query: (id) => ({ url: `/purchases/${id}` }),
       providesTags: (result, error, id) => [{ type: 'Purchase', id: Number(id) }],
     }),
+    // Pedido sugerido al proveedor (D-COMP-10)
+    getReorderSuggestions: build.query({
+      query: (params) => ({ url: '/purchases/reorder-suggestions', params }),
+      keepUnusedDataFor: 0,
+    }),
     createPurchase: build.mutation({
       query: (body) => ({ url: '/purchases', method: 'POST', data: body }),
       invalidatesTags: [{ type: 'Purchase', id: 'LIST' }, 'Audit'],
     }),
     updatePurchase: build.mutation({
       query: ({ id, ...body }) => ({ url: `/purchases/${id}`, method: 'PATCH', data: body }),
-      invalidatesTags: (result, error, { id }) => [{ type: 'Purchase', id }, { type: 'Purchase', id: 'LIST' }, 'Audit'],
+      invalidatesTags: (result, error, { id }) => [{ type: 'Purchase', id }, { type: 'Purchase', id: 'LIST' }, 'Audit', 'PurchaseGroup'],
     }),
     deletePurchase: build.mutation({
       query: (id) => ({ url: `/purchases/${id}`, method: 'DELETE' }),
-      invalidatesTags: [{ type: 'Purchase', id: 'LIST' }, 'Audit'],
+      invalidatesTags: [{ type: 'Purchase', id: 'LIST' }, 'Audit', 'PurchaseGroup'],
     }),
     confirmPurchase: build.mutation({
       // paymentType, dueDate?, payment?, confirmExpiredLots?
@@ -67,6 +73,19 @@ export const purchasesApi = baseApi.injectEndpoints({
       // purchaseId solo sirve para invalidar el caché de esa compra
       query: ({ paymentId, reason }) => ({ url: `/payables/payments/${paymentId}/cancel`, method: 'POST', data: { reason } }),
       invalidatesTags: (result, error, { purchaseId }) => purchaseTags(purchaseId),
+    }),
+    // Compras con varios proveedores (D-COMP-9): cada proveedor es una compra de las de siempre
+    getPurchaseGroups: build.query({
+      query: (params) => ({ url: '/purchase-groups', params }),
+      providesTags: ['PurchaseGroup'],
+    }),
+    getPurchaseGroup: build.query({
+      query: (id) => ({ url: `/purchase-groups/${id}` }),
+      providesTags: ['PurchaseGroup'],
+    }),
+    createPurchaseGroup: build.mutation({
+      query: (body) => ({ url: '/purchase-groups', method: 'POST', data: body }),
+      invalidatesTags: ['PurchaseGroup', 'Audit'],
     }),
     getPayablesSummary: build.query({
       query: () => ({ url: '/payables/summary' }),
@@ -101,6 +120,7 @@ export const {
   useGetPurchasesQuery,
   useGetPurchaseQuery,
   useCreatePurchaseMutation,
+  useGetReorderSuggestionsQuery,
   useUpdatePurchaseMutation,
   useDeletePurchaseMutation,
   useConfirmPurchaseMutation,
@@ -108,6 +128,9 @@ export const {
   useUploadPurchaseAttachmentMutation,
   useAddPurchasePaymentMutation,
   useCancelSupplierPaymentMutation,
+  useGetPurchaseGroupsQuery,
+  useGetPurchaseGroupQuery,
+  useCreatePurchaseGroupMutation,
   useGetPayablesSummaryQuery,
   useGetSupplierAccountQuery,
   useGetProductBatchesQuery,

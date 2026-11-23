@@ -1,0 +1,173 @@
+/* Etiquetas con código de barras (D-INV-21) */
+.labels-search {
+  position: relative;
+}
+
+.labels-results {
+  display: grid;
+  gap: var(--space-1);
+  margin: var(--space-2) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.labels-results li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+}
+
+.labels-results small {
+  color: var(--color-text-muted);
+}
+
+.labels-results__actions {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+}
+
+.labels-list {
+  display: grid;
+  gap: var(--space-2);
+  margin-block: var(--space-4);
+}
+
+.labels-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+}
+
+.labels-row__name {
+  display: grid;
+  gap: 2px;
+  flex: 1 1 220px;
+  justify-items: start;
+}
+
+.labels-row__name small {
+  color: var(--color-text-muted);
+}
+
+.labels-row__copies {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--font-size-sm);
+}
+
+.labels-row__copies input {
+  width: 64px;
+  min-height: 34px;
+  padding: 0 var(--space-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  color: inherit;
+  font: inherit;
+  text-align: right;
+}
+
+.labels-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--space-3);
+}
+
+.labels-preview {
+  overflow-x: auto;
+  padding: var(--space-3);
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-muted, var(--color-surface));
+}
+
+/* La hoja: carta, 3 × 10 etiquetas de 66,7 × 25,4 mm (márgenes de hoja tipo 5160) */
+.label-sheet {
+  box-sizing: border-box;
+  display: grid;
+  grid-template-columns: repeat(3, 66.7mm);
+  grid-auto-rows: 25.4mm;
+  column-gap: 3.2mm;
+  width: 215.9mm;
+  min-height: 279.4mm;
+  padding: 12.7mm 4.8mm;
+  background: #fff;
+  color: #111;
+}
+
+.labels-preview .label-sheet {
+  margin: 0 auto var(--space-3);
+  box-shadow: var(--shadow-sm);
+}
+
+.label {
+  box-sizing: border-box;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-template-rows: auto auto 1fr;
+  align-content: start;
+  gap: 0 2mm;
+  overflow: hidden;
+  padding: 1.6mm 2.4mm;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.labels-preview .label:not(.label--empty) {
+  outline: 1px dashed #c9d3cc;
+}
+
+.label__name {
+  grid-column: 1;
+  overflow: hidden;
+  font-size: 8.5pt;
+  font-weight: 700;
+  line-height: 1.15;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.label__pack {
+  grid-column: 1;
+  font-size: 7pt;
+  color: #444;
+}
+
+.label__price {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  font-size: 11pt;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.label svg {
+  grid-column: 1 / -1;
+  justify-self: center;
+  max-width: 100%;
+  height: auto;
+  max-height: 14mm;
+}
+
+@media print {
+  .labels-print-root .label-sheet {
+    break-after: page;
+  }
+
+  .labels-print-root .label-sheet:last-child {
+    break-after: auto;
+  }
+}

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Ban, Banknote, CalendarPlus, Gift, HandCoins, Hash, PackageCheck, Undo2, Wallet } from 'lucide-react'
+import { Stethoscope, Ban, Banknote, CalendarPlus, Gift, HandCoins, Hash, PackageCheck, Undo2, Wallet } from 'lucide-react'
 import { Modal } from '../../components/ui/Modal/Modal'
 import { Button } from '../../components/ui/Button/Button'
 import { TextField } from '../../components/ui/TextField/TextField'
@@ -24,7 +24,11 @@ function useOpenSessions() {
   const canViewCash = useCan('cash.view')
   const { data } = useGetCashSessionsQuery({ status: 'open', pageSize: 50 }, { skip: !canViewCash })
   const sessions = data?.rows ?? []
-  return { canViewCash, sessions, only: sessions.length === 1 ? String(sessions[0].id) : '' }
+  return {
+    canViewCash,
+    sessions,
+    only: sessions.length === 1 ? String(sessions[0].id) : '',
+  }
 }
 
 function SessionField({ sessions, value, onChange, error, label = 'Caja (turno abierto)', required = true }) {
@@ -39,7 +43,10 @@ function SessionField({ sessions, value, onChange, error, label = 'Caja (turno a
     <SelectField
       label={label}
       placeholder="Selecciona el turno…"
-      options={sessions.map((session) => ({ value: String(session.id), label: `${session.register?.name} · abierta ${formatDateTime(session.openedAt)}` }))}
+      options={sessions.map((session) => ({
+        value: String(session.id),
+        label: `${session.register?.name} · abierta ${formatDateTime(session.openedAt)}`,
+      }))}
       value={value}
       onChange={(event) => onChange(event.target.value)}
       error={error}
@@ -51,9 +58,17 @@ function SessionField({ sessions, value, onChange, error, label = 'Caja (turno a
 /** Abono a un apartado: entra a la caja (D-CLI-4). Al completar el total queda listo para entregar. */
 export function LayawayPaymentModal({ layaway, onClose, onSaved }) {
   const { sessions, only } = useOpenSessions()
-  const [form, setForm] = useState({ amount: '', paymentMethodId: '', paymentReference: '', cashSessionId: '', notes: '' })
+  const [form, setForm] = useState({
+    amount: '',
+    paymentMethodId: '',
+    paymentReference: '',
+    cashSessionId: '',
+    notes: '',
+  })
   const [localErrors, setLocalErrors] = useState({})
-  const { methods, method } = usePaymentMethodInfo(form.paymentMethodId, { creditBalance: layaway.customer?.creditBalance })
+  const { methods, method } = usePaymentMethodInfo(form.paymentMethodId, {
+    creditBalance: layaway.customer?.creditBalance,
+  })
   const [pay, { isLoading, error }] = usePayLayawayMutation()
   const { fieldErrors: serverErrors, formError } = splitApiError(error)
   const fieldErrors = { ...serverErrors, ...localErrors }
@@ -64,7 +79,11 @@ export function LayawayPaymentModal({ layaway, onClose, onSaved }) {
     setForm((current) => ({ ...current, [name]: value }))
     setLocalErrors((current) => ({ ...current, [name]: undefined }))
   }
-  const bind = (name) => ({ value: form[name], error: fieldErrors[name], onChange: (event) => set(name, event.target.value) })
+  const bind = (name) => ({
+    value: form[name],
+    error: fieldErrors[name],
+    onChange: (event) => set(name, event.target.value),
+  })
 
   const handleSubmit = async (event) => {
     event.preventDefault()
@@ -84,7 +103,9 @@ export function LayawayPaymentModal({ layaway, onClose, onSaved }) {
         id: layaway.id,
         amount,
         paymentMethodId: Number(form.paymentMethodId),
-        ...(method.requiresReference && { paymentReference: form.paymentReference.trim() }),
+        ...(method.requiresReference && {
+          paymentReference: form.paymentReference.trim(),
+        }),
         ...(usesCash && sessionId && { cashSessionId: Number(sessionId) }),
         ...(form.notes.trim() && { notes: form.notes.trim() }),
       }).unwrap()
@@ -139,12 +160,17 @@ export function LayawayPaymentModal({ layaway, onClose, onSaved }) {
           <SelectField
             label="Método de pago"
             placeholder="Selecciona…"
-            options={methods.map((item) => ({ value: String(item.id), label: item.isCustomerCredit ? `${item.name} (tiene ${formatCurrency(layaway.customer.creditBalance)})` : item.name }))}
+            options={methods.map((item) => ({
+              value: String(item.id),
+              label: item.isCustomerCredit ? `${item.name} (tiene ${formatCurrency(layaway.customer.creditBalance)})` : item.name,
+            }))}
             required
             {...bind('paymentMethodId')}
           />
           {method?.requiresReference && <TextField label="Referencia" icon={Hash} maxLength={60} required {...bind('paymentReference')} />}
-          {usesCash && <SessionField sessions={sessions} value={sessionId} onChange={(value) => set('cashSessionId', value)} error={fieldErrors.cashSessionId} required={method.isCash} label="Entra a la caja" />}
+          {usesCash && (
+            <SessionField sessions={sessions} value={sessionId} onChange={(value) => set('cashSessionId', value)} error={fieldErrors.cashSessionId} required={method.isCash} label="Entra a la caja" />
+          )}
           <TextAreaField className="form-section__full" label="Nota" rows={1} maxLength={255} hint="Opcional." {...bind('notes')} />
         </FormSection>
       </form>
@@ -158,6 +184,20 @@ export function DeliverModal({ layaway, onClose, onDelivered }) {
   const [sessionId, setSessionId] = useState('')
   const [localError, setLocalError] = useState(null)
   const [askExpired, setAskExpired] = useState(false)
+  // Fórmula veterinaria (D-VET-1): opcional con aviso, como en el punto de venta
+  const needsPrescription = (layaway.prescriptionProducts ?? []).length > 0
+  const [rx, setRx] = useState({
+    number: '',
+    veterinarianName: '',
+    veterinarianLicense: '',
+    date: '',
+    patient: '',
+  })
+  const hasRx = Boolean(rx.number.trim() || rx.veterinarianName.trim())
+  const rxField = (name) => ({
+    value: rx[name],
+    onChange: (event) => setRx((current) => ({ ...current, [name]: event.target.value })),
+  })
   const [deliver, { isLoading, error, reset }] = useDeliverLayawayMutation()
   const { formError, fieldErrors } = splitApiError(error?.code === 'AUTHORIZATION_REQUIRED' ? null : error)
   const chosen = sessionId || only
@@ -165,8 +205,27 @@ export function DeliverModal({ layaway, onClose, onDelivered }) {
   const submit = async (expiredAuthorization) => {
     setLocalError(null)
     if (!chosen) return setLocalError('Escoge la caja donde se entrega')
+    if (needsPrescription && hasRx && (!rx.number.trim() || rx.veterinarianName.trim().length < 3))
+      return setLocalError('De la fórmula, escribe al menos el número y el veterinario (o deja todo vacío para entregar sin fórmula)')
+    const prescription =
+      needsPrescription && hasRx
+        ? {
+            number: rx.number.trim(),
+            veterinarianName: rx.veterinarianName.trim(),
+            ...(rx.veterinarianLicense.trim() && {
+              veterinarianLicense: rx.veterinarianLicense.trim(),
+            }),
+            ...(rx.date && { date: rx.date }),
+            ...(rx.patient.trim() && { patient: rx.patient.trim() }),
+          }
+        : null
     try {
-      const result = await deliver({ id: layaway.id, cashSessionId: Number(chosen), ...(expiredAuthorization && { expiredAuthorization }) }).unwrap()
+      const result = await deliver({
+        id: layaway.id,
+        cashSessionId: Number(chosen),
+        ...(expiredAuthorization && { expiredAuthorization }),
+        ...(prescription && { prescription }),
+      }).unwrap()
       onDelivered(result)
     } catch (deliverError) {
       if (deliverError.code === 'AUTHORIZATION_REQUIRED') setAskExpired(true)
@@ -204,7 +263,10 @@ export function DeliverModal({ layaway, onClose, onDelivered }) {
             <li key={item.id}>
               <PackageCheck aria-hidden="true" />
               <span>
-                <strong>{formatQuantity(item.quantity)} {item.presentationName ?? item.unitSymbol}</strong> {item.productName}
+                <strong>
+                  {formatQuantity(item.quantity)} {item.presentationName ?? item.unitSymbol}
+                </strong>{' '}
+                {item.productName}
               </span>
             </li>
           ))}
@@ -213,6 +275,19 @@ export function DeliverModal({ layaway, onClose, onDelivered }) {
           <SessionField sessions={sessions} value={chosen} onChange={setSessionId} error={fieldErrors.cashSessionId} />
           <p className="form-section__full layaway-hint">La venta queda en este turno. No entra dinero: ya se pagó con los abonos.</p>
         </FormSection>
+        {needsPrescription && (
+          <FormSection
+            icon={Stethoscope}
+            title="Fórmula veterinaria"
+            description={`${layaway.prescriptionProducts.join(', ')} ${layaway.prescriptionProducts.length === 1 ? 'requiere' : 'requieren'} fórmula. Si no la trae, se entrega y queda «Sin fórmula» en el libro.`}
+          >
+            <TextField label="Número de la fórmula" maxLength={40} {...rxField('number')} />
+            <TextField label="Médico veterinario" maxLength={150} {...rxField('veterinarianName')} />
+            <TextField label="Tarjeta profesional" maxLength={40} {...rxField('veterinarianLicense')} />
+            <TextField label="Fecha de la fórmula" type="date" {...rxField('date')} />
+            <TextField className="form-section__full" label="Para qué animal o finca" maxLength={150} {...rxField('patient')} />
+          </FormSection>
+        )}
       </Modal>
       {askExpired && (
         <AuthorizationModal
@@ -242,7 +317,13 @@ export function ExtendModal({ layaway, onClose, onSaved }) {
   const handleSubmit = async (event) => {
     event.preventDefault()
     try {
-      onSaved(await extend({ id: layaway.id, dueDate, ...(reason.trim() && { reason: reason.trim() }) }).unwrap())
+      onSaved(
+        await extend({
+          id: layaway.id,
+          dueDate,
+          ...(reason.trim() && { reason: reason.trim() }),
+        }).unwrap(),
+      )
     } catch {
       // Se muestra desde `error`
     }
@@ -275,7 +356,15 @@ export function ExtendModal({ layaway, onClose, onSaved }) {
         )}
         <FormSection icon={CalendarPlus} title="Nueva fecha">
           <TextField label="Pagar antes del" type="date" min={todayIso()} value={dueDate} onChange={(event) => setDueDate(event.target.value)} error={fieldErrors.dueDate} required />
-          <TextAreaField className="form-section__full" label="Motivo" rows={2} maxLength={255} hint="Opcional. Queda en la auditoría." value={reason} onChange={(event) => setReason(event.target.value)} />
+          <TextAreaField
+            className="form-section__full"
+            label="Motivo"
+            rows={2}
+            maxLength={255}
+            hint="Opcional. Queda en la auditoría."
+            value={reason}
+            onChange={(event) => setReason(event.target.value)}
+          />
         </FormSection>
       </form>
     </Modal>
@@ -291,7 +380,15 @@ export function CancelModal({ layaway, onClose, onSaved }) {
   const { methods } = usePaymentMethodInfo('')
   const cashMethod = methods.find((item) => item.isCash)
   const paid = layaway.amountPaid
-  const [form, setForm] = useState({ retained: '', refund: '', credit: Number(paid) > 0 ? toInputMoney(paid) : '', reason: '', cashSessionId: '', refundPaymentMethodId: '', refundReference: '' })
+  const [form, setForm] = useState({
+    retained: '',
+    refund: '',
+    credit: Number(paid) > 0 ? toInputMoney(paid) : '',
+    reason: '',
+    cashSessionId: '',
+    refundPaymentMethodId: '',
+    refundReference: '',
+  })
   const [localError, setLocalError] = useState(null)
   const [cancel, { isLoading, error }] = useCancelLayawayMutation()
   const { fieldErrors, formError } = splitApiError(error)
@@ -308,7 +405,14 @@ export function CancelModal({ layaway, onClose, onSaved }) {
   const refundMethod = methods.find((item) => String(item.id) === refundMethodId)
   const sessionId = form.cashSessionId || only
 
-  const preset = (values) => setForm((current) => ({ ...current, retained: '', refund: '', credit: '', ...Object.fromEntries(Object.entries(values).map(([key, value]) => [key, toInputMoney(value)])) }))
+  const preset = (values) =>
+    setForm((current) => ({
+      ...current,
+      retained: '',
+      refund: '',
+      credit: '',
+      ...Object.fromEntries(Object.entries(values).map(([key, value]) => [key, toInputMoney(value)])),
+    }))
 
   const handleSubmit = async (event) => {
     event.preventDefault()
@@ -325,7 +429,13 @@ export function CancelModal({ layaway, onClose, onSaved }) {
         retainedAmount: retained,
         refundAmount: refund,
         creditAmount: credit,
-        ...(Number(refund) > 0 && { cashSessionId: Number(sessionId), refundPaymentMethodId: Number(refundMethodId), ...(form.refundReference.trim() && { refundReference: form.refundReference.trim() }) }),
+        ...(Number(refund) > 0 && {
+          cashSessionId: Number(sessionId),
+          refundPaymentMethodId: Number(refundMethodId),
+          ...(form.refundReference.trim() && {
+            refundReference: form.refundReference.trim(),
+          }),
+        }),
       }).unwrap()
       onSaved(saved)
     } catch {
@@ -373,23 +483,72 @@ export function CancelModal({ layaway, onClose, onSaved }) {
                 Retener todo
               </Button>
             </div>
-            <TextField label="Saldo a favor" icon={Gift} inputMode="decimal" placeholder="0" hint="Para pagar compras o fiados después." value={form.credit} onChange={(event) => set('credit', event.target.value)} onBlur={() => set('credit', toInputMoney(toApiNumber(form.credit)))} />
-            <TextField label="Se le devuelve" icon={Undo2} inputMode="decimal" placeholder="0" hint="Sale de la caja." value={form.refund} onChange={(event) => set('refund', event.target.value)} onBlur={() => set('refund', toInputMoney(toApiNumber(form.refund)))} />
-            <TextField label="Se retiene" icon={Wallet} inputMode="decimal" placeholder="0" hint="Se lo queda el negocio." value={form.retained} onChange={(event) => set('retained', event.target.value)} onBlur={() => set('retained', toInputMoney(toApiNumber(form.retained)))} />
+            <TextField
+              label="Saldo a favor"
+              icon={Gift}
+              inputMode="decimal"
+              placeholder="0"
+              hint="Para pagar compras o fiados después."
+              value={form.credit}
+              onChange={(event) => set('credit', event.target.value)}
+              onBlur={() => set('credit', toInputMoney(toApiNumber(form.credit)))}
+            />
+            <TextField
+              label="Se le devuelve"
+              icon={Undo2}
+              inputMode="decimal"
+              placeholder="0"
+              hint="Sale de la caja."
+              value={form.refund}
+              onChange={(event) => set('refund', event.target.value)}
+              onBlur={() => set('refund', toInputMoney(toApiNumber(form.refund)))}
+            />
+            <TextField
+              label="Se retiene"
+              icon={Wallet}
+              inputMode="decimal"
+              placeholder="0"
+              hint="Se lo queda el negocio."
+              value={form.retained}
+              onChange={(event) => set('retained', event.target.value)}
+              onBlur={() => set('retained', toInputMoney(toApiNumber(form.retained)))}
+            />
             <p className={`form-section__full layaway-split${Number(missing) === 0 ? ' layaway-split--ok' : ''}`}>
               {Number(missing) === 0 ? '¡Repartido completo!' : Number(missing) > 0 ? `Falta repartir ${formatCurrency(missing)}` : `Sobran ${formatCurrency(missing.replace('-', ''))}`}
             </p>
             {Number(refund) > 0 && (
               <>
                 <SessionField sessions={sessions} value={sessionId} onChange={(value) => set('cashSessionId', value)} error={fieldErrors.cashSessionId} label="Sale de la caja" />
-                <SelectField label="Se devuelve en" options={methods.filter((item) => !item.isCustomerCredit).map((item) => ({ value: String(item.id), label: item.name }))} value={refundMethodId} onChange={(event) => set('refundPaymentMethodId', event.target.value)} />
-                {refundMethod?.requiresReference && <TextField label="Referencia" icon={Hash} maxLength={60} value={form.refundReference} onChange={(event) => set('refundReference', event.target.value)} />}
+                <SelectField
+                  label="Se devuelve en"
+                  options={methods
+                    .filter((item) => !item.isCustomerCredit)
+                    .map((item) => ({
+                      value: String(item.id),
+                      label: item.name,
+                    }))}
+                  value={refundMethodId}
+                  onChange={(event) => set('refundPaymentMethodId', event.target.value)}
+                />
+                {refundMethod?.requiresReference && (
+                  <TextField label="Referencia" icon={Hash} maxLength={60} value={form.refundReference} onChange={(event) => set('refundReference', event.target.value)} />
+                )}
               </>
             )}
           </FormSection>
         )}
         <FormSection icon={Ban} title="Motivo">
-          <TextAreaField className="form-section__full" label="¿Por qué se cancela?" rows={2} maxLength={200} required placeholder="Ej.: el cliente desistió de la compra" value={form.reason} onChange={(event) => set('reason', event.target.value)} error={fieldErrors.reason} />
+          <TextAreaField
+            className="form-section__full"
+            label="¿Por qué se cancela?"
+            rows={2}
+            maxLength={200}
+            required
+            placeholder="Ej.: el cliente desistió de la compra"
+            value={form.reason}
+            onChange={(event) => set('reason', event.target.value)}
+            error={fieldErrors.reason}
+          />
         </FormSection>
       </form>
     </Modal>

@@ -29,11 +29,14 @@ const TaxSettingsPage = lazy(() => import('../features/settings/tax/TaxSettingsP
 const PaymentMethodsPage = lazy(() => import('../features/settings/paymentMethods/PaymentMethodsPage'))
 const UnitsPage = lazy(() => import('../features/settings/units/UnitsPage'))
 const SequencesPage = lazy(() => import('../features/settings/sequences/SequencesPage'))
+const BackupsPage = lazy(() => import('../features/settings/backups/BackupsPage'))
 const ProductsPage = lazy(() => import('../features/inventory/products/ProductsPage'))
 const ProductDetailPage = lazy(() => import('../features/inventory/products/ProductDetailPage'))
 const CategoriesPage = lazy(() => import('../features/inventory/categories/CategoriesPage'))
 const SuppliersPage = lazy(() => import('../features/inventory/suppliers/SuppliersPage'))
 const ProductImportPage = lazy(() => import('../features/inventory/import/ProductImportPage'))
+const LabelsPage = lazy(() => import('../features/inventory/labels/LabelsPage'))
+const BulkPricesPage = lazy(() => import('../features/inventory/products/BulkPricesPage'))
 const CashPage = lazy(() => import('../features/cash/registers/CashPage'))
 const CashSessionPage = lazy(() => import('../features/cash/sessions/CashSessionPage'))
 const CashSessionsPage = lazy(() => import('../features/cash/sessions/CashSessionsPage'))
@@ -41,7 +44,9 @@ const CashHistoryPage = lazy(() => import('../features/cash/history/CashHistoryP
 const CashRegistersPage = lazy(() => import('../features/cash/registers/CashRegistersPage'))
 const PurchasesPage = lazy(() => import('../features/purchases/list/PurchasesPage'))
 const PurchasePage = lazy(() => import('../features/purchases/detail/PurchasePage'))
+const PurchaseGroupPage = lazy(() => import('../features/purchases/groups/PurchaseGroupPage'))
 const PayablesPage = lazy(() => import('../features/purchases/payables/PayablesPage'))
+const ReorderPage = lazy(() => import('../features/purchases/reorder/ReorderPage'))
 const PosPage = lazy(() => import('../features/sales/pos/PosPage'))
 const SalesPage = lazy(() => import('../features/sales/SalesPage'))
 const LayawaysPage = lazy(() => import('../features/layaways/LayawaysPage'))
@@ -55,9 +60,17 @@ const ReportsPage = lazy(() => import('../features/reports/ReportsPage'))
 const CustomersPage = lazy(() => import('../features/customers/CustomersPage'))
 const CustomerPage = lazy(() => import('../features/customers/CustomerPage'))
 const ReceivablesPage = lazy(() => import('../features/customers/ReceivablesPage'))
+const PrescriptionsPage = lazy(() => import('../features/sales/PrescriptionsPage'))
+const PortersPage = lazy(() => import('../features/expenses/porters/PortersPage'))
+const PorterPage = lazy(() => import('../features/expenses/porters/PorterPage'))
+const QuotesPage = lazy(() => import('../features/quotes/QuotesPage'))
+const QuotePage = lazy(() => import('../features/quotes/QuotePage'))
+const PriceListsPage = lazy(() => import('../features/customers/priceLists/PriceListsPage'))
+const PriceListPage = lazy(() => import('../features/customers/priceLists/PriceListPage'))
 const CountsPage = lazy(() => import('../features/inventory/counts/CountsPage'))
 const CountPage = lazy(() => import('../features/inventory/counts/CountPage'))
 const AlertSettingsPage = lazy(() => import('../features/settings/alerts/AlertSettingsPage'))
+const SalesSettingsPage = lazy(() => import('../features/settings/sales/SalesSettingsPage'))
 const AppearanceSettingsPage = lazy(() => import('../features/settings/appearance/AppearanceSettingsPage'))
 const BatchesPage = lazy(() => import('../features/purchases/batches/BatchesPage'))
 
@@ -113,6 +126,8 @@ export const routes = [
               guarded({ path: ROUTES.suppliers, permission: 'suppliers.view', feature: 'inventory', element: <SuppliersPage />, title: 'Proveedores' }),
               guarded({ path: ROUTES.inventoryCounts, permission: 'inventory.view', feature: 'inventory', element: <CountsPage />, title: 'Inventario físico' }),
               guarded({ path: ROUTES.inventoryCount, permission: 'inventory.view', feature: 'inventory', element: <CountPage />, title: 'Inventario físico' }),
+              guarded({ path: ROUTES.labels, permission: 'inventory.update', feature: 'inventory', element: <LabelsPage />, title: 'Etiquetas' }),
+              guarded({ path: ROUTES.bulkPrices, permission: 'inventory.prices', feature: 'inventory', element: <BulkPricesPage />, title: 'Cambiar precios en bloque' }),
               guarded({ path: ROUTES.productImport, permission: 'inventory.import', feature: 'inventory', element: <ProductImportPage />, title: 'Importar productos' }),
               guarded({ path: ROUTES.cash, permission: 'cash.view', feature: 'cash', element: <CashPage />, title: 'Mis cajas de hoy' }),
               guarded({ path: ROUTES.cashSessions, permission: 'cash.view', feature: 'cash', element: <CashSessionsPage />, title: 'Turnos' }),
@@ -122,6 +137,11 @@ export const routes = [
               guarded({ path: ROUTES.pos, permission: 'sales.create', feature: 'sales', element: <PosPage />, title: 'Punto de venta' }),
               guarded({ path: ROUTES.sales, permission: 'sales.view', feature: 'sales', element: <SalesPage />, title: 'Ventas' }),
               guarded({ path: ROUTES.layaways, permission: 'layaways.view', feature: 'sales', element: <LayawaysPage />, title: 'Apartados' }),
+              guarded({ path: ROUTES.prescriptions, permission: 'sales.view', feature: 'sales', element: <PrescriptionsPage />, title: 'Fórmulas veterinarias' }),
+              guarded({ path: ROUTES.porters, permission: 'porters.view', feature: 'expenses', element: <PortersPage />, title: 'Coteros' }),
+              guarded({ path: ROUTES.porterDetail, permission: 'porters.view', feature: 'expenses', element: <PorterPage />, title: 'Cotero' }),
+              guarded({ path: ROUTES.quotes, permission: 'quotes.view', feature: 'sales', element: <QuotesPage />, title: 'Cotizaciones' }),
+              guarded({ path: ROUTES.quoteDetail, permission: 'quotes.view', feature: 'sales', element: <QuotePage />, title: 'Cotización' }),
               guarded({ path: ROUTES.layawayDetail, permission: 'layaways.view', feature: 'sales', element: <LayawayPage />, title: 'Apartado' }),
               guarded({ path: ROUTES.saleReturns, permission: 'sales.view', feature: 'sales', element: <SaleReturnsPage />, title: 'Devoluciones' }),
               guarded({ path: ROUTES.quarantine, permission: 'inventory.view', feature: 'inventory', element: <QuarantinePage />, title: 'Cuarentena' }),
@@ -130,11 +150,15 @@ export const routes = [
               guarded({ path: ROUTES.recurringExpenses, permission: 'expenses.view', feature: 'expenses', element: <RecurringExpensesPage />, title: 'Gastos fijos' }),
               guarded({ path: ROUTES.reports, permission: REPORT_PERMISSIONS, feature: 'reports', element: <ReportsPage />, title: 'Informes' }),
               guarded({ path: ROUTES.customers, permission: 'customers.view', feature: 'customers', element: <CustomersPage />, title: 'Clientes' }),
+              guarded({ path: ROUTES.priceLists, permission: 'price_lists.manage', feature: 'sales', element: <PriceListsPage />, title: 'Listas de precios' }),
+              guarded({ path: ROUTES.priceList, permission: 'price_lists.manage', feature: 'sales', element: <PriceListPage />, title: 'Lista de precios' }),
               guarded({ path: ROUTES.customerDetail, permission: 'customers.view', feature: 'customers', element: <CustomerPage />, title: 'Cliente' }),
               guarded({ path: ROUTES.receivables, permission: 'receivables.view', feature: 'customers', element: <ReceivablesPage />, title: 'Cartera' }),
               guarded({ path: ROUTES.purchases, permission: 'purchases.view', feature: 'purchases', element: <PurchasesPage />, title: 'Compras' }),
               guarded({ path: ROUTES.purchaseNew, permission: 'purchases.create', feature: 'purchases', element: <PurchasePage />, title: 'Nueva compra' }),
               guarded({ path: ROUTES.payables, permission: 'purchases.view', feature: 'purchases', element: <PayablesPage />, title: 'Cuentas por pagar' }),
+              guarded({ path: ROUTES.reorder, permission: 'purchases.create', feature: 'purchases', element: <ReorderPage />, title: 'Pedido sugerido' }),
+              guarded({ path: ROUTES.purchaseGroup, permission: 'purchases.view', feature: 'purchases', element: <PurchaseGroupPage />, title: 'Compra' }),
               guarded({ path: ROUTES.purchaseDetail, permission: 'purchases.view', feature: 'purchases', element: <PurchasePage />, title: 'Compra' }),
               guarded({ path: ROUTES.batches, permission: 'inventory.view', feature: 'purchases', element: <BatchesPage />, title: 'Lotes y vencimientos' }),
               guarded({ path: ROUTES.users, permission: 'users.view', feature: 'administration', element: <UsersPage />, title: 'Usuarios' }),
@@ -145,8 +169,10 @@ export const routes = [
               guarded({ path: ROUTES.taxSettings, permission: 'settings.tax', feature: 'settings', element: <TaxSettingsPage />, title: 'IVA y redondeo' }),
               guarded({ path: ROUTES.paymentMethods, permission: 'payment_methods.manage', feature: 'settings', element: <PaymentMethodsPage />, title: 'Métodos de pago' }),
               guarded({ path: ROUTES.units, permission: 'units.manage', feature: 'settings', element: <UnitsPage />, title: 'Unidades de medida' }),
+              guarded({ path: ROUTES.salesSettings, permission: 'settings.update', feature: 'settings', element: <SalesSettingsPage />, title: 'Cotizaciones y apartados' }),
               guarded({ path: ROUTES.alertSettings, permission: 'settings.update', feature: 'settings', element: <AlertSettingsPage />, title: 'Avisos' }),
               guarded({ path: ROUTES.appearanceSettings, permission: 'settings.update', feature: 'settings', element: <AppearanceSettingsPage />, title: 'Apariencia' }),
+              guarded({ path: ROUTES.backups, permission: 'backups.manage', feature: 'settings', element: <BackupsPage />, title: 'Copias de seguridad' }),
               guarded({ path: ROUTES.sequences, permission: 'document_sequences.manage', feature: 'settings', element: <SequencesPage />, title: 'Consecutivos' }),
               { path: '*', element: <NotFoundPage />, handle: withTitle('Página no encontrada') },
             ],

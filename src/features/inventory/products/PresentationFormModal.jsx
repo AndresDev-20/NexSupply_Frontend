@@ -4,6 +4,7 @@ import { Modal } from '../../../components/ui/Modal/Modal'
 import { Button } from '../../../components/ui/Button/Button'
 import { TextField } from '../../../components/ui/TextField/TextField'
 import { FormSection } from '../../../components/ui/FormSection/FormSection'
+import { Switch } from '../../../components/ui/Switch/Switch'
 import { ConfirmDialog } from '../../../components/ui/ConfirmDialog/ConfirmDialog'
 import { FormWithPreview } from '../../../components/layout/FormWithPreview/FormWithPreview'
 import { Alert } from '../../../components/feedback/Alert/Alert'
@@ -17,8 +18,9 @@ import { previewProfit, scalePrice } from './profitPreview'
 import './PresentationFormModal.css'
 
 /**
- * Presentación de un producto (D11): "Bulto 40 kg" contiene 40 unidades base y tiene
- * precio y código de barras propios.
+ * Presentación o empaque de un producto (D11): "Bulto 40 kg" contiene 40 unidades base y tiene
+ * precio y código de barras propios. Un empaque que no se vende completo (un frasco que se
+ * vende por cc o por dosis) no tiene precio de venta y solo sirve para comprar (D-INV-20).
  */
 export function PresentationFormModal({ product, presentation, onClose, onSaved }) {
   const isEdit = Boolean(presentation)
@@ -30,6 +32,7 @@ export function PresentationFormModal({ product, presentation, onClose, onSaved 
     factor: toInputNumber(presentation?.factor),
     salePrice: toInputNumber(presentation?.salePrice),
     barcode: presentation?.barcode ?? '',
+    isSoldWhole: presentation?.isSoldWhole ?? true,
   })
   const [localErrors, setLocalErrors] = useState({})
   const [addPresentation, addState] = useAddPresentationMutation()
@@ -44,7 +47,9 @@ export function PresentationFormModal({ product, presentation, onClose, onSaved 
   const validFactor = QUANTITY_PATTERN.test(factor) && Number(factor) > 0
   // Solo con permiso de costos llega el precio de compra del producto
   const purchase = product.purchasePrice !== undefined && validFactor ? scalePrice(product.purchasePrice, factor) : null
-  const profit = purchase !== null && MONEY_PATTERN.test(price) ? previewProfit(purchase, price) : null
+  const profit = form.isSoldWhole && purchase !== null && MONEY_PATTERN.test(price) ? previewProfit(purchase, price) : null
+  // El precio se envía al crear, si cambió o si el empaque pasa a venderse completo
+  const priceChanged = !isEdit || Number(price) !== Number(presentation.salePrice) || !presentation.isSoldWhole
 
   const bind = (name) => ({
     value: form[name],
@@ -60,7 +65,8 @@ export function PresentationFormModal({ product, presentation, onClose, onSaved 
       name: form.name.trim(),
       factor,
       barcode: form.barcode.trim() || null,
-      ...((!isEdit || (canChangePrice && Number(price) !== Number(presentation.salePrice))) && { salePrice: price }),
+      isSoldWhole: form.isSoldWhole,
+      ...(form.isSoldWhole && priceChanged && (!isEdit || canChangePrice) && { salePrice: price }),
       ...(confirm && { confirmBelowCost: true }),
     }
     return isEdit
@@ -74,7 +80,7 @@ export function PresentationFormModal({ product, presentation, onClose, onSaved 
     if (form.name.trim().length < 2) errors.name = 'Escribe el nombre (ej. Bulto 40 kg)'
     if (!validFactor) errors.factor = `Cuántos ${unit.symbol} trae (mayor que cero)`
     else if (!unit.allowsDecimals && !/^\d+$/.test(factor)) errors.factor = `La unidad ${unit.symbol} solo admite cantidades enteras`
-    if (!MONEY_PATTERN.test(price)) errors.salePrice = 'Escribe el precio (ej. 98.000)'
+    if (form.isSoldWhole && !MONEY_PATTERN.test(price)) errors.salePrice = 'Escribe el precio (ej. 98.000)'
     if (form.barcode.trim() && !/^[A-Za-z0-9-]{3,50}$/.test(form.barcode.trim())) errors.barcode = 'De 3 a 50 letras, números o guiones'
     setLocalErrors(errors)
     if (Object.keys(errors).length > 0) return
@@ -117,7 +123,7 @@ export function PresentationFormModal({ product, presentation, onClose, onSaved 
             <p className="presentation-preview__equals">
               = {validFactor ? formatQuantity(factor) : '…'} <strong>{unit.symbol}</strong>
             </p>
-            <p className="presentation-preview__price">{MONEY_PATTERN.test(price) ? formatCurrency(price) : '$ —'}</p>
+            <p className="presentation-preview__price">{form.isSoldWhole ? (MONEY_PATTERN.test(price) ? formatCurrency(price) : '$ —') : `Se vende por ${unit.symbol}`}</p>
             {purchase !== null && <p className="presentation-preview__base">Compra: {formatCurrency(purchase)}</p>}
             {profit && (
               <p className={`presentation-preview__profit${profit.profit.startsWith('-') ? ' presentation-preview__profit--loss' : ''}`}>
@@ -137,19 +143,33 @@ export function PresentationFormModal({ product, presentation, onClose, onSaved 
               <Alert tone="danger">{formError}</Alert>
             </div>
           )}
-          <FormSection icon={Boxes} title="Presentación" description="Ej.: Bulto 40 kg, Caja x 12, Galón.">
+          <FormSection icon={Boxes} title="Presentación" description="Ej.: Bulto 40 kg, Caja x 12, Frasco 100 cc.">
             <TextField className="form-section__full" label="Nombre" placeholder="Ej.: Bulto 40 kg" maxLength={60} data-autofocus {...bind('name')} required />
             <TextField label={`Contenido (${unit.symbol})`} inputMode="decimal" placeholder="Ej.: 40" hint={`Cuántos ${unit.symbol} trae.`} {...bind('factor')} required />
-            <TextField
-              label="Precio de venta"
-              icon={CircleDollarSign}
-              inputMode="decimal"
-              placeholder="Ej.: 98.000"
-              disabled={priceLocked}
-              hint={priceLocked ? 'Cambiar precios requiere el permiso "Cambiar precios de venta".' : undefined}
-              {...bind('salePrice')}
-              required
-            />
+            <div className="form-section__full">
+              <Switch
+                label="Se vende completo"
+                description={`Apágalo si solo lo compras así (ej. un frasco) y lo vendes por ${unit.symbol}: no aparece en el punto de venta.`}
+                checked={form.isSoldWhole}
+                disabled={priceLocked}
+                onChange={(checked) => {
+                  setForm((current) => ({ ...current, isSoldWhole: checked }))
+                  setLocalErrors((current) => ({ ...current, salePrice: undefined }))
+                }}
+              />
+            </div>
+            {form.isSoldWhole && (
+              <TextField
+                label="Precio de venta"
+                icon={CircleDollarSign}
+                inputMode="decimal"
+                placeholder="Ej.: 98.000"
+                disabled={priceLocked}
+                hint={priceLocked ? 'Cambiar precios requiere el permiso "Cambiar precios de venta".' : undefined}
+                {...bind('salePrice')}
+                required
+              />
+            )}
             <TextField className="form-section__full" label="Código de barras" icon={Barcode} hint="Opcional. Único." maxLength={50} {...bind('barcode')} />
           </FormSection>
         </form>
