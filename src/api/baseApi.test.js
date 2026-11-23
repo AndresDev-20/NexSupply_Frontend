@@ -28,6 +28,18 @@ describe('axiosBaseQuery', () => {
     })
   })
 
+  it('una página HTML en lugar del JSON es un error, no datos vacíos (D-DEP-1)', async () => {
+    vi.spyOn(httpClient, 'request').mockResolvedValue({ status: 200, headers: {}, data: '<!doctype html><html></html>' })
+    const result = await baseQuery({ url: '/auth/me' })
+    expect(result.error).toMatchObject({ code: 'INVALID_RESPONSE' })
+    expect(result.data).toBeUndefined()
+  })
+
+  it('una respuesta sin cuerpo (204) da data null', async () => {
+    vi.spyOn(httpClient, 'request').mockResolvedValue({ status: 204, headers: {}, data: '' })
+    expect((await baseQuery({ url: '/auth/logout', method: 'POST' })).data).toBeNull()
+  })
+
   it('devuelve el error normalizado en { error }', async () => {
     const normalized = { status: 404, code: 'NOT_FOUND', message: 'El producto no existe', details: [], requestId: null }
     vi.spyOn(httpClient, 'request').mockRejectedValue(normalized)

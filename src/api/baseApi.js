@@ -13,7 +13,12 @@ export function axiosBaseQuery() {
   return async ({ url, method = 'GET', data, params, headers, signal }) => {
     try {
       const response = await httpClient.request({ url, method, data, params, headers, signal })
-      const body = response.data ?? {}
+      // Una página HTML en lugar del JSON de la API (ej. VITE_API_BASE_URL mal configurada y el
+      // hosting devolviendo index.html): es un error, no una respuesta vacía (D-DEP-1)
+      if (typeof response.data === 'string' && response.data.trim() !== '') {
+        return { error: { status: response.status, code: 'INVALID_RESPONSE', message: 'El servidor respondió algo inesperado. Revisa la dirección de la API (VITE_API_BASE_URL).', details: [], requestId: null } }
+      }
+      const body = response.data || {}
       return {
         data: body.data ?? null,
         meta: {
