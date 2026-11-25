@@ -89,7 +89,14 @@ export function PosCart({ lines, computed, onChange, onRemove }) {
         const { product } = line
         const result = computed?.[index]
         const outOfStock = Number(product.stock) <= 0
-        const units = [{ id: '', name: product.unit.symbol }, ...product.presentations]
+        // Medio bulto: la misma presentación con cantidad 0,5 (cobra la mitad del precio del bulto).
+        // Solo si la mitad cabe en la unidad base (kg sí; unidades enteras solo si el factor es par)
+        const canHalve = (presentation) => product.unit.allowsDecimals || Number(presentation.factor) % 2 === 0
+        const isHalf = Number(toApiNumber(line.quantity)) === 0.5
+        const units = [
+          { id: '', name: product.unit.symbol },
+          ...product.presentations.flatMap((presentation) => (canHalve(presentation) ? [presentation, { ...presentation, name: `½ ${presentation.name}`, half: true }] : [presentation])),
+        ]
         // Animal (D-ANI-1): se escoge el lote; cada uno tiene su precio de hoy
         const isAnimal = product.productKind === 'animal'
         const lot = isAnimal ? lineLot(product, line.animalLotId) : null
@@ -148,9 +155,16 @@ export function PosCart({ lines, computed, onChange, onRemove }) {
                 {!isAnimal && units.length > 1 && (
                   <div className="pos-units" role="radiogroup" aria-label={`Unidad de ${product.name}`}>
                     {units.map((unit) => {
-                      const active = String(line.presentationId) === String(unit.id)
+                      const samePresentation = String(line.presentationId) === String(unit.id)
+                      // «½ Bulto» está activo con el bulto y 0,5; «Bulto» con cualquier otra cantidad
+                      const active = samePresentation && (!unit.id || Boolean(unit.half) === isHalf)
+                      const choose = () => {
+                        if (unit.half) return onChange(line.key, { presentationId: String(unit.id), quantity: '0,5' })
+                        // Al pasar de medio bulto al bulto completo, la cantidad vuelve a 1
+                        return onChange(line.key, { presentationId: String(unit.id), ...(samePresentation && isHalf && { quantity: '1' }) })
+                      }
                       return (
-                        <button key={unit.id || 'base'} type="button" role="radio" aria-checked={active} className={`pos-units__option${active ? ' pos-units__option--active' : ''}`} onClick={() => onChange(line.key, { presentationId: String(unit.id) })}>
+                        <button key={`${unit.id || 'base'}${unit.half ? '-half' : ''}`} type="button" role="radio" aria-checked={active} className={`pos-units__option${active ? ' pos-units__option--active' : ''}`} onClick={choose}>
                           {unit.name}
                         </button>
                       )

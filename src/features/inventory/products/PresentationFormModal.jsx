@@ -15,6 +15,7 @@ import { useAddPresentationMutation, useUpdatePresentationMutation } from '../in
 import { MONEY_PATTERN, QUANTITY_PATTERN, toApiNumber, toInputNumber } from '../inventoryOptions'
 import { useBelowCostConfirmation } from './useBelowCostConfirmation'
 import { previewProfit, scalePrice } from './profitPreview'
+import { presentationPresets } from './presentationPresets'
 import './PresentationFormModal.css'
 
 /**
@@ -41,6 +42,8 @@ export function PresentationFormModal({ product, presentation, onClose, onSaved 
   const { isLoading, error } = isEdit ? updateState : addState
   const { fieldErrors: serverErrors, formError } = splitApiError(error?.code === 'CONFIRMATION_REQUIRED' ? null : error)
   const fieldErrors = { ...serverErrors, ...localErrors }
+  // Atajos (D-INV-22): Libra, Arroba, Medio bulto… llenan el nombre y el contenido
+  const presets = isEdit ? [] : presentationPresets(product)
 
   const factor = toApiNumber(form.factor)
   const price = toApiNumber(form.salePrice)
@@ -144,6 +147,24 @@ export function PresentationFormModal({ product, presentation, onClose, onSaved 
             </div>
           )}
           <FormSection icon={Boxes} title="Presentación" description="Ej.: Bulto 40 kg, Caja x 12, Frasco 100 cc.">
+            {presets.length > 0 && (
+              <div className="form-section__full presentation-presets" role="group" aria-label="Atajos de presentaciones">
+                <span className="presentation-presets__label">Atajos:</span>
+                {presets.map((preset) => (
+                  <button
+                    key={preset.name}
+                    type="button"
+                    className={`presentation-presets__chip${form.name === preset.name && toApiNumber(form.factor) === preset.factor ? ' presentation-presets__chip--active' : ''}`}
+                    onClick={() => {
+                      setForm((current) => ({ ...current, name: preset.name, factor: toInputNumber(preset.factor) }))
+                      setLocalErrors((current) => ({ ...current, name: undefined, factor: undefined }))
+                    }}
+                  >
+                    {preset.name} <small>{formatQuantity(preset.factor)} {unit.symbol}</small>
+                  </button>
+                ))}
+              </div>
+            )}
             <TextField className="form-section__full" label="Nombre" placeholder="Ej.: Bulto 40 kg" maxLength={60} data-autofocus {...bind('name')} required />
             <TextField label={`Contenido (${unit.symbol})`} inputMode="decimal" placeholder="Ej.: 40" hint={`Cuántos ${unit.symbol} trae.`} {...bind('factor')} required />
             <div className="form-section__full">

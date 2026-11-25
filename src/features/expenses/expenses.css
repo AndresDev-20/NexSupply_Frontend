@@ -504,3 +504,56 @@
     transform: none;
   }
 }
+
+/* Gasto con producto del inventario (D-GAS-6) */
+.expense-stock {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: var(--space-3);
+  align-items: end;
+  animation: expense-stock-in var(--duration-base) var(--easing-standard);
+}
+
+.expense-stock > .product-search,
+.expense-stock__product,
+.expense-stock__error {
+  grid-column: 1 / -1;
+}
+
+.expense-stock__product {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface-muted);
+}
+
+.expense-stock__product > svg {
+  width: 20px;
+  height: 20px;
+  color: var(--color-primary);
+}
+
+.expense-stock__product > span {
+  display: grid;
+  flex: 1;
+}
+
+.expense-stock__product small {
+  color: var(--color-text-muted);
+}
+
+.expense-stock__error {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  color: var(--color-danger);
+}
+
+@keyframes expense-stock-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+}

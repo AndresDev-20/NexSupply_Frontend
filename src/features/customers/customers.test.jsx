@@ -168,6 +168,56 @@ describe('clientes', () => {
   })
 })
 
+describe('importar desde Excel (D-CLI-10)', () => {
+  const xlsx = () => new File(['x'], 'clientes.xlsx', { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' })
+
+  it('desde la lista se llega a importar; con el archivo válido muestra clientes y deudas y luego importa', async () => {
+    const user = userEvent.setup()
+    const summary = { isValid: true, customersToCreate: 3, customersWithDebt: 2, debtTotal: '738000.00', customersWithoutPhone: 1, errors: [], totalErrors: 0 }
+    const calls = mockApi({
+      ...baseRoutes(),
+      'POST /customers/import': (call) => ok(call.params?.dryRun ? { ...summary, imported: false } : { ...summary, imported: true, created: 3, debtsCreated: 2 }),
+    })
+    renderApp('/clientes')
+
+    await user.click(await screen.findByRole('button', { name: 'Importar' }))
+    await user.upload(await screen.findByLabelText('Archivo de Excel con los clientes'), xlsx())
+    expect(await screen.findByText('Clientes nuevos')).toBeInTheDocument()
+    expect(screen.getByText('Con deuda · $ 738.000')).toBeInTheDocument()
+    expect(screen.getByText('Con deuda y sin celular')).toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: 'Importar 3 clientes' }))
+    const dialog = await screen.findByRole('dialog', { name: 'Importar clientes' })
+    expect(dialog).toHaveTextContent('2 con deuda por $ 738.000 en total')
+    await user.click(within(dialog).getByRole('button', { name: 'Importar' }))
+
+    expect(await screen.findByRole('heading', { name: '3 clientes importados' })).toBeInTheDocument()
+    expect(screen.getByText('2 deudas por $ 738.000 en la cartera.')).toBeInTheDocument()
+    const uploads = calls.filter((call) => call.url === '/customers/import')
+    expect(uploads.map((call) => call.params?.dryRun ?? 'commit')).toEqual(['true', 'commit'])
+  })
+
+  it('con errores los muestra por fila y no deja importar', async () => {
+    const user = userEvent.setup()
+    mockApi({
+      ...baseRoutes(),
+      'POST /customers/import': ok({ isValid: false, totalErrors: 1, errors: [{ row: 4, field: 'Nombre', message: 'Ya existe un cliente con este nombre' }] }),
+    })
+    renderApp('/clientes/importar')
+    await user.upload(await screen.findByLabelText('Archivo de Excel con los clientes'), xlsx())
+    expect(await screen.findByText('El archivo tiene 1 error')).toBeInTheDocument()
+    expect(screen.getByText('Ya existe un cliente con este nombre')).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /^Importar \d/ })).not.toBeInTheDocument()
+  })
+
+  it('sin permiso para administrar clientes no aparece Importar', async () => {
+    mockApi(baseRoutes(['customers.view']))
+    renderApp('/clientes')
+    expect(await screen.findByRole('link', { name: /Pedro Gómez/ })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Importar' })).not.toBeInTheDocument()
+  })
+})
+
 describe('deudas y abonos', () => {
   it('registra un saldo inicial en cuotas calculadas y editables', async () => {
     const user = userEvent.setup()

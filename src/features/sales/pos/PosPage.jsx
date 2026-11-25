@@ -19,6 +19,7 @@ import { PosCart } from './PosCart'
 import { PosCustomer } from './PosCustomer'
 import { PosPriceList } from './PosPriceList'
 import { CheckoutPanel } from './CheckoutPanel'
+import { PosFreight } from './PosFreight'
 import { useAnimatedNumber } from './useAnimatedNumber'
 import { SaleReceiptModal } from '../SaleReceiptModal'
 import { LayawayReceiptModal } from '../../layaways/LayawayReceiptModal'
@@ -67,6 +68,9 @@ export default function PosPage() {
   // Cotizaciones (D-COT-1): modo «Cotizar» del cobro y la cotización que se está vendiendo
   const [payMode, setPayMode] = useState('cash')
   const [quoteSale, setQuoteSale] = useState(null) // { id, number }
+  // Flete con conductor (D-FLE-1): solo en ventas de contado o fiadas, con caja abierta
+  const canAddFreight = useCan('porters.trips')
+  const [freight, setFreight] = useState({ isOpen: false, porterId: '', amount: '' })
   const [fetchQuote] = quotesApi.useLazyGetQuoteQuery()
   const [fetchCustomer] = customersApi.useLazyGetCustomerQuery()
   const [searchCatalog] = useLazySearchSaleCatalogQuery()
@@ -85,6 +89,8 @@ export default function PosPage() {
   const session = sessions.find((row) => String(row.id) === String(sessionId)) ?? (sessions.length === 1 ? sessions[0] : null)
 
   const items = toRequestItems(lines)
+  const freightMode = payMode === 'cash' || payMode === 'credit'
+  const freightApplies = canAddFreight && freightMode && freight.isOpen && Boolean(freight.porterId) && Number(toApiNumber(freight.amount)) > 0
   const request = {
     items,
     ...(toApiNumber(globalDiscount) && { globalDiscount: toApiNumber(globalDiscount) }),
@@ -94,6 +100,7 @@ export default function PosPage() {
     // Cotizar no exige existencia; vender una cotización vigente respeta sus precios
     ...(payMode === 'quote' && { forQuote: true }),
     ...(quoteSale && payMode !== 'quote' && { quoteId: quoteSale.id }),
+    ...(freightApplies && { freight: { porterId: Number(freight.porterId), amount: toApiNumber(freight.amount) } }),
   }
   const pricing = { ...(customer && { customerId: customer.id }), ...(priceListChoice !== undefined && { priceListId: priceListChoice ?? 'none' }) }
   const requestKey = useDebouncedValue(JSON.stringify(request), 300)
@@ -190,6 +197,7 @@ export default function PosPage() {
     setPriceListChoice(undefined)
     setQuoteSale(null)
     setGlobalDiscount('')
+    setFreight({ isOpen: false, porterId: '', amount: '' })
     setRound((value) => value + 1)
     focusSearch()
   }
@@ -314,6 +322,8 @@ export default function PosPage() {
             </span>
           </label>
 
+          {canAddFreight && freightMode && session && <PosFreight value={freight} onChange={setFreight} />}
+
           <div className="pos-totals" aria-live="polite">
             <div className="pos-totals__row">
               <span>Subtotal</span>
@@ -335,6 +345,12 @@ export default function PosPage() {
               <div className="pos-totals__row">
                 <span>Redondeo</span>
                 <span>{formatCurrency(totals.roundingAdjustment)}</span>
+              </div>
+            )}
+            {Number(totals?.freight ?? 0) > 0 && (
+              <div className="pos-totals__row">
+                <span>Flete (va al conductor)</span>
+                <span>{formatCurrency(totals.freight)}</span>
               </div>
             )}
             <div className="pos-totals__total">

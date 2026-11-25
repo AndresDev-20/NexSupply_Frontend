@@ -65,6 +65,7 @@ const PortersPage = lazy(() => import('../features/expenses/porters/PortersPage'
 const PorterPage = lazy(() => import('../features/expenses/porters/PorterPage'))
 const QuotesPage = lazy(() => import('../features/quotes/QuotesPage'))
 const QuotePage = lazy(() => import('../features/quotes/QuotePage'))
+const CustomerImportPage = lazy(() => import('../features/customers/import/CustomerImportPage'))
 const PriceListsPage = lazy(() => import('../features/customers/priceLists/PriceListsPage'))
 const PriceListPage = lazy(() => import('../features/customers/priceLists/PriceListPage'))
 const CountsPage = lazy(() => import('../features/inventory/counts/CountsPage'))
@@ -138,8 +139,8 @@ export const routes = [
               guarded({ path: ROUTES.sales, permission: 'sales.view', feature: 'sales', element: <SalesPage />, title: 'Ventas' }),
               guarded({ path: ROUTES.layaways, permission: 'layaways.view', feature: 'sales', element: <LayawaysPage />, title: 'Apartados' }),
               guarded({ path: ROUTES.prescriptions, permission: 'sales.view', feature: 'sales', element: <PrescriptionsPage />, title: 'Fórmulas veterinarias' }),
-              guarded({ path: ROUTES.porters, permission: 'porters.view', feature: 'expenses', element: <PortersPage />, title: 'Coteros' }),
-              guarded({ path: ROUTES.porterDetail, permission: 'porters.view', feature: 'expenses', element: <PorterPage />, title: 'Cotero' }),
+              guarded({ path: ROUTES.porters, permission: 'porters.view', feature: 'sales', element: <PortersPage />, title: 'Conductores' }),
+              guarded({ path: ROUTES.porterDetail, permission: 'porters.view', feature: 'sales', element: <PorterPage />, title: 'Conductor' }),
               guarded({ path: ROUTES.quotes, permission: 'quotes.view', feature: 'sales', element: <QuotesPage />, title: 'Cotizaciones' }),
               guarded({ path: ROUTES.quoteDetail, permission: 'quotes.view', feature: 'sales', element: <QuotePage />, title: 'Cotización' }),
               guarded({ path: ROUTES.layawayDetail, permission: 'layaways.view', feature: 'sales', element: <LayawayPage />, title: 'Apartado' }),
@@ -150,6 +151,7 @@ export const routes = [
               guarded({ path: ROUTES.recurringExpenses, permission: 'expenses.view', feature: 'expenses', element: <RecurringExpensesPage />, title: 'Gastos fijos' }),
               guarded({ path: ROUTES.reports, permission: REPORT_PERMISSIONS, feature: 'reports', element: <ReportsPage />, title: 'Informes' }),
               guarded({ path: ROUTES.customers, permission: 'customers.view', feature: 'customers', element: <CustomersPage />, title: 'Clientes' }),
+              guarded({ path: ROUTES.customerImport, permission: 'customers.manage', feature: 'customers', element: <CustomerImportPage />, title: 'Importar clientes' }),
               guarded({ path: ROUTES.priceLists, permission: 'price_lists.manage', feature: 'sales', element: <PriceListsPage />, title: 'Listas de precios' }),
               guarded({ path: ROUTES.priceList, permission: 'price_lists.manage', feature: 'sales', element: <PriceListPage />, title: 'Lista de precios' }),
               guarded({ path: ROUTES.customerDetail, permission: 'customers.view', feature: 'customers', element: <CustomerPage />, title: 'Cliente' }),

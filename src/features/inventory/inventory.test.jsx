@@ -347,6 +347,23 @@ describe('ficha del producto', () => {
     expect(posts[1].data).toEqual({ name: 'Bulto 40 kg', factor: '40', barcode: null, isSoldWhole: true, salePrice: '80000', confirmBelowCost: true })
   })
 
+  it('los atajos llenan Arroba (12,5 kg) y, con un bulto, Medio bulto (D-INV-22)', async () => {
+    const user = userEvent.setup()
+    mockApi(detailRoutes(buildProduct({ presentations: [{ id: 1, name: 'Bulto 40 kg', factor: '40.000', salePrice: '100000.00', barcode: null, isActive: true, isSoldWhole: true }] })))
+    renderApp('/inventario/productos/5')
+
+    await user.click(await screen.findByRole('button', { name: 'Nueva presentación' }))
+    const dialog = await screen.findByRole('dialog', { name: 'Nueva presentación' })
+    const presets = within(dialog).getByRole('group', { name: 'Atajos de presentaciones' })
+    // Ya tiene el bulto de 40 kg: no se repite; aparece su medio bulto
+    expect(within(presets).queryByRole('button', { name: /^Bulto 40 kg/ })).not.toBeInTheDocument()
+    await user.click(within(presets).getByRole('button', { name: /^Arroba/ }))
+    expect(within(dialog).getByLabelText(/^Nombre/)).toHaveValue('Arroba')
+    expect(within(dialog).getByLabelText(/^Contenido/)).toHaveValue('12,5')
+    await user.click(within(presets).getByRole('button', { name: /^Medio bulto 40 kg/ }))
+    expect(within(dialog).getByLabelText(/^Contenido/)).toHaveValue('20')
+  })
+
   it('sin inventory.prices el precio no se puede editar ni se envía', async () => {
     const user = userEvent.setup()
     const permissions = ALL.filter((code) => code !== 'inventory.prices')

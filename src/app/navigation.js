@@ -18,6 +18,8 @@ export const NAVIGATION = [
       { to: ROUTES.layaways, label: 'Apartados', icon: Archive, permission: 'layaways.view', feature: 'sales' },
       { to: ROUTES.saleReturns, label: 'Devoluciones', icon: Undo2, permission: 'sales.view', feature: 'sales' },
       { to: ROUTES.prescriptions, label: 'Fórmulas veterinarias', icon: Stethoscope, permission: 'sales.view', feature: 'sales' },
+      // Conductores del carro de línea: el flete va en la venta (D-FLE-1)
+      { to: ROUTES.porters, label: 'Conductores', icon: Truck, permission: 'porters.view', feature: 'sales' },
     ],
   },
   {
@@ -38,7 +40,6 @@ export const NAVIGATION = [
     items: [
       { to: ROUTES.expenses, label: 'Gastos', icon: Receipt, permission: 'expenses.view', feature: 'expenses', end: true },
       { to: ROUTES.recurringExpenses, label: 'Gastos fijos', icon: Repeat, permission: 'expenses.view', feature: 'expenses' },
-      { to: ROUTES.porters, label: 'Coteros', icon: Truck, permission: 'porters.view', feature: 'expenses' },
     ],
   },
   {

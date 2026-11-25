@@ -1,5 +1,7 @@
 // Endpoints de la Fase 9: clientes, cuentas por cobrar (cartera) y abonos.
 import { baseApi } from '../../api/baseApi'
+import { httpClient } from '../../api/httpClient'
+import { saveBlob } from '../../utils/saveBlob'
 
 const paginated = (data, meta) => ({ rows: data ?? [], pagination: meta?.pagination ?? null })
 
@@ -48,6 +50,15 @@ export const customersApi = baseApi.injectEndpoints({
       query: (id) => ({ url: `/receivables/${id}` }),
       providesTags: ['Receivable'],
     }),
+    // Importación de clientes con sus deudas desde Excel (D-CLI-10)
+    importCustomers: build.mutation({
+      query: ({ file, dryRun }) => {
+        const data = new FormData()
+        data.append('file', file)
+        return { url: '/customers/import', method: 'POST', data, params: dryRun ? { dryRun: 'true' } : undefined }
+      },
+      invalidatesTags: (result, error, { dryRun }) => (dryRun ? [] : CARTERA),
+    }),
     createReceivable: build.mutation({
       query: (body) => ({ url: '/receivables', method: 'POST', data: body }),
       transformResponse: (data, meta) => ({ ...data, message: meta?.message ?? null }),
@@ -81,7 +92,14 @@ export const customersApi = baseApi.injectEndpoints({
   }),
 })
 
+/** Descarga la plantilla de Excel para importar clientes. */
+export async function downloadCustomerImportTemplate() {
+  const response = await httpClient.get('/customers/import/template', { responseType: 'blob' })
+  saveBlob(response.data, 'plantilla-clientes-nexsupply.xlsx')
+}
+
 export const {
+  useImportCustomersMutation,
   useGetCustomersQuery,
   useGetCustomerQuery,
   useCreateCustomerMutation,

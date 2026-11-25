@@ -147,6 +147,8 @@ export function SaleReceiptLetter({ sale, business, receipt }) {
             </>
           )}
           {Number(sale.roundingAdjustment) !== 0 && <Total label="Redondeo" value={formatCurrency(sale.roundingAdjustment)} />}
+          {/* Flete con conductor (D-FLE-1): va en la misma factura */}
+          {Number(sale.freightAmount ?? 0) > 0 && <Total label={`Flete${sale.freightDriver ? ` · ${sale.freightDriver.name}` : ''}`} value={formatCurrency(sale.freightAmount)} />}
           <div className="rcl__total">
             <span>Total</span>
             <strong>{formatCurrency(sale.total)}</strong>

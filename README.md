@@ -250,7 +250,7 @@ Solo adapta lo que se ve: el backend vuelve a verificar cada petición. `canAcce
 | `features/inventory/products/ProductFormModal.jsx` | Nuevo y editar producto. «¿Cómo lo compras?» (suelto o en empaque, D-INV-20), «Empaque y cantidad» y «¿A qué compra va?» (D-COMP-9) |
 | `features/cash/DenominationCounter.jsx` · `denominations.js` · `sessions/CashClosingPaper.jsx` | Conteo por billetes y monedas e informe de cierre impreso (D-CAJA-14); reabrir turno en `CashSessionPage.jsx` (D-CAJA-15) |
 | `features/reports/AccountingBook.jsx` | Libro para el contador (D-CON-1), arriba en Informes |
-| `features/expenses/porters/` | Coteros (D-CTR-1): lista, ficha con viajes y pagos, modales de cotero, viaje y pago; «Lo lleva un cotero» está en `SaleReceiptModal.jsx` |
+| `features/expenses/porters/` | Conductores (D-FLE-1, antes coteros): lista y ficha con sus fletes, en `/ventas/conductores`. «Agregar flete» del punto de venta está en `sales/pos/PosFreight.jsx`; el medio bulto (D-POS-1), en `sales/pos/PosCart.jsx` |
 | `features/inventory/labels/` | Etiquetas con código de barras (D-INV-21) en hoja carta; `Barcode.jsx` usa JsBarcode |
 | `features/sales/PrescriptionsPage.jsx` | Libro de fórmulas veterinarias (D-VET-1); los campos de la fórmula están en `CheckoutPanel.jsx` |
 | `features/purchases/reorder/ReorderPage.jsx` | Pedido sugerido al proveedor (D-COMP-10): cantidades editables, compra en borrador y WhatsApp |
@@ -440,6 +440,7 @@ Los formularios que crean dinero (venta, apartado, devolución, abono y gasto) m
 | Ruta | Permiso | Pantalla |
 |---|---|---|
 | `/clientes` | `customers.view` | Clientes con lo que deben (con `receivables.view`), resumen de cartera, filtros con deuda, vencidos, cumpleaños próximos e inactivos. Nuevo cliente: `customers.manage` |
+| `/clientes/importar` | `customers.manage` | Importar clientes con sus deudas desde Excel: plantilla, vista previa con errores por fila y carga de todo o nada (D-CLI-10) |
 | `/clientes/:id` | `customers.view` | Ficha: datos, edad, cumpleaños, cuenta (debe, vencido, cupo), deudas con sus cuotas, abonos con recibo y estado de cuenta. Registrar deuda (`receivables.create`), recibir abono (`receivables.collect`), anular abono (`receivables.cancel_payment`), recordar por WhatsApp |
 | `/cartera` | `receivables.view` | Deudas por cobrar, vencidas, pagadas y anuladas; abonos recibidos con su recibo |
 

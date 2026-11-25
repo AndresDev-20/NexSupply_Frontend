@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { AlarmClock, Cake, CalendarClock, Eye, HandCoins, Search, UserPlus, Users } from 'lucide-react'
+import { AlarmClock, Cake, CalendarClock, Eye, FileSpreadsheet, HandCoins, Search, UserPlus, Users } from 'lucide-react'
 import { useGetCustomersQuery, useGetReceivablesSummaryQuery } from './customersApi'
 import { DEBT_FILTERS, birthdayLabel } from './customerOptions'
 import { CustomerFormModal } from './CustomerFormModal'
@@ -17,7 +17,7 @@ import { IconButton } from '../../components/ui/IconButton/IconButton'
 import { Button } from '../../components/ui/Button/Button'
 import { Badge } from '../../components/ui/Badge/Badge'
 import { formatCurrency } from '../../utils/format'
-import { customerPath } from '../../routes/paths'
+import { ROUTES, customerPath } from '../../routes/paths'
 import '../cash/cash.css'
 import '../purchases/purchases.css'
 import './customers.css'
@@ -119,9 +119,14 @@ export default function CustomersPage() {
         description="Tus clientes, lo que deben y sus cumpleaños. Registra un cliente con solo su nombre; para fiarle, agrega su celular."
         actions={
           canManage && (
-            <Button icon={UserPlus} onClick={() => setIsCreating(true)}>
-              Nuevo cliente
-            </Button>
+            <>
+              <Button variant="secondary" icon={FileSpreadsheet} onClick={() => navigate(ROUTES.customerImport)}>
+                Importar
+              </Button>
+              <Button icon={UserPlus} onClick={() => setIsCreating(true)}>
+                Nuevo cliente
+              </Button>
+            </>
           )
         }
       />

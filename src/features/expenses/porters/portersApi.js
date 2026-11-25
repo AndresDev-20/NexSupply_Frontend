@@ -1,7 +1,6 @@
-// Coteros (D-CTR-1): viajes al carro de línea y sus pagos.
+// Conductores (D-FLE-1; antes coteros): quien lleva la mercancía en el carro de línea.
+// El flete se agrega en la venta del punto de venta; aquí solo se registran y se consultan.
 import { baseApi } from '../../../api/baseApi'
-
-const withMessage = (data, meta) => ({ ...data, message: meta?.message ?? null })
 
 export const portersApi = baseApi.injectEndpoints({
   endpoints: (build) => ({
@@ -25,31 +24,7 @@ export const portersApi = baseApi.injectEndpoints({
       query: ({ id, active }) => ({ url: `/porters/${id}/${active ? 'activate' : 'deactivate'}`, method: 'POST' }),
       invalidatesTags: (result, error, { id }) => [{ type: 'Porter', id: 'LIST' }, { type: 'Porter', id }, 'Audit'],
     }),
-    addPorterTrip: build.mutation({
-      query: ({ porterId, ...body }) => ({ url: `/porters/${porterId}/trips`, method: 'POST', data: body }),
-      transformResponse: withMessage,
-      invalidatesTags: (result, error, { porterId }) => [{ type: 'Porter', id: 'LIST' }, { type: 'Porter', id: porterId }, 'Audit'],
-    }),
-    cancelPorterTrip: build.mutation({
-      query: ({ tripId, reason }) => ({ url: `/porter-trips/${tripId}/cancel`, method: 'POST', data: { reason } }),
-      invalidatesTags: (result, error, { porterId }) => [{ type: 'Porter', id: 'LIST' }, { type: 'Porter', id: porterId }, 'Audit'],
-    }),
-    payPorter: build.mutation({
-      query: ({ porterId, ...body }) => ({ url: `/porters/${porterId}/payments`, method: 'POST', data: body }),
-      transformResponse: withMessage,
-      // El pago es un gasto y puede salir de la caja
-      invalidatesTags: (result, error, { porterId }) => [{ type: 'Porter', id: 'LIST' }, { type: 'Porter', id: porterId }, 'Expense', 'CashSession', 'CashRegister', 'Audit'],
-    }),
   }),
 })
 
-export const {
-  useGetPortersQuery,
-  useGetPorterQuery,
-  useCreatePorterMutation,
-  useUpdatePorterMutation,
-  useSetPorterActiveMutation,
-  useAddPorterTripMutation,
-  useCancelPorterTripMutation,
-  usePayPorterMutation,
-} = portersApi
+export const { useGetPortersQuery, useGetPorterQuery, useCreatePorterMutation, useUpdatePorterMutation, useSetPorterActiveMutation } = portersApi

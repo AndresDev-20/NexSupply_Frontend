@@ -1,0 +1,186 @@
+/* Bloque: import-steps — pasos numerados de una importación desde Excel (productos, clientes) */
+.import-steps {
+  display: grid;
+  gap: var(--space-4);
+  max-width: 1040px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.import-step {
+  display: flex;
+  gap: var(--space-4);
+  padding: var(--space-5);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  background-color: var(--color-surface);
+  animation: import-step-in var(--duration-slow) var(--easing-standard);
+}
+
+.import-step__number {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  border-radius: var(--radius-full);
+  font-weight: var(--font-weight-extrabold);
+  color: var(--color-text-on-accent);
+  background-color: var(--color-accent);
+}
+
+.import-step__body {
+  display: grid;
+  flex: 1;
+  gap: var(--space-3);
+  justify-items: start;
+  min-width: 0;
+}
+
+.import-step__body > * {
+  max-width: 100%;
+}
+
+.import-step__title {
+  font-size: var(--font-size-lg);
+}
+
+.import-step__text {
+  color: var(--color-text-muted);
+}
+
+/* Bloque: import-drop — zona para soltar el archivo */
+.import-drop {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  padding: var(--space-6) var(--space-4);
+  border: 2px dashed var(--color-border-strong);
+  border-radius: var(--radius-lg);
+  text-align: center;
+  background-color: var(--color-surface-muted);
+  transition:
+    border-color var(--duration-fast) var(--easing-standard),
+    background-color var(--duration-fast) var(--easing-standard);
+}
+
+.import-drop--dragging {
+  border-color: var(--color-primary);
+  background-color: var(--color-primary-soft);
+}
+
+.import-drop__icon {
+  width: 40px;
+  height: 40px;
+  color: var(--color-primary);
+}
+
+.import-drop__text {
+  font-weight: var(--font-weight-semibold);
+  overflow-wrap: anywhere;
+}
+
+.import-drop__error {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-danger);
+}
+
+/* Bloque: import-summary */
+.import-summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: var(--space-3);
+  width: 100%;
+}
+
+.import-summary__card {
+  display: grid;
+  justify-items: start;
+  gap: var(--space-1);
+  padding: var(--space-4);
+  border-radius: var(--radius-lg);
+  background-color: var(--color-primary-soft);
+}
+
+.import-summary__card svg {
+  width: 22px;
+  height: 22px;
+  color: var(--color-primary);
+}
+
+.import-summary__card--accent {
+  background-color: var(--color-accent-soft);
+}
+
+.import-summary__card--info {
+  background-color: var(--color-info-soft);
+}
+
+.import-summary__value {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-extrabold);
+}
+
+.import-summary__label {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
+
+.import-categories {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--font-size-sm);
+}
+
+.import-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.import-errors {
+  width: 100%;
+}
+
+/* Bloque: import-done */
+.import-done {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-2);
+  max-width: 1040px;
+  margin-top: var(--space-4);
+  padding: var(--space-8) var(--space-5);
+  border-radius: var(--radius-xl);
+  text-align: center;
+  background:
+    radial-gradient(60% 80% at 50% 0%, var(--color-accent-soft), transparent 70%),
+    var(--color-surface);
+  border: 1px solid var(--color-border);
+  animation: import-step-in var(--duration-slow) var(--easing-emphasized);
+}
+
+.import-done__icon {
+  width: 56px;
+  height: 56px;
+  color: var(--color-success);
+}
+
+.import-done__title {
+  font-size: var(--font-size-xl);
+}
+
+.import-done__text {
+  color: var(--color-text-muted);
+}
+
+@keyframes import-step-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}

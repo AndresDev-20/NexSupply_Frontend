@@ -142,6 +142,24 @@ describe('punto de venta', () => {
     expect(await screen.findByText('Busca o escanea un producto para empezar la venta.')).toBeInTheDocument()
   })
 
+  it('vende medio bulto: «½ Bulto» manda 0,5 del bulto y vuelve al bulto completo con 1', async () => {
+    const user = userEvent.setup()
+    const calls = mockApi(baseRoutes())
+    renderApp('/ventas/punto-de-venta')
+
+    await scanBulto(user)
+    const units = screen.getByRole('radiogroup', { name: 'Unidad de Concentrado cerdos' })
+    await user.click(within(units).getByRole('radio', { name: '½ Bulto 40 kg' }))
+    expect(within(units).getByRole('radio', { name: '½ Bulto 40 kg' })).toHaveAttribute('aria-checked', 'true')
+    expect(within(units).getByRole('radio', { name: 'Bulto 40 kg' })).toHaveAttribute('aria-checked', 'false')
+    expect(screen.getByLabelText('Cantidad de Concentrado cerdos')).toHaveValue('0,5')
+    // El servidor cobra la mitad del precio del bulto
+    await waitFor(() => expect(calls.filter((call) => call.url === '/sales/preview').at(-1).data).toEqual({ items: [{ productId: 5, presentationId: 3, quantity: '0.5' }] }))
+
+    await user.click(within(units).getByRole('radio', { name: 'Bulto 40 kg' }))
+    expect(screen.getByLabelText('Cantidad de Concentrado cerdos')).toHaveValue('1')
+  })
+
   it('si el servidor pide autorización, pide la clave del supervisor y reintenta con la misma clave de venta', async () => {
     const user = userEvent.setup()
     let attempts = 0

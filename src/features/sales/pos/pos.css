@@ -1442,3 +1442,144 @@ kbd {
   font-weight: var(--font-weight-bold);
   color: var(--color-warning);
 }
+
+/* Flete con conductor (D-FLE-1) */
+.pos-freight__add {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  align-self: flex-start;
+  padding: var(--space-1) var(--space-3);
+  border: 1px dashed var(--color-border-strong);
+  border-radius: var(--radius-full);
+  font: inherit;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-muted);
+  background: transparent;
+  cursor: pointer;
+  transition: color var(--duration-fast) var(--easing-standard), border-color var(--duration-fast) var(--easing-standard);
+}
+
+.pos-freight__add:hover,
+.pos-freight__add:focus-visible {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.pos-freight__add svg,
+.pos-freight__legend svg {
+  width: 16px;
+  height: 16px;
+}
+
+.pos-freight {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0;
+  padding: var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface-muted);
+  animation: pos-freight-in var(--duration-base) var(--easing-standard);
+}
+
+.pos-freight__legend {
+  float: left;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: 0;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text);
+}
+
+.pos-freight__driver {
+  flex: 1;
+  min-width: 160px;
+  height: 36px;
+  padding: 0 var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  font: inherit;
+  font-size: var(--font-size-sm);
+  color: var(--color-text);
+  background: var(--color-surface);
+}
+
+.pos-freight__driver:focus-visible {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--pos-glow);
+}
+
+.pos-freight__new {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  height: 36px;
+  padding: 0 var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  font: inherit;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-primary);
+  background: var(--color-surface);
+  cursor: pointer;
+  transition: border-color var(--duration-fast) var(--easing-standard), background-color var(--duration-fast) var(--easing-standard);
+}
+
+.pos-freight__new:hover,
+.pos-freight__new:focus-visible {
+  border-color: var(--color-primary);
+  background: var(--color-primary-soft);
+}
+
+.pos-freight__new svg {
+  width: 16px;
+  height: 16px;
+}
+
+.pos-freight .pos-discount-all__input {
+  background: var(--color-surface);
+}
+
+.pos-freight__remove {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border: 0;
+  border-radius: var(--radius-full);
+  color: var(--color-text-muted);
+  background: transparent;
+  cursor: pointer;
+}
+
+.pos-freight__remove:hover {
+  color: var(--color-danger);
+  background: var(--color-danger-soft);
+}
+
+.pos-freight__remove svg {
+  width: 16px;
+  height: 16px;
+}
+
+.pos-freight__hint {
+  flex-basis: 100%;
+  margin: 0;
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
+
+@keyframes pos-freight-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+}

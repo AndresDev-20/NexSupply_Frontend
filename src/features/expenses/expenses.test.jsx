@@ -94,6 +94,41 @@ describe('gastos', () => {
     expect(await screen.findByRole('dialog', { name: 'Gasto G-000001' })).toBeInTheDocument()
   })
 
+  it('saca un bulto del inventario como gasto: sin valor ni pago, con producto y cantidad (D-GAS-6)', async () => {
+    const user = userEvent.setup()
+    const FEED = { id: 5, code: 'P-00005', name: 'Concentrado pollos', unit: { id: 2, name: 'Kilogramo', symbol: 'kg', allowsDecimals: true }, stock: '400.000', averageCost: '2000.0000', productKind: 'standard', presentations: [{ id: 3, name: 'Bulto 40 kg', factor: '40.000', isActive: true }] }
+    const calls = mockApi({
+      ...baseRoutes([...ALL, 'inventory.adjust']),
+      'GET /products': page([FEED]),
+      'POST /expenses': { status: 201, body: { success: true, data: { ...EXPENSE, source: 'inventory', fromCash: false, amount: '80000.00', paymentMethod: { id: null, name: 'Del inventario', isCash: false } }, message: 'Gasto G-000001 registrado' } },
+    })
+    renderApp('/gastos')
+    await user.click(await screen.findByRole('button', { name: 'Registrar gasto' }))
+    const dialog = await screen.findByRole('dialog', { name: 'Registrar gasto' })
+    await user.selectOptions(within(dialog).getByLabelText(/^Categoría/), '3')
+    await user.click(within(dialog).getByRole('switch', { name: 'Es un producto del inventario' }))
+    // Sin pago: no se pide valor ni método
+    expect(within(dialog).queryByLabelText(/^Valor/)).not.toBeInTheDocument()
+    await user.type(within(dialog).getByPlaceholderText(/Escribe el nombre o el código/), 'conc')
+    await user.click(await within(dialog).findByRole('option', { name: /Concentrado pollos/ }))
+    expect(within(dialog).getByText('Concentrado pollos')).toBeInTheDocument()
+    expect(within(dialog).getByText('40 kg salen del inventario')).toBeInTheDocument()
+    await user.click(within(dialog).getByRole('button', { name: 'Registrar gasto' }))
+    await waitFor(() => expect(calls.find((call) => call.method === 'POST' && call.url === '/expenses').data).toMatchObject({ categoryId: 3, inventory: { productId: 5, presentationId: 3, quantity: '1' } }))
+    const body = calls.find((call) => call.method === 'POST' && call.url === '/expenses').data
+    expect(body.amount).toBeUndefined()
+    expect(body.fromCash).toBeUndefined()
+  })
+
+  it('sin permiso de ajustar el inventario no aparece la opción', async () => {
+    const user = userEvent.setup()
+    mockApi(baseRoutes())
+    renderApp('/gastos')
+    await user.click(await screen.findByRole('button', { name: 'Registrar gasto' }))
+    const dialog = await screen.findByRole('dialog', { name: 'Registrar gasto' })
+    expect(within(dialog).queryByRole('switch', { name: 'Es un producto del inventario' })).not.toBeInTheDocument()
+  })
+
   it('el detalle de un gasto de la caja no deja editar el valor y permite anular', async () => {
     const user = userEvent.setup()
     const calls = mockApi({ ...baseRoutes(), 'POST /expenses/11/cancel': ok({ ...EXPENSE, status: 'cancelled' }, 'Gasto G-000001 anulado') })

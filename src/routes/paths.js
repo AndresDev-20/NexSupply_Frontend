@@ -16,8 +16,8 @@ export const cashSessionPath = (id) => `/caja/turnos/${id}`
 /** Inventario físico: inventoryCountPath(3) → '/inventario/conteos/3' */
 export const inventoryCountPath = (id) => `/inventario/conteos/${id}`
 
-/** Cotero: porterPath(3) → '/gastos/coteros/3' */
-export const porterPath = (id) => `/gastos/coteros/${id}`
+/** Conductor (D-FLE-1): porterPath(3) → '/ventas/conductores/3' */
+export const porterPath = (id) => `/ventas/conductores/${id}`
 
 /** Cotización: quotePath(5) → '/ventas/cotizaciones/5' */
 export const quotePath = (id) => `/ventas/cotizaciones/${id}`
@@ -71,6 +71,7 @@ export const ROUTES = Object.freeze({
   pos: '/ventas/punto-de-venta',
   sales: '/ventas',
   customers: '/clientes',
+  customerImport: '/clientes/importar',
   customerDetail: '/clientes/:id',
   receivables: '/cartera',
   priceLists: '/clientes/listas-de-precios',
@@ -84,8 +85,8 @@ export const ROUTES = Object.freeze({
   quarantine: '/inventario/cuarentena',
   expenses: '/gastos',
   recurringExpenses: '/gastos/fijos',
-  porters: '/gastos/coteros',
-  porterDetail: '/gastos/coteros/:id',
+  porters: '/ventas/conductores',
+  porterDetail: '/ventas/conductores/:id',
   reports: '/informes',
   // Fase 18 (el backend enlaza aquí sus avisos)
   transfers: '/inventario/transferencias',

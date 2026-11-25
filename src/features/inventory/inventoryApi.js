@@ -2,6 +2,7 @@
 // existencia inicial, kárdex, historial de precios e importación desde Excel.
 import { baseApi } from '../../api/baseApi'
 import { httpClient } from '../../api/httpClient'
+import { saveBlob } from '../../utils/saveBlob'
 
 const paginated = (data, meta) => ({ rows: data ?? [], pagination: meta?.pagination ?? null })
 
@@ -184,14 +185,7 @@ export async function openProductDocument(productId, documentId) {
 /** Descarga la plantilla de Excel y la guarda con su nombre. */
 export async function downloadImportTemplate() {
   const response = await httpClient.get('/products/import/template', { responseType: 'blob' })
-  const url = URL.createObjectURL(response.data)
-  const link = document.createElement('a')
-  link.href = url
-  link.download = 'plantilla-productos-nexsupply.xlsx'
-  document.body.appendChild(link)
-  link.click()
-  link.remove()
-  URL.revokeObjectURL(url)
+  saveBlob(response.data, 'plantilla-productos-nexsupply.xlsx')
 }
 
 export const {
