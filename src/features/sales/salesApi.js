@@ -56,14 +56,6 @@ export async function getSalePdfFile(id, number) {
   return new File([response.data], `comprobante-${number}.pdf`, { type: 'application/pdf' })
 }
 
-/** Abre el comprobante en PDF en una pestaña nueva. */
-export async function openSalePdf(id) {
-  const response = await httpClient.get(`/sales/${id}/receipt.pdf`, { responseType: 'blob' })
-  const url = URL.createObjectURL(response.data)
-  window.open(url, '_blank', 'noopener')
-  setTimeout(() => URL.revokeObjectURL(url), 60000)
-}
-
 export const {
   useLazySearchSaleCatalogQuery,
   usePreviewSaleMutation,

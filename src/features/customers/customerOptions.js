@@ -61,12 +61,3 @@ export function reminderLink({ customer, businessName, balance, overdueBalance, 
   lines.push(`Tu saldo total es de ${formatCurrency(balance)}. ¡Gracias por tu confianza!`)
   return `https://wa.me/${number}?text=${encodeURIComponent(lines.join(' '))}`
 }
-
-/** Recibo de un abono por WhatsApp. */
-export function receiptLink({ payment, businessName }) {
-  const number = whatsappNumber(payment.customer?.phone)
-  if (!number) return null
-  const balance = payment.allocations.reduce((sum, item) => sum + Number(item.balanceNow), 0)
-  const text = `Hola ${payment.customer.name.split(' ')[0]}, ${businessName || 'la agropecuaria'} confirma tu abono ${payment.number} por ${formatCurrency(payment.amount)} (${payment.paymentMethod?.name}). Saldo pendiente: ${formatCurrency(String(balance))}. ¡Gracias!`
-  return `https://wa.me/${number}?text=${encodeURIComponent(text)}`
-}

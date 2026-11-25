@@ -132,6 +132,8 @@
 
 .debt-card__actions {
   display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
   justify-content: flex-end;
 }
 

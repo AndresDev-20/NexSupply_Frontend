@@ -82,6 +82,23 @@ const PAYMENT = {
   allocations: [{ receivableId: 7, number: 'CXC-000001', description: 'Cuaderno de fiados', balanceNow: '50000.00', amount: '50000.00', installments: [{ installmentNumber: 1, dueDate: '2026-11-01', amount: '50000.00' }] }],
 }
 
+// Comprobantes de cartera (D-CLI-11)
+const RECEIPT_SETTINGS = {
+  business: { name: 'Agro El Campo', nit: '900123456-7', address: 'Calle 3', phone: null, whatsapp: null, hasLogo: false },
+  receipt: { paperFormat: '80mm', showLogo: false, taxRegime: 'No responsable de IVA', legalNotice: 'Documento interno de cobro: no es una factura.' },
+  emailEnabled: true,
+}
+const DEBTS_DOCUMENT = (receivableId) => ({
+  kind: receivableId ? 'debt' : 'statement',
+  title: receivableId ? 'Estado de la deuda' : 'Estado de cuenta',
+  number: receivableId ? 'CXC-000001' : 'Pedro Gómez',
+  generatedAt: '2026-11-17T15:00:00.000Z',
+  customer: { id: 4, name: 'Pedro Gómez', documentType: 'CC', documentNumber: '1075234567', phone: '3001234567', email: 'pedro@example.com' },
+  debts: [{ ...RECEIVABLE, daysOverdue: 16, payments: [{ id: 9, number: 'AB-000001', paidAt: '2026-11-17T15:00:00.000Z', method: 'Efectivo', status: 'active', amount: '20000.00' }] }],
+  totals: { total: '100000.00', amountPaid: '0.00', balance: '100000.00', overdue: '50000.00' },
+  customerBalance: '150000.00',
+})
+
 const SUMMARY = { balance: '150000.00', overdue: '50000.00', dueThisWeek: '20000.00', customersWithDebt: 3, customersOverdue: 1 }
 const page = (rows) => ({ status: 200, body: { success: true, data: rows, meta: { page: 1, pageSize: 20, total: rows.length, totalPages: 1 }, message: 'ok' } })
 
@@ -99,6 +116,8 @@ const baseRoutes = (permissions = ALL) => ({
   'GET /receivables': page([RECEIVABLE]),
   'GET /receivables/7': ok(RECEIVABLE),
   'GET /customer-payments': page([PAYMENT]),
+  'GET /customer-payments/9/receipt': ok({ payment: PAYMENT, customerBalance: '100000.00', ...RECEIPT_SETTINGS }),
+  'GET /customers/4/debts-receipt': (call) => ok({ document: DEBTS_DOCUMENT(call.params?.receivableId ?? null), ...RECEIPT_SETTINGS }),
   'GET /customers/4/statement': ok({ customer: buildCustomer(), entries: [] }),
   'GET /cash-sessions': page([{ id: 3, register: { id: 1, name: 'Mostrador' }, openedAt: '2026-11-17T12:00:00.000Z', status: 'open' }]),
 })
@@ -282,9 +301,13 @@ describe('deudas y abonos', () => {
     expect(within(dialog).getByLabelText(/^Entra a la caja/)).toHaveValue('3')
     await user.click(within(dialog).getByRole('button', { name: 'Registrar abono' }))
 
+    // El recibo es como el comprobante de venta (D-CLI-11): tirilla, carta, PDF, WhatsApp y correo
     const receipt = await screen.findByRole('dialog', { name: 'Recibo AB-000001' })
-    expect(within(receipt).getByText('Cuota 1 (01/11/2026): $ 50.000')).toBeInTheDocument()
-    expect(within(receipt).getByRole('link', { name: 'Enviar por WhatsApp' })).toHaveAttribute('href', expect.stringMatching(/^https:\/\/wa\.me\/573001234567/))
+    const paper = await within(receipt).findByRole('article', { name: 'Recibo de abono AB-000001' })
+    expect(within(paper).getByText('Cuota 1 · 01/11/2026')).toBeInTheDocument()
+    expect(within(paper).getByText('Saldo pendiente')).toBeInTheDocument()
+    expect(within(paper).getByText('$ 100.000')).toBeInTheDocument()
+    for (const name of [/^Imprimir tirilla/, /^Imprimir carta/, /^PDF/, /^WhatsApp/, /^Enviar por correo/]) expect(within(receipt).getByRole('button', { name })).toBeEnabled()
     // Va con su clave contra el doble registro (D-AUD-3)
     expect(calls.find((call) => call.method === 'POST').data).toEqual({ idempotencyKey: expect.stringMatching(/^[A-Za-z0-9_-]{8,64}$/), customerId: 4, amount: '50000', paymentMethodId: 1, cashSessionId: 3, notes: null })
   })
@@ -331,7 +354,12 @@ describe('varias sucursales (Fase 19)', () => {
         { receivableId: 2, number: 'CXCNOR-000001', description: 'Venta fiada', balanceNow: '150000.00', amount: '50000.00', branch: { id: 2, code: 'NOR', name: 'Norte' }, installments: [] },
       ],
     }
-    mockApi({ ...baseRoutes(), 'GET /customers/4/statement': ok({ customer: buildCustomer(), entries }), 'GET /customer-payments': page([crossPayment]) })
+    mockApi({
+      ...baseRoutes(),
+      'GET /customers/4/statement': ok({ customer: buildCustomer(), entries }),
+      'GET /customer-payments': page([crossPayment]),
+      'GET /customer-payments/9/receipt': ok({ payment: crossPayment, customerBalance: '150000.00', ...RECEIPT_SETTINGS }),
+    })
     renderApp('/clientes/4')
     await user.click(await screen.findByRole('tab', { name: /Estado de cuenta/ }))
     expect(await screen.findAllByRole('columnheader', { name: 'Sucursal' })).not.toHaveLength(0)
@@ -340,8 +368,55 @@ describe('varias sucursales (Fase 19)', () => {
     await user.click(screen.getByRole('tab', { name: /Abonos/ }))
     await user.click(await screen.findByRole('button', { name: 'Ver recibo AB-000001' }))
     const receipt = await screen.findByRole('dialog', { name: 'Recibo AB-000001' })
-    expect(within(receipt).getByText('Sucursal Centro')).toBeInTheDocument()
+    expect(await within(receipt).findByText('Sucursal Centro')).toBeInTheDocument()
     expect(within(receipt).getByText('Sucursal Norte')).toBeInTheDocument()
+  })
+})
+
+describe('comprobantes de deuda (D-CLI-11)', () => {
+  it('el estado de cuenta con todas las deudas, sus abonos y lo que debe; se envía por correo', async () => {
+    const user = userEvent.setup()
+    const calls = mockApi({ ...baseRoutes(), 'POST /customers/4/debts-receipt/email': ok({ to: 'pedro@example.com', simulated: false }, 'Comprobante enviado a pedro@example.com') })
+    renderApp('/clientes/4')
+
+    await user.click(await screen.findByRole('button', { name: 'Comprobante de deudas' }))
+    const dialog = await screen.findByRole('dialog', { name: 'Estado de cuenta de Pedro Gómez' })
+    const paper = await within(dialog).findByRole('article', { name: 'Estado de cuenta Pedro Gómez' })
+    expect(within(paper).getByText('CXC-000001 · Cuaderno de fiados')).toBeInTheDocument()
+    expect(within(paper).getByText(/^Abono AB-000001/)).toBeInTheDocument()
+    expect(within(paper).getByText('Vencido (16 días)')).toBeInTheDocument()
+    expect(within(paper).getByText('Debe')).toBeInTheDocument()
+    expect(within(paper).getByText('Documento interno de cobro: no es una factura.')).toBeInTheDocument()
+    expect(calls.find((call) => call.url === '/customers/4/debts-receipt').params).toBeUndefined()
+
+    // El correo del cliente viene escrito
+    expect(within(dialog).getByLabelText('Enviar por correo')).toHaveValue('pedro@example.com')
+    await user.click(within(dialog).getByRole('button', { name: 'Enviar' }))
+    expect(await screen.findByText('Comprobante enviado a pedro@example.com')).toBeInTheDocument()
+    expect(calls.find((call) => call.url === '/customers/4/debts-receipt/email').data).toEqual({ email: 'pedro@example.com' })
+  })
+
+  it('cada deuda tiene su comprobante, con lo que debe en total', async () => {
+    const user = userEvent.setup()
+    const calls = mockApi(baseRoutes())
+    renderApp('/clientes/4')
+
+    await user.click(await screen.findByRole('button', { name: 'Comprobante de CXC-000001' }))
+    const dialog = await screen.findByRole('dialog', { name: 'Deuda CXC-000001' })
+    const paper = await within(dialog).findByRole('article', { name: 'Estado de la deuda CXC-000001' })
+    expect(within(paper).getByText('Debe en total')).toBeInTheDocument()
+    expect(within(paper).getByText('$ 150.000')).toBeInTheDocument()
+    expect(calls.find((call) => call.url === '/customers/4/debts-receipt').params).toEqual({ receivableId: 7 })
+    // Vista previa en carta
+    await user.click(within(dialog).getByRole('radio', { name: 'Carta' }))
+    expect(within(dialog).getByRole('article', { name: 'Estado de la deuda CXC-000001' })).toHaveClass('rcpt--letter')
+  })
+
+  it('sin permiso de ver la cartera no aparece el comprobante de deudas', async () => {
+    mockApi(baseRoutes(['customers.view']))
+    renderApp('/clientes/4')
+    expect(await screen.findByRole('heading', { name: 'Pedro Gómez' })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Comprobante de deudas' })).not.toBeInTheDocument()
   })
 })
 

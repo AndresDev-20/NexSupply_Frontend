@@ -89,8 +89,37 @@ export const customersApi = baseApi.injectEndpoints({
       query: ({ id, reason }) => ({ url: `/customer-payments/${id}/cancel`, method: 'POST', data: { reason } }),
       invalidatesTags: [...CARTERA, 'CashSession', 'CashRegister'],
     }),
+
+    // Comprobantes de cartera (D-CLI-11): la deuda (o el estado de cuenta) y el recibo del abono
+    getDebtsReceipt: build.query({
+      query: ({ customerId, receivableId }) => ({ url: `/customers/${customerId}/debts-receipt`, params: receivableId ? { receivableId } : undefined }),
+      providesTags: ['Receivable', 'CustomerPayment'],
+    }),
+    emailDebtsReceipt: build.mutation({
+      query: ({ customerId, receivableId, email }) => ({ url: `/customers/${customerId}/debts-receipt/email`, method: 'POST', data: { email: email || null, ...(receivableId && { receivableId }) } }),
+      transformResponse: (data, meta) => ({ ...data, message: meta?.message ?? null }),
+    }),
+    getPaymentReceipt: build.query({
+      query: (id) => ({ url: `/customer-payments/${id}/receipt` }),
+      providesTags: ['CustomerPayment', 'Receivable'],
+    }),
+    emailPaymentReceipt: build.mutation({
+      query: ({ id, email }) => ({ url: `/customer-payments/${id}/email`, method: 'POST', data: { email: email || null } }),
+      transformResponse: (data, meta) => ({ ...data, message: meta?.message ?? null }),
+    }),
   }),
 })
+
+async function pdfFile(url, params, fileName) {
+  const response = await httpClient.get(url, { params, responseType: 'blob' })
+  return new File([response.data], fileName, { type: 'application/pdf' })
+}
+
+/** El comprobante de una deuda (receivableId) o el estado de cuenta del cliente en PDF. */
+export const getDebtsPdfFile = ({ customerId, receivableId, fileName }) => pdfFile(`/customers/${customerId}/debts-receipt.pdf`, receivableId ? { receivableId } : undefined, fileName)
+
+/** El recibo de un abono en PDF. */
+export const getPaymentPdfFile = (id, number) => pdfFile(`/customer-payments/${id}/receipt.pdf`, undefined, `recibo-abono-${number}.pdf`)
 
 /** Descarga la plantilla de Excel para importar clientes. */
 export async function downloadCustomerImportTemplate() {
@@ -116,4 +145,8 @@ export const {
   useGetCustomerPaymentQuery,
   useCreateCustomerPaymentMutation,
   useCancelCustomerPaymentMutation,
+  useGetDebtsReceiptQuery,
+  useEmailDebtsReceiptMutation,
+  useGetPaymentReceiptQuery,
+  useEmailPaymentReceiptMutation,
 } = customersApi

@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { AlarmClock, Archive, ArrowLeft, BadgePercent, Ban, Cake, Gift, CalendarClock, Eye, HandCoins, IdCard, MapPin, MessageCircle, NotebookPen, Pencil, Phone, Power, ReceiptText, RotateCw, ScrollText, TriangleAlert, UserRound, Wallet } from 'lucide-react'
+import { AlarmClock, Archive, ArrowLeft, BadgePercent, Ban, Cake, Gift, CalendarClock, Eye, FileText, HandCoins, IdCard, MapPin, MessageCircle, NotebookPen, Pencil, Phone, Power, ReceiptText, RotateCw, ScrollText, TriangleAlert, UserRound, Wallet } from 'lucide-react'
 import {
   useCancelCustomerPaymentMutation,
   useCancelReceivableMutation,
@@ -17,6 +17,7 @@ import { CustomerFormModal } from './CustomerFormModal'
 import { DebtModal } from './DebtModal'
 import { PaymentModal } from './PaymentModal'
 import { PaymentReceiptModal } from './PaymentReceiptModal'
+import { DebtsReceiptModal } from './DebtsReceiptModal'
 import { CustomerCreditTab, CustomerLayawaysTab } from '../layaways/CustomerLayawayTabs'
 import { ReasonModal } from '../purchases/detail/PurchaseModals'
 import { formatDay } from '../purchases/purchaseOptions'
@@ -48,8 +49,8 @@ function Pill({ tone, children }) {
   )
 }
 
-/** Una deuda con sus cuotas. */
-function DebtCard({ receivable, canCancel, onCancel }) {
+/** Una deuda con sus cuotas. onReceipt: su comprobante (D-CLI-11). */
+function DebtCard({ receivable, canCancel, onCancel, onReceipt }) {
   const state = receivableState(receivable)
   const paidPercent = Number(receivable.total) > 0 ? Math.round((Number(receivable.amountPaid) / Number(receivable.total)) * 100) : 0
   return (
@@ -95,19 +96,22 @@ function DebtCard({ receivable, canCancel, onCancel }) {
         </ol>
       )}
       {receivable.status === 'cancelled' && <p className="debt-card__meta">Anulada: {receivable.cancelReason}</p>}
-      {canCancel && receivable.status === 'open' && Number(receivable.amountPaid) === 0 && receivable.originType === 'opening_balance' && (
-        <div className="debt-card__actions">
+      <div className="debt-card__actions">
+        <Button size="sm" variant="secondary" icon={FileText} onClick={() => onReceipt(receivable)} aria-label={`Comprobante de ${receivable.number}`}>
+          Comprobante
+        </Button>
+        {canCancel && receivable.status === 'open' && Number(receivable.amountPaid) === 0 && receivable.originType === 'opening_balance' && (
           <Button size="sm" variant="ghost" icon={Ban} onClick={() => onCancel(receivable)}>
             Anular deuda
           </Button>
-        </div>
-      )}
+        )}
+      </div>
     </article>
   )
 }
 
 /** Detalle de las deudas: se pide cada una con sus cuotas. */
-function DebtsTab({ customerId, canCancel, onCancel }) {
+function DebtsTab({ customerId, canCancel, onCancel, onReceipt }) {
   const [status, setStatus] = useState('open')
   const { data, isFetching, error, refetch } = useGetReceivablesQuery({ customerId, pageSize: 50, ...(status && { status }) })
   const rows = data?.rows ?? []
@@ -137,7 +141,7 @@ function DebtsTab({ customerId, canCancel, onCancel }) {
       ) : (
         <div className="debt-list">
           {rows.map((row) => (
-            <DebtCardLoader key={row.id} receivable={row} canCancel={canCancel} onCancel={onCancel} />
+            <DebtCardLoader key={row.id} receivable={row} canCancel={canCancel} onCancel={onCancel} onReceipt={onReceipt} />
           ))}
         </div>
       )}
@@ -146,9 +150,9 @@ function DebtsTab({ customerId, canCancel, onCancel }) {
 }
 
 // La lista no trae las cuotas: cada tarjeta las pide (pocas deudas por cliente)
-function DebtCardLoader({ receivable, canCancel, onCancel }) {
+function DebtCardLoader({ receivable, canCancel, onCancel, onReceipt }) {
   const { data } = useGetReceivableQuery(receivable.id)
-  return <DebtCard receivable={data ?? receivable} canCancel={canCancel} onCancel={onCancel} />
+  return <DebtCard receivable={data ?? receivable} canCancel={canCancel} onCancel={onCancel} onReceipt={onReceipt} />
 }
 
 function PaymentsTab({ customerId, canCancel, onView, onCancel }) {
@@ -204,7 +208,7 @@ export default function CustomerPage() {
     viewLayaways: useCan('layaways.view'),
   }
   const [tab, setTab] = useState('debts')
-  const [modal, setModal] = useState(null) // 'edit' | 'debt' | 'payment' | 'toggle' | { receipt } | { cancelDebt } | { cancelPayment }
+  const [modal, setModal] = useState(null) // 'edit' | 'debt' | 'payment' | 'toggle' | { receipt } | { debtsReceipt } | { cancelDebt } | { cancelPayment }
   const { data: customer, isLoading, error, refetch } = useGetCustomerQuery(id)
   const [setActive, toggleState] = useSetCustomerActiveMutation()
   const [cancelReceivable, cancelDebtState] = useCancelReceivableMutation()
@@ -347,6 +351,11 @@ export default function CustomerPage() {
               Registrar deuda
             </Button>
           )}
+          {can.viewDebt && hasDebt && (
+            <Button variant="secondary" icon={FileText} onClick={() => setModal({ debtsReceipt: { receivableId: null } })}>
+              Comprobante de deudas
+            </Button>
+          )}
           {whatsapp && (
             <a className="button button--secondary button--md" href={whatsapp} target="_blank" rel="noreferrer">
               <MessageCircle className="button__icon" aria-hidden="true" />
@@ -395,7 +404,7 @@ export default function CustomerPage() {
 
       {can.viewDebt && (
         <Tabs tabs={tabs} active={tab} onChange={setTab} label="Cuenta del cliente">
-          {tab === 'debts' && <DebtsTab customerId={customer.id} canCancel={can.createDebt} onCancel={(receivable) => setModal({ cancelDebt: receivable })} />}
+          {tab === 'debts' && <DebtsTab customerId={customer.id} canCancel={can.createDebt} onCancel={(receivable) => setModal({ cancelDebt: receivable })} onReceipt={(receivable) => setModal({ debtsReceipt: { receivableId: receivable.id } })} />}
           {tab === 'payments' && <PaymentsTab customerId={customer.id} canCancel={can.cancelPayment} onView={(payment) => setModal({ receipt: payment })} onCancel={(payment) => setModal({ cancelPayment: payment })} />}
           {tab === 'statement' && <StatementTab customerId={customer.id} />}
           {tab === 'layaways' && <CustomerLayawaysTab customerId={customer.id} />}
@@ -436,6 +445,7 @@ export default function CustomerPage() {
         />
       )}
       {modal?.receipt && <PaymentReceiptModal payment={modal.receipt} onClose={() => setModal(null)} />}
+      {modal?.debtsReceipt && <DebtsReceiptModal customerId={customer.id} receivableId={modal.debtsReceipt.receivableId} onClose={() => setModal(null)} />}
       {modal?.cancelDebt && (
         <ReasonModal
           title={`Anular la deuda ${modal.cancelDebt.number}`}
