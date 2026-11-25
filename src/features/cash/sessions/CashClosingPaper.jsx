@@ -250,7 +250,7 @@ export function CashClosingPaper({ session, business = {}, format = '80mm' }) {
             N
           </span>
           <span>
-            Sistema <strong>NexSupply</strong> · Desarrollado por <strong>Nexoon</strong>
+            Sistema <strong>El Campesino</strong> · Desarrollado por <strong>Nexoon</strong>
           </span>
         </div>
       </footer>

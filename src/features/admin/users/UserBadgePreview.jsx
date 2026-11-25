@@ -1,5 +1,5 @@
 import { KeyRound, ShieldCheck, ShieldOff } from 'lucide-react'
-import emblem from '../../../assets/brand/nexsupply-emblem.jpg'
+import emblem from '../../../assets/brand/elcampesino-emblem.png'
 import './UserBadgePreview.css'
 
 function initialsOf(fullName = '') {
@@ -27,7 +27,7 @@ export function UserBadgePreview({ fullName, username, document, phone, email, r
       <div className="user-badge__brand">
         <img className="user-badge__emblem" src={emblem} alt="" width="30" height="20" />
         <span>
-          Nex<span className="user-badge__brand-accent">Supply</span>
+          El <span className="user-badge__brand-accent">Campesino</span>
         </span>
       </div>
 

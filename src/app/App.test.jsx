@@ -18,7 +18,7 @@ describe('Inicio: estado del sistema', () => {
     mockApi({ ...loggedIn, 'GET /health': healthyResponse })
     renderApp('/')
 
-    expect(await screen.findByRole('heading', { name: /Bienvenido a NexSupply/ })).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { name: /Bienvenido a El Campesino/ })).toBeInTheDocument()
     await waitFor(() => expect(tileValue('Servidor')).toHaveTextContent('En línea'))
     expect(tileValue('Base de datos')).toHaveTextContent('Disponible')
     expect(tileValue('Hora del servidor')).toHaveTextContent(/16\/11\/2026,? 8:00/)
@@ -69,7 +69,7 @@ describe('Layout', () => {
     expect(screen.getByRole('link', { name: 'Inicio' })).toHaveClass('sidebar__link--active')
     expect(screen.getByRole('button', { name: 'Menú de Robinson Barrios' })).toBeInTheDocument()
     expect(screen.getAllByText('Nexoon').length).toBeGreaterThan(0)
-    await waitFor(() => expect(document.title).toBe('Inicio · NexSupply'))
+    await waitFor(() => expect(document.title).toBe('Inicio · El Campesino'))
   })
 
   it('el menú lateral se abre con el botón y se cierra con Escape', async () => {

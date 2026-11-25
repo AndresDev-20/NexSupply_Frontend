@@ -7,7 +7,7 @@ import { useRouteTitle } from '../../../hooks/useRouteTitle'
 import { BusinessBrand } from '../../../features/settings/BusinessBrand'
 import { useBusinessAppearance } from '../../../features/settings/appearance'
 import { SeasonalGarland, SeasonMessage } from '../../brand/Seasonal/SeasonalDecoration'
-import emblem from '../../../assets/brand/nexsupply-emblem.jpg'
+import emblem from '../../../assets/brand/elcampesino-emblem.png'
 import './AuthLayout.css'
 
 /**
@@ -31,7 +31,7 @@ export function AuthLayout() {
             <img className="auth-layout__emblem" src={emblem} alt="" width="300" height="200" />
           </div>
           <p className="auth-layout__name">
-            Nex<span className="auth-layout__name--accent">Supply</span>
+            El <span className="auth-layout__name--accent">Campesino</span>
           </p>
           <p className="auth-layout__tagline">Tu agropecuaria, siempre en control.</p>
           <SeasonMessage season={season} className="auth-layout__season" />

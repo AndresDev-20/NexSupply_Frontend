@@ -7,7 +7,7 @@ import { StatusTile } from '../components/StatusTile/StatusTile'
 import { formatDateTime } from '../../../utils/format'
 import { Spinner } from '../../../components/ui/Spinner/Spinner'
 import { useHasFeature } from '../../../hooks/usePermissions'
-import emblem from '../../../assets/brand/nexsupply-emblem.jpg'
+import emblem from '../../../assets/brand/elcampesino-emblem.png'
 import './HomePage.css'
 
 /**
@@ -66,7 +66,7 @@ function SystemHome() {
         <div className="home-page__hero-text">
           <p className="home-page__eyebrow">Sistema administrativo</p>
           <h2 className="home-page__title">
-            Bienvenido a Nex<span className="home-page__title--accent">Supply</span>
+            Bienvenido a El <span className="home-page__title--accent">Campesino</span>
           </h2>
           <p className="home-page__subtitle">
             Tu agropecuaria, siempre en control. Aquí aparecerán inventarios, ventas, caja e informes a medida que

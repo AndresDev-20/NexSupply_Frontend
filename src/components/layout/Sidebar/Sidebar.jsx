@@ -8,7 +8,7 @@ import { NexoonCredit } from '../../brand/NexoonCredit/NexoonCredit'
 import { useBusinessName } from '../../../features/settings/useBusinessName'
 import { useSeason } from '../../../features/settings/appearance'
 import { SeasonalGarland } from '../../brand/Seasonal/SeasonalDecoration'
-import emblem from '../../../assets/brand/nexsupply-emblem.jpg'
+import emblem from '../../../assets/brand/elcampesino-emblem.png'
 import './Sidebar.css'
 
 /**
@@ -35,7 +35,7 @@ export function Sidebar({ id, isOpen, onClose }) {
           <img className="sidebar__emblem" src={emblem} alt="" width="48" height="32" />
           <div className="sidebar__brand-text">
             <span className="sidebar__brand-name">
-              Nex<span className="sidebar__brand-name--accent">Supply</span>
+              El <span className="sidebar__brand-name--accent">Campesino</span>
             </span>
             {/* El negocio del cliente debajo de la marca del sistema */}
             <span className="sidebar__brand-tagline" title={businessName ?? undefined}>

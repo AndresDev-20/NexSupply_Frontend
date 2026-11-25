@@ -199,7 +199,7 @@ export default function BusinessSettingsPage() {
               <p className="settings-note">
                 <FileText aria-hidden="true" />
                 <span>
-                  Siempre se imprime el aviso: <strong>{settings?.fixed?.legalNotice}</strong> NexSupply no emite facturas electrónicas de la DIAN.
+                  Siempre se imprime el aviso: <strong>{settings?.fixed?.legalNotice}</strong> El sistema no emite facturas electrónicas de la DIAN.
                 </span>
               </p>
             </FormSection>

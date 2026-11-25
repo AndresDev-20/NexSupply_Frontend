@@ -32,7 +32,7 @@ describe('protección de rutas', () => {
     mockApi({ 'GET /auth/me': ok({ user: buildUser() }), 'GET /health': healthyResponse })
     const { router } = renderApp('/iniciar-sesion')
 
-    expect(await screen.findByRole('heading', { name: /Bienvenido a NexSupply/ })).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { name: /Bienvenido a El Campesino/ })).toBeInTheDocument()
     expect(router.state.location.pathname).toBe('/')
   })
 })
@@ -49,7 +49,7 @@ describe('inicio de sesión', () => {
 
     await fillLogin(user, 'robinson', 'Clave2026')
 
-    expect(await screen.findByRole('heading', { name: /Bienvenido a NexSupply/ })).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { name: /Bienvenido a El Campesino/ })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Menú de Robinson Barrios' })).toBeInTheDocument()
     const loginCall = calls.find((c) => c.url === '/auth/login')
     expect(loginCall.data).toEqual({ identifier: 'robinson', password: 'Clave2026' })
@@ -86,7 +86,7 @@ describe('inicio de sesión', () => {
 
     expect(await screen.findByText('¡Bienvenido, Robinson!')).toBeInTheDocument()
     // Por debajo, el sistema ya cargó
-    expect(await screen.findByRole('heading', { name: /Bienvenido a NexSupply/ })).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { name: /Bienvenido a El Campesino/ })).toBeInTheDocument()
     await waitFor(() => expect(screen.queryByText('¡Bienvenido, Robinson!')).not.toBeInTheDocument(), { timeout: 3000 })
   })
 
@@ -94,7 +94,7 @@ describe('inicio de sesión', () => {
     mockApi({ 'GET /auth/me': ok({ user: buildUser() }), 'GET /health': healthyResponse })
     renderApp('/')
 
-    expect(await screen.findByRole('heading', { name: /Bienvenido a NexSupply/ })).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { name: /Bienvenido a El Campesino/ })).toBeInTheDocument()
     expect(screen.queryByText('¡Bienvenido, Robinson!')).not.toBeInTheDocument()
   })
 
@@ -153,7 +153,7 @@ describe('cambio de contraseña obligatorio', () => {
 
     expect(await screen.findByRole('heading', { name: 'Contraseña actualizada' })).toBeInTheDocument()
     await user.click(screen.getByRole('button', { name: 'Ir al inicio' }))
-    expect(await screen.findByRole('heading', { name: /Bienvenido a NexSupply/ })).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { name: /Bienvenido a El Campesino/ })).toBeInTheDocument()
   })
 
   it('avisa si la confirmación no coincide, sin llamar al servidor', async () => {
